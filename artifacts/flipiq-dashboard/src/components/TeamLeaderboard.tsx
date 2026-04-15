@@ -1,4 +1,5 @@
 import { Info, Trophy } from "lucide-react";
+import { Link } from "wouter";
 
 const teamData = [
   {
@@ -54,6 +55,9 @@ export default function TeamLeaderboard() {
         <Trophy className="w-4 h-4 text-yellow-500" />
         <span className="text-sm font-semibold text-gray-800">Team Leaderboard</span>
         <Info className="w-3.5 h-3.5 text-gray-400 ml-0.5" />
+        <Link href="/adaptation-reports" className="ml-auto text-xs font-medium text-orange-500 hover:text-orange-600 hover:underline">
+          Adaptation Reports →
+        </Link>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
