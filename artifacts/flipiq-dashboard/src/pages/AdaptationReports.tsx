@@ -315,7 +315,7 @@ export default function AdaptationReports() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <StatsHeader />
         <div className="flex-1 overflow-y-auto">
-          <div className="p-6 max-w-4xl">
+          <div className="p-6">
 
             {/* Page header */}
             <div className="flex items-start justify-between mb-5">
@@ -368,104 +368,16 @@ export default function AdaptationReports() {
               </div>
             </div>
 
-            {/* Section 1 — Conditions for Success */}
+            {/* Section 1 — Dashboard */}
             <div className="bg-white border border-gray-200 rounded-xl mb-4 overflow-hidden">
               <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
                 <SectionNum n={1} />
-                <span className="text-sm font-bold text-gray-900">
-                  {view === "individual" ? "Conditions for Success" : "AM Team Commitments"}
-                </span>
-                <span className="text-xs text-gray-400 font-normal ml-1">
-                  {view === "individual" ? "(Our Agreement)" : "(Operator Agreement)"}
-                </span>
-                <span className="ml-auto text-xs font-medium text-orange-500">Signed Apr 9, 2026</span>
-              </div>
-              <div className="p-5">
-                {view === "individual" ? (
-                  <>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        "I am a full-time user",
-                        "I will follow the FlipIQ process that is proven",
-                        "I know the system is not perfect — I am an early adopter",
-                        "Feedback only — focused on reaching my goal of 2 deals/month",
-                      ].map((text, i) => (
-                        <div key={i} className="flex items-start gap-2.5 p-3 rounded-lg bg-gray-50 border border-gray-100 text-[13px] text-gray-700 leading-snug">
-                          <div className="w-4.5 h-4.5 rounded bg-emerald-500 flex-shrink-0 flex items-center justify-center mt-0.5">
-                            {CHECK_SVG}
-                          </div>
-                          {text}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-2 mt-3 px-3 py-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-[12px] text-emerald-800 font-medium">
-                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 4L6.5 11 3 7.5" stroke="#065F46" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                      Contract signed · Jenna Castillo · April 9, 2026 · Coko Homes
-                    </div>
-                  </>
-                ) : (
-                  <div className="space-y-2">
-                    <p className="text-xs text-gray-400 mb-3">AM-level expectations — this is what the Acquisition Manager committed to for their team:</p>
-                    {[
-                      "Minimum 2 full-time AAs using the system at all times",
-                      "I will support the FlipIQ process — not a custom workflow",
-                      "I will attend weekly check-in meetings with Ramy",
-                      "I will act on FlipIQ's coaching prescriptions within 48 hours",
-                      "Goal: 2 closed deals per AA per month",
-                    ].map((text, i) => (
-                      <div key={i} className="flex items-center gap-2.5 p-3 rounded-lg bg-gray-50 text-[13px] text-gray-700">
-                        <div className="w-4.5 h-4.5 rounded bg-emerald-500 flex-shrink-0 flex items-center justify-center">
-                          {CHECK_SVG}
-                        </div>
-                        {text}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Section 2 — User Training */}
-            <div className="bg-white border border-gray-200 rounded-xl mb-4 overflow-hidden">
-              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
-                <SectionNum n={2} />
-                <span className="text-sm font-bold text-gray-900">User Training</span>
-                <span className="text-xs text-gray-400 font-normal ml-1">— what we showed you, and what we both agreed you know</span>
-                <span className="ml-auto text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-orange-50 text-orange-700">{aa.phase}</span>
-              </div>
-              <div className="p-5">
-                <div className="space-y-1.5">
-                  {trainingItems.map((item, i) => {
-                    const done = i < completedCount;
-                    return (
-                      <div key={i} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] ${done ? "bg-emerald-50" : "bg-gray-50"}`}>
-                        <div className={`w-4.5 h-4.5 rounded flex-shrink-0 flex items-center justify-center border-2 ${done ? "bg-emerald-500 border-emerald-500" : "border-gray-300"}`}>
-                          {done && CHECK_SVG}
-                        </div>
-                        <span className={done ? "text-gray-800" : "text-gray-400"}>{item.text}</span>
-                        <span className="ml-auto text-[11px] font-mono text-gray-400">
-                          {!done && item.isNext
-                            ? <span className="text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full font-semibold text-[10px]">Next — Apr 15</span>
-                            : item.date
-                          }
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Section 3 — Dashboard */}
-            <div className="bg-white border border-gray-200 rounded-xl mb-4 overflow-hidden">
-              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
-                <SectionNum n={3} />
                 <span className="text-sm font-bold text-gray-900">Dashboard</span>
                 <span className="text-xs text-gray-400 font-normal ml-1">— what you're doing, and what you're not</span>
                 <span className="ml-auto text-[11px] text-gray-400 font-mono">3/14/26 – 4/14/26 · 20 work days</span>
               </div>
               <div className="p-5">
-                <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+                <div className="grid grid-cols-4 gap-2.5 mb-2.5">
                   <MetricCard
                     label="1 · Engagement"
                     value={<>{aa.eng.replace("%", "")}<span className="text-sm text-gray-300 font-semibold">%</span></>}
@@ -502,7 +414,7 @@ export default function AdaptationReports() {
                     sub={aa.offSub} barW={aa.offW} barC={aa.offC}
                   />
                   {/* Deal Source card */}
-                  <div className="bg-white border border-gray-200 rounded-lg p-3">
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
                     <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2.5">6 · Deal Source</div>
                     <div className="space-y-1.5">
                       {aa.dealSource.map((row, i) => (
@@ -520,6 +432,94 @@ export default function AdaptationReports() {
               </div>
             </div>
 
+            {/* Section 2 — Conditions for Success */}
+            <div className="bg-white border border-gray-200 rounded-xl mb-4 overflow-hidden">
+              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
+                <SectionNum n={2} />
+                <span className="text-sm font-bold text-gray-900">
+                  {view === "individual" ? "Conditions for Success" : "AM Team Commitments"}
+                </span>
+                <span className="text-xs text-gray-400 font-normal ml-1">
+                  {view === "individual" ? "(Our Agreement)" : "(Operator Agreement)"}
+                </span>
+                <span className="ml-auto text-xs font-medium text-orange-500">Signed Apr 9, 2026</span>
+              </div>
+              <div className="p-5">
+                {view === "individual" ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        "I am a full-time user",
+                        "I will follow the FlipIQ process that is proven",
+                        "I know the system is not perfect — I am an early adopter",
+                        "Feedback only — focused on reaching my goal of 2 deals/month",
+                      ].map((text, i) => (
+                        <div key={i} className="flex items-start gap-2.5 p-3 rounded-lg bg-gray-50 border border-gray-100 text-[13px] text-gray-700 leading-snug">
+                          <div className="w-[18px] h-[18px] rounded bg-emerald-500 flex-shrink-0 flex items-center justify-center mt-0.5">
+                            {CHECK_SVG}
+                          </div>
+                          {text}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2 mt-3 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-[12px] text-gray-600 font-medium">
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 4L6.5 11 3 7.5" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      Contract signed · {aa.name} · April 9, 2026 · Coko Homes
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-xs text-gray-400 mb-3">AM-level expectations — this is what the Acquisition Manager committed to for their team:</p>
+                    {[
+                      "Minimum 2 full-time AAs using the system at all times",
+                      "I will support the FlipIQ process — not a custom workflow",
+                      "I will attend weekly check-in meetings with Ramy",
+                      "I will act on FlipIQ's coaching prescriptions within 48 hours",
+                      "Goal: 2 closed deals per AA per month",
+                    ].map((text, i) => (
+                      <div key={i} className="flex items-center gap-2.5 p-3 rounded-lg bg-gray-50 text-[13px] text-gray-700">
+                        <div className="w-[18px] h-[18px] rounded bg-emerald-500 flex-shrink-0 flex items-center justify-center">
+                          {CHECK_SVG}
+                        </div>
+                        {text}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Section 3 — User Training */}
+            <div className="bg-white border border-gray-200 rounded-xl mb-4 overflow-hidden">
+              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
+                <SectionNum n={3} />
+                <span className="text-sm font-bold text-gray-900">User Training</span>
+                <span className="text-xs text-gray-400 font-normal ml-1">— what we showed you, and what we both agreed you know</span>
+                <span className="ml-auto text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-orange-50 text-orange-700">{aa.phase}</span>
+              </div>
+              <div className="p-5">
+                <div className="space-y-1.5">
+                  {trainingItems.map((item, i) => {
+                    const done = i < completedCount;
+                    return (
+                      <div key={i} className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] bg-gray-50">
+                        <div className={`w-[18px] h-[18px] rounded flex-shrink-0 flex items-center justify-center border-2 ${done ? "bg-emerald-500 border-emerald-500" : "border-gray-300"}`}>
+                          {done && CHECK_SVG}
+                        </div>
+                        <span className={done ? "text-gray-800" : "text-gray-400"}>{item.text}</span>
+                        <span className="ml-auto text-[11px] font-mono text-gray-400">
+                          {!done && item.isNext
+                            ? <span className="text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full font-semibold text-[10px]">Next — Apr 15</span>
+                            : item.date
+                          }
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
             {/* Section 4 — Meeting Notes */}
             <div className="bg-white border border-gray-200 rounded-xl mb-6 overflow-hidden">
               <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
@@ -532,7 +532,7 @@ export default function AdaptationReports() {
                 {/* Snapshot notice */}
                 <div className="flex items-start gap-2.5 bg-orange-50 border border-dashed border-orange-200 rounded-lg px-3 py-2.5 mb-4 text-xs text-gray-500">
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="flex-shrink-0 mt-0.5"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#F97316" strokeWidth="1.3" /><path d="M5 8h6M5 5h4M5 11h3" stroke="#F97316" strokeWidth="1.3" strokeLinecap="round" /></svg>
-                  <span>When you save a note, a <strong className="text-orange-500">snapshot</strong> of the current dashboard metrics (Section 3) will be automatically attached. You'll always see what the numbers looked like at the time of each meeting.</span>
+                  <span>When you save a note, a <strong className="text-orange-500">snapshot</strong> of the current dashboard metrics (Section 1) will be automatically attached. You'll always see what the numbers looked like at the time of each meeting.</span>
                 </div>
                 {/* Add note */}
                 <div className="flex gap-2.5 mb-5">
