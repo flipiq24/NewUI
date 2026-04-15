@@ -289,26 +289,16 @@ const teamDealSource: DealSourceRow[] = [
 const individualConditions = [
   "I am a full-time user — I will engage with the system consistently during working hours",
   "I will follow the established FlipIQ process because we know it works",
-  "I know the system is not perfect — I am an early adopter and I accept this",
-  "My feedback is focused on one goal: reaching a minimum of 2 closed deals per month",
+  "My goal is a minimum of 2 closed deals per month — my feedback is focused on that",
   "I will complete my daily iQ check-in every working day",
-  "I will maintain an active pipeline of approximately 100 properties",
-  "I will attend all scheduled training sessions and act on agreed follow-up items",
-  "I understand FlipIQ is an efficiency tool — not a magic wand",
-  "I will submit system improvement suggestions through the proper feedback channel",
   "I accept that 3 consecutive zero-activity days may trigger a suspension review",
 ];
 
 const amConditions = [
   "I will maintain a minimum of 2 full-time AAs actively using the system at all times",
-  "My goal is 4 full-time AAs engaged and following the process within 60 days",
-  "I will not place part-time users on the platform — they take agents from producers",
   "I will support the FlipIQ process — not a custom workflow that bypasses it",
   "I will attend the weekly 15-minute Adaptation Meeting with Ramy — data in hand",
-  "I will review each AA's pipeline daily and verify offer status, notes, and follow-up",
-  "I will respond to FlipIQ escalation notices within 24 hours",
   "I will act when an AA shows 3 consecutive zero-activity days",
-  "I will reinforce the process with my team — not create workarounds",
   "I accept that non-compliant users may be suspended if I do not act on escalations",
 ];
 
