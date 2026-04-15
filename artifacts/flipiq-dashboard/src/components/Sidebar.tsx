@@ -88,26 +88,12 @@ function NavItem({ icon, label, badge, active, small }: {
 
 function FlipIQLogo() {
   return (
-    <div className="flex flex-col items-start px-1">
-      {/* House + lightbulb icon */}
-      <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Roof / house outline */}
-        <path d="M8 26L28 8L48 26V50H8V26Z" fill="none" stroke="#E8671A" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round"/>
-        {/* Door */}
-        <rect x="21" y="38" width="14" height="12" rx="1" fill="none" stroke="#E8671A" strokeWidth="2"/>
-        {/* Lightbulb circle */}
-        <circle cx="28" cy="29" r="7" fill="none" stroke="#E8671A" strokeWidth="2"/>
-        {/* Bulb bottom lines */}
-        <line x1="24" y1="35" x2="32" y2="35" stroke="#E8671A" strokeWidth="1.5" strokeLinecap="round"/>
-        <line x1="25" y1="37.5" x2="31" y2="37.5" stroke="#E8671A" strokeWidth="1.5" strokeLinecap="round"/>
-        {/* Filament / spark inside bulb */}
-        <path d="M26 29l2-3 2 3" stroke="#E8671A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-      {/* Text below icon */}
-      <div className="flex items-baseline -mt-1 ml-1">
-        <span className="text-[22px] font-extrabold text-gray-900 leading-none tracking-tight">Flip</span>
-        <span className="text-[22px] font-extrabold text-orange-500 leading-none tracking-tight">iq</span>
-      </div>
+    <div className="px-1">
+      <img
+        src={`${import.meta.env.BASE_URL}flipiq-logo.png`}
+        alt="FlipIQ"
+        className="w-[110px] object-contain"
+      />
     </div>
   );
 }
