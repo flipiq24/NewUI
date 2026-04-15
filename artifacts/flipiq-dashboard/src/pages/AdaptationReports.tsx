@@ -322,15 +322,15 @@ export default function AdaptationReports() {
   const completedCount = isTeam ? 0 : getCompletedCount(selectedView as AAKey);
 
   function saveNote() {
-    if (!noteText.trim() || !aa) return;
+    if (!noteText.trim()) return;
     const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
     const newNote: Note = {
       date: today,
-      attendees: `Meeting Note · Ramy + ${aa.name.split(" ")[0]}`,
+      attendees: aa ? `Meeting Note · Ramy + ${aa.name.split(" ")[0]}` : "Team Meeting Note · Ramy + Coko Homes",
       pill: "New",
       pillClass: "bg-emerald-50 text-emerald-800",
       body: noteText.trim(),
-      snapshot: [
+      snapshot: aa ? [
         { label: "Engagement", val: aa.eng, sub: "" },
         { label: "Adaptation", val: aa.adapt, sub: "" },
         { label: "Pipeline", val: aa.pip, sub: "" },
@@ -339,6 +339,15 @@ export default function AdaptationReports() {
         { label: "Relationships", val: aa.rel, sub: "" },
         { label: "Hours/Day", val: aa.hours, sub: "" },
         { label: "Training", val: aa.training, sub: "" },
+      ] : [
+        { label: "Engagement", val: "50%", sub: "team avg" },
+        { label: "Adaptation", val: "62%", sub: "team avg" },
+        { label: "Pipeline", val: "44%", sub: "team avg" },
+        { label: "Offers/Day", val: "1.7", sub: "team avg" },
+        { label: "Campaigns", val: "44%", sub: "team avg" },
+        { label: "Relationships", val: "2.1", sub: "team avg" },
+        { label: "Hours/Day", val: "3.3h", sub: "team avg" },
+        { label: "AAs Active", val: "4/4", sub: "Coko Homes" },
       ],
       chips: [{ text: `Saved ${today}`, cls: "bg-blue-50 text-blue-700" }],
     };
@@ -598,48 +607,50 @@ export default function AdaptationReports() {
               </div>
             )}
 
-            {/* Section 4 (individual) / Section 3 (team) — Meeting Notes */}
-            {!isTeam && aa && (
-              <div className="bg-white border border-gray-200 rounded-xl mb-6 overflow-hidden">
-                <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
-                  <SectionNum n={4} />
-                  <span className="text-sm font-bold text-gray-900">Meeting Notes</span>
-                  <span className="text-xs text-gray-400 font-normal ml-1">— what we discussed, and what you committed to</span>
-                  <span className="ml-auto text-xs text-gray-400">Latest on top</span>
-                </div>
-                <div className="p-5">
-                  <div className="flex items-start gap-2.5 bg-orange-50 border border-dashed border-orange-200 rounded-lg px-3 py-2.5 mb-4 text-xs text-gray-500">
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="flex-shrink-0 mt-0.5"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#F97316" strokeWidth="1.3" /><path d="M5 8h6M5 5h4M5 11h3" stroke="#F97316" strokeWidth="1.3" strokeLinecap="round" /></svg>
-                    <span>When you save a note, a <strong className="text-orange-500">snapshot</strong> of the current dashboard metrics will be automatically attached.</span>
-                  </div>
-                  <div className="flex gap-2.5 mb-5">
-                    <textarea
-                      value={noteText}
-                      onChange={(e) => setNoteText(e.target.value)}
-                      placeholder={`What did you discuss? What did ${aa.name.split(" ")[0]} commit to? Write it here...`}
-                      className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 text-[13px] text-gray-800 resize-none min-h-[72px] outline-none bg-gray-50 focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100 placeholder:text-gray-300"
-                    />
-                    <div className="flex flex-col gap-1.5 justify-end">
-                      <button
-                        onClick={saveNote}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600 transition-colors whitespace-nowrap"
-                      >
-                        💾 Save + Snapshot
-                      </button>
-                      <button
-                        onClick={() => setNoteText("")}
-                        className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50 transition-colors"
-                      >
-                        Clear
-                      </button>
-                    </div>
-                  </div>
-                  {notes.map((note, i) => (
-                    <NoteCard key={i} note={note} />
-                  ))}
-                </div>
+            {/* Section 4 — Meeting Notes (both individual and team) */}
+            <div className="bg-white border border-gray-200 rounded-xl mb-6 overflow-hidden">
+              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
+                <SectionNum n={4} />
+                <span className="text-sm font-bold text-gray-900">Meeting Notes</span>
+                <span className="text-xs text-gray-400 font-normal ml-1">— what we discussed, and what you committed to</span>
+                <span className="ml-auto text-xs text-gray-400">Latest on top</span>
               </div>
-            )}
+              <div className="p-5">
+                <div className="flex items-start gap-2.5 bg-orange-50 border border-dashed border-orange-200 rounded-lg px-3 py-2.5 mb-4 text-xs text-gray-500">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="flex-shrink-0 mt-0.5"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#F97316" strokeWidth="1.3" /><path d="M5 8h6M5 5h4M5 11h3" stroke="#F97316" strokeWidth="1.3" strokeLinecap="round" /></svg>
+                  <span>When you save a note, a <strong className="text-orange-500">snapshot</strong> of the current dashboard metrics will be automatically attached.</span>
+                </div>
+                <div className="flex gap-2.5 mb-5">
+                  <textarea
+                    value={noteText}
+                    onChange={(e) => setNoteText(e.target.value)}
+                    placeholder={
+                      isTeam
+                        ? "What did you discuss with the team? What did the team commit to? Write it here..."
+                        : `What did you discuss? What did ${aa?.name.split(" ")[0]} commit to? Write it here...`
+                    }
+                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 text-[13px] text-gray-800 resize-none min-h-[72px] outline-none bg-gray-50 focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100 placeholder:text-gray-300"
+                  />
+                  <div className="flex flex-col gap-1.5 justify-end">
+                    <button
+                      onClick={saveNote}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600 transition-colors whitespace-nowrap"
+                    >
+                      💾 Save + Snapshot
+                    </button>
+                    <button
+                      onClick={() => setNoteText("")}
+                      className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50 transition-colors"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+                {notes.map((note, i) => (
+                  <NoteCard key={i} note={note} />
+                ))}
+              </div>
+            </div>
 
           </div>
         </div>
