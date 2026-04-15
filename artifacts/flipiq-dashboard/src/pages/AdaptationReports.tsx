@@ -12,6 +12,8 @@ const CHECK_SVG = (
 
 type AAKey = "jenna" | "devon" | "marcus" | "priya";
 
+type DealSourceRow = { label: string; pct: string; w: string };
+
 type AAData = {
   name: string;
   tag: string;
@@ -28,6 +30,7 @@ type AAData = {
   off: string; offW: string; offC: string; offSub: string;
   training: string;
   phase: string;
+  dealSource: DealSourceRow[];
 };
 
 const aaData: Record<AAKey, AAData> = {
@@ -42,6 +45,12 @@ const aaData: Record<AAKey, AAData> = {
     rel: "3.5", relW: "68%", relC: "warn", relSub: "Team avg: 5.1 · ↓ below target",
     off: "3.4", offW: "68%", offC: "warn", offSub: "Team avg: 5.0 · ↓ below target",
     training: "9/11", phase: "Phase 1 — 9/11 Complete",
+    dealSource: [
+      { label: "Hot Properties", pct: "50%", w: "50%" },
+      { label: "MLS Search", pct: "20%", w: "20%" },
+      { label: "Deal Outreach", pct: "15%", w: "15%" },
+      { label: "Off Market", pct: "15%", w: "15%" },
+    ],
   },
   devon: {
     name: "Devon Okafor", tag: "Capable", tagClass: "blue", day: "Day 21 · Coko Homes",
@@ -54,6 +63,12 @@ const aaData: Record<AAKey, AAData> = {
     rel: "2.8", relW: "55%", relC: "bad", relSub: "Team avg: 5.1 · ↓ significantly below",
     off: "2.1", offW: "42%", offC: "bad", offSub: "Team avg: 5.0 · ↓ needs urgent attention",
     training: "6/11", phase: "Phase 1 — 6/11 Complete",
+    dealSource: [
+      { label: "Hot Properties", pct: "35%", w: "35%" },
+      { label: "MLS Search", pct: "30%", w: "30%" },
+      { label: "Deal Outreach", pct: "25%", w: "25%" },
+      { label: "Off Market", pct: "10%", w: "10%" },
+    ],
   },
   marcus: {
     name: "Marcus Webb", tag: "Traditional", tagClass: "yellow", day: "Day 18 · Coko Homes",
@@ -66,6 +81,12 @@ const aaData: Record<AAKey, AAData> = {
     rel: "0.8", relW: "16%", relC: "bad", relSub: "Team avg: 5.1 · ↓↓ not building",
     off: "0.3", offW: "6%", offC: "bad", offSub: "Team avg: 5.0 · ↓↓ near zero",
     training: "4/11", phase: "Phase 1 — 4/11 Complete",
+    dealSource: [
+      { label: "Hot Properties", pct: "70%", w: "70%" },
+      { label: "MLS Search", pct: "15%", w: "15%" },
+      { label: "Deal Outreach", pct: "10%", w: "10%" },
+      { label: "Off Market", pct: "5%", w: "5%" },
+    ],
   },
   priya: {
     name: "Priya Nair", tag: "Novice", tagClass: "gray", day: "Day 9 · Coko Homes",
@@ -78,6 +99,12 @@ const aaData: Record<AAKey, AAData> = {
     rel: "1.2", relW: "24%", relC: "warn", relSub: "Team avg: 5.1 · early stage",
     off: "0.9", offW: "18%", offC: "warn", offSub: "Team avg: 5.0 · learning the flow",
     training: "3/11", phase: "Phase 1 — 3/11 Complete",
+    dealSource: [
+      { label: "Hot Properties", pct: "60%", w: "60%" },
+      { label: "MLS Search", pct: "25%", w: "25%" },
+      { label: "Deal Outreach", pct: "10%", w: "10%" },
+      { label: "Off Market", pct: "5%", w: "5%" },
+    ],
   },
 };
 
@@ -478,12 +505,7 @@ export default function AdaptationReports() {
                   <div className="bg-white border border-gray-200 rounded-lg p-3">
                     <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2.5">6 · Deal Source</div>
                     <div className="space-y-1.5">
-                      {[
-                        { label: "Hot Properties", pct: "50%", w: "50%" },
-                        { label: "MLS Search", pct: "20%", w: "20%" },
-                        { label: "Deal Outreach", pct: "15%", w: "15%" },
-                        { label: "Off Market", pct: "15%", w: "15%" },
-                      ].map((row, i) => (
+                      {aa.dealSource.map((row, i) => (
                         <div key={i} className="flex items-center gap-2 text-xs">
                           <span className="w-28 text-gray-600 flex-shrink-0">{row.label}</span>
                           <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
