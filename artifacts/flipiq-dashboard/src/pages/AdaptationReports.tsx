@@ -277,17 +277,52 @@ function NoteCard({ note }: { note: Note }) {
   );
 }
 
+type ViewKey = "team" | AAKey;
+
+const teamDealSource: DealSourceRow[] = [
+  { label: "Hot Properties", pct: "54%", w: "54%" },
+  { label: "MLS Search", pct: "23%", w: "23%" },
+  { label: "Deal Outreach", pct: "15%", w: "15%" },
+  { label: "Off Market", pct: "9%",  w: "9%"  },
+];
+
+const individualConditions = [
+  "I am a full-time user — I will engage with the system consistently during working hours",
+  "I will follow the established FlipIQ process because we know it works",
+  "I know the system is not perfect — I am an early adopter and I accept this",
+  "My feedback is focused on one goal: reaching a minimum of 2 closed deals per month",
+  "I will complete my daily iQ check-in every working day",
+  "I will maintain an active pipeline of approximately 100 properties",
+  "I will attend all scheduled training sessions and act on agreed follow-up items",
+  "I understand FlipIQ is an efficiency tool — not a magic wand",
+  "I will submit system improvement suggestions through the proper feedback channel",
+  "I accept that 3 consecutive zero-activity days may trigger a suspension review",
+];
+
+const amConditions = [
+  "I will maintain a minimum of 2 full-time AAs actively using the system at all times",
+  "My goal is 4 full-time AAs engaged and following the process within 60 days",
+  "I will not place part-time users on the platform — they take agents from producers",
+  "I will support the FlipIQ process — not a custom workflow that bypasses it",
+  "I will attend the weekly 15-minute Adaptation Meeting with Ramy — data in hand",
+  "I will review each AA's pipeline daily and verify offer status, notes, and follow-up",
+  "I will respond to FlipIQ escalation notices within 24 hours",
+  "I will act when an AA shows 3 consecutive zero-activity days",
+  "I will reinforce the process with my team — not create workarounds",
+  "I accept that non-compliant users may be suspended if I do not act on escalations",
+];
+
 export default function AdaptationReports() {
-  const [selectedAA, setSelectedAA] = useState<AAKey>("jenna");
-  const [view, setView] = useState<"individual" | "team">("individual");
+  const [selectedView, setSelectedView] = useState<ViewKey>("jenna");
   const [noteText, setNoteText] = useState("");
   const [notes, setNotes] = useState<Note[]>(initialNotes);
 
-  const aa = aaData[selectedAA];
-  const completedCount = getCompletedCount(selectedAA);
+  const isTeam = selectedView === "team";
+  const aa = isTeam ? null : aaData[selectedView as AAKey];
+  const completedCount = isTeam ? 0 : getCompletedCount(selectedView as AAKey);
 
   function saveNote() {
-    if (!noteText.trim()) return;
+    if (!noteText.trim() || !aa) return;
     const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
     const newNote: Note = {
       date: today,
@@ -320,54 +355,42 @@ export default function AdaptationReports() {
           <div className="p-6">
 
             {/* Page header */}
-            <div className="flex items-start justify-between mb-5">
+            <div className="flex items-center justify-between mb-5">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <Link href="/" className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-0.5">
                     <ChevronLeft className="w-3 h-3" /> My Stats
                   </Link>
                 </div>
-                <h2 className="text-xl font-black text-gray-900">AA Individual View</h2>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {view === "individual"
-                    ? "Admin / Ramy can review any AA without logging in as them"
-                    : "Team lead view — AM-level agreements and team commitments"}
-                </p>
-              </div>
-              <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setView("individual")}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${view === "individual" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500"}`}
-                >
-                  Individual View
-                </button>
-                <button
-                  onClick={() => setView("team")}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${view === "team" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500"}`}
-                >
-                  Team View
-                </button>
+                <h2 className="text-xl font-black text-gray-900">Adaptation Reports</h2>
               </div>
             </div>
 
-            {/* AA Selector bar */}
+            {/* View Selector bar */}
             <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 mb-5">
-              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Viewing AA</span>
               <select
-                value={selectedAA}
-                onChange={(e) => setSelectedAA(e.target.value as AAKey)}
-                className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-900 bg-gray-50 outline-none cursor-pointer max-w-[240px] focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                value={selectedView}
+                onChange={(e) => setSelectedView(e.target.value as ViewKey)}
+                className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-900 bg-gray-50 outline-none cursor-pointer min-w-[200px] focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
               >
+                <option value="team">Team View</option>
                 <option value="jenna">Jenna Castillo</option>
                 <option value="devon">Devon Okafor</option>
                 <option value="marcus">Marcus Webb</option>
                 <option value="priya">Priya Nair</option>
               </select>
-              <div className="flex items-center gap-2 ml-auto">
-                <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${tagColors(aa.tagClass)}`}>{aa.tag}</span>
-                <span className="text-xs text-gray-400 font-mono">{aa.day}</span>
-                <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${statusColors(aa.statusClass)}`}>{aa.status}</span>
-              </div>
+              {isTeam ? (
+                <div className="flex items-center gap-2 ml-auto">
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800">4 AAs</span>
+                  <span className="text-xs text-gray-400 font-mono">Coko Homes · Apr 2026</span>
+                </div>
+              ) : aa ? (
+                <div className="flex items-center gap-2 ml-auto">
+                  <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${tagColors(aa.tagClass)}`}>{aa.tag}</span>
+                  <span className="text-xs text-gray-400 font-mono">{aa.day}</span>
+                  <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${statusColors(aa.statusClass)}`}>{aa.status}</span>
+                </div>
+              ) : null}
             </div>
 
             {/* Section 1 — Dashboard */}
@@ -375,87 +398,156 @@ export default function AdaptationReports() {
               <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
                 <SectionNum n={1} />
                 <span className="text-sm font-bold text-gray-900">Dashboard</span>
-                <span className="text-xs text-gray-400 font-normal ml-1">— what you're doing, and what you're not</span>
+                <span className="text-xs text-gray-400 font-normal ml-1">
+                  {isTeam ? "— what your team is doing, and what they're not" : "— what you're doing, and what you're not"}
+                </span>
                 <span className="ml-auto text-[11px] text-gray-400 font-mono">3/14/26 – 4/14/26 · 20 work days</span>
               </div>
               <div className="p-5">
-                <div className="grid grid-cols-4 gap-2.5 mb-2.5">
-                  <MetricCard
-                    label="Engagement"
-                    value={<>{aa.eng.replace("%", "")}<span className="text-sm text-gray-300 font-semibold">%</span></>}
-                    sub={aa.engSub} barW={aa.engW} barC={aa.engC}
-                  />
-                  <MetricCard
-                    label="Avg Hours / Day"
-                    value={<>{aa.hours.replace("h", "")}<span className="text-sm text-gray-300 font-semibold">h</span></>}
-                    sub={aa.hoursSub} barW={aa.hoursW} barC={aa.hoursC}
-                  />
-                  <MetricCard
-                    label="System Adaptation"
-                    value={<>{aa.adapt.replace("%", "")}<span className="text-sm text-gray-300 font-semibold">%</span></>}
-                    sub={aa.adaptSub} barW={aa.adaptW} barC={aa.adaptC}
-                  />
-                  <MetricCard
-                    label="Pipeline Compliance"
-                    value={<>{aa.pip.replace("%", "")}<span className="text-sm text-gray-300 font-semibold">%</span></>}
-                    sub={aa.pipSub} barW={aa.pipW} barC={aa.pipC}
-                  />
-                  <MetricCard
-                    label="Campaigns"
-                    value={<>{aa.camp.replace("%", "")}<span className="text-sm text-gray-300 font-semibold">%</span></>}
-                    sub={aa.campSub} barW={aa.campW} barC={aa.campC}
-                  />
-                  <MetricCard
-                    label="Relationships / Day"
-                    value={aa.rel}
-                    sub={aa.relSub} barW={aa.relW} barC={aa.relC}
-                  />
-                  <MetricCard
-                    label="Avg Offers / Day"
-                    value={aa.off}
-                    sub={aa.offSub} barW={aa.offW} barC={aa.offC}
-                  />
-                  {/* Deal Source card */}
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5">
-                    <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Deal Source</div>
-                    <div className="space-y-1.5">
-                      {aa.dealSource.map((row, i) => (
-                        <div key={i} className="flex items-center gap-2 text-xs">
-                          <span className="w-28 text-gray-600 flex-shrink-0">{row.label}</span>
-                          <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                            <div className="h-full rounded-full bg-orange-400" style={{ width: row.w }} />
-                          </div>
-                          <span className="w-8 text-right font-mono text-[11px] text-gray-500">{row.pct}</span>
+                {isTeam ? (
+                  <>
+                    <div className="grid grid-cols-4 gap-2.5 mb-4">
+                      <MetricCard label="Engagement" value={<>50<span className="text-sm text-gray-300 font-semibold">%</span></>} sub="Team avg · target 80%" barW="50%" barC="warn" />
+                      <MetricCard label="Avg Hours / Day" value={<>3.3<span className="text-sm text-gray-300 font-semibold">h</span></>} sub="Team avg · target 4h" barW="47%" barC="warn" />
+                      <MetricCard label="System Adaptation" value={<>62<span className="text-sm text-gray-300 font-semibold">%</span></>} sub="Team avg · target 80%" barW="62%" barC="warn" />
+                      <MetricCard label="Pipeline Compliance" value={<>44<span className="text-sm text-gray-300 font-semibold">%</span></>} sub="Team avg · target 80%" barW="44%" barC="bad" />
+                      <MetricCard label="Campaigns" value={<>44<span className="text-sm text-gray-300 font-semibold">%</span></>} sub="Team avg · target 80%" barW="44%" barC="bad" />
+                      <MetricCard label="Relationships / Day" value="2.1" sub="Team avg · target 5.1" barW="41%" barC="bad" />
+                      <MetricCard label="Avg Offers / Day" value="1.7" sub="Team avg · target 5.0" barW="34%" barC="bad" />
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5">
+                        <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Deal Source</div>
+                        <div className="space-y-1.5">
+                          {teamDealSource.map((row, i) => (
+                            <div key={i} className="flex items-center gap-2 text-xs">
+                              <span className="w-28 text-gray-600 flex-shrink-0">{row.label}</span>
+                              <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                <div className="h-full rounded-full bg-orange-400" style={{ width: row.w }} />
+                              </div>
+                              <span className="w-8 text-right font-mono text-[11px] text-gray-500">{row.pct}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                    </div>
+                    {/* Team AA list */}
+                    <div className="border-t border-gray-100 pt-4">
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">All AAs — Coko Homes</div>
+                      <div className="grid grid-cols-4 gap-2.5">
+                        {(Object.keys(aaData) as AAKey[]).map((key) => {
+                          const a = aaData[key];
+                          return (
+                            <div
+                              key={key}
+                              onClick={() => setSelectedView(key)}
+                              className="bg-gray-50 border border-gray-200 rounded-lg p-3 cursor-pointer hover:border-orange-300 hover:bg-orange-50 transition-all"
+                            >
+                              <div className="font-semibold text-[13px] text-gray-900 mb-1">{a.name}</div>
+                              <div className="text-[10px] text-gray-400 font-mono mb-2">{a.day}</div>
+                              <div className="flex flex-wrap gap-1">
+                                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${tagColors(a.tagClass)}`}>{a.tag}</span>
+                                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusColors(a.statusClass)}`}>{a.status}</span>
+                              </div>
+                              <div className="mt-2 space-y-1">
+                                <div className="flex justify-between text-[10px] text-gray-500">
+                                  <span>Engagement</span><span className="font-mono font-bold text-gray-700">{a.eng}</span>
+                                </div>
+                                <div className="flex justify-between text-[10px] text-gray-500">
+                                  <span>Adaptation</span><span className="font-mono font-bold text-gray-700">{a.adapt}</span>
+                                </div>
+                                <div className="flex justify-between text-[10px] text-gray-500">
+                                  <span>Training</span><span className="font-mono font-bold text-gray-700">{a.training}</span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
+                ) : aa ? (
+                  <div className="grid grid-cols-4 gap-2.5">
+                    <MetricCard
+                      label="Engagement"
+                      value={<>{aa.eng.replace("%", "")}<span className="text-sm text-gray-300 font-semibold">%</span></>}
+                      sub={aa.engSub} barW={aa.engW} barC={aa.engC}
+                    />
+                    <MetricCard
+                      label="Avg Hours / Day"
+                      value={<>{aa.hours.replace("h", "")}<span className="text-sm text-gray-300 font-semibold">h</span></>}
+                      sub={aa.hoursSub} barW={aa.hoursW} barC={aa.hoursC}
+                    />
+                    <MetricCard
+                      label="System Adaptation"
+                      value={<>{aa.adapt.replace("%", "")}<span className="text-sm text-gray-300 font-semibold">%</span></>}
+                      sub={aa.adaptSub} barW={aa.adaptW} barC={aa.adaptC}
+                    />
+                    <MetricCard
+                      label="Pipeline Compliance"
+                      value={<>{aa.pip.replace("%", "")}<span className="text-sm text-gray-300 font-semibold">%</span></>}
+                      sub={aa.pipSub} barW={aa.pipW} barC={aa.pipC}
+                    />
+                    <MetricCard
+                      label="Campaigns"
+                      value={<>{aa.camp.replace("%", "")}<span className="text-sm text-gray-300 font-semibold">%</span></>}
+                      sub={aa.campSub} barW={aa.campW} barC={aa.campC}
+                    />
+                    <MetricCard
+                      label="Relationships / Day"
+                      value={aa.rel}
+                      sub={aa.relSub} barW={aa.relW} barC={aa.relC}
+                    />
+                    <MetricCard
+                      label="Avg Offers / Day"
+                      value={aa.off}
+                      sub={aa.offSub} barW={aa.offW} barC={aa.offC}
+                    />
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5">
+                      <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Deal Source</div>
+                      <div className="space-y-1.5">
+                        {aa.dealSource.map((row, i) => (
+                          <div key={i} className="flex items-center gap-2 text-xs">
+                            <span className="w-28 text-gray-600 flex-shrink-0">{row.label}</span>
+                            <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                              <div className="h-full rounded-full bg-orange-400" style={{ width: row.w }} />
+                            </div>
+                            <span className="w-8 text-right font-mono text-[11px] text-gray-500">{row.pct}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : null}
               </div>
             </div>
 
-            {/* Section 2 — Conditions for Success */}
+            {/* Section 2 — Conditions */}
             <div className="bg-white border border-gray-200 rounded-xl mb-4 overflow-hidden">
               <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
                 <SectionNum n={2} />
                 <span className="text-sm font-bold text-gray-900">
-                  {view === "individual" ? "Conditions for Success" : "AM Team Commitments"}
+                  {isTeam ? "Your Commitments" : "Conditions for Success"}
                 </span>
                 <span className="text-xs text-gray-400 font-normal ml-1">
-                  {view === "individual" ? "(Our Agreement)" : "(Operator Agreement)"}
+                  {isTeam ? "(Acquisition Manager Agreement)" : "(Our Agreement)"}
                 </span>
                 <span className="ml-auto text-xs font-medium text-orange-500">Signed Apr 9, 2026</span>
               </div>
               <div className="p-5">
-                {view === "individual" ? (
+                {isTeam ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    {amConditions.map((text, i) => (
+                      <div key={i} className="flex items-start gap-2.5 p-3 rounded-lg bg-gray-50 border border-gray-100 text-[13px] text-gray-700 leading-snug">
+                        <div className="w-[18px] h-[18px] rounded bg-emerald-500 flex-shrink-0 flex items-center justify-center mt-0.5">
+                          {CHECK_SVG}
+                        </div>
+                        {text}
+                      </div>
+                    ))}
+                  </div>
+                ) : aa ? (
                   <>
                     <div className="grid grid-cols-2 gap-2">
-                      {[
-                        "I am a full-time user",
-                        "I will follow the FlipIQ process that is proven",
-                        "I know the system is not perfect — I am an early adopter",
-                        "Feedback only — focused on reaching my goal of 2 deals/month",
-                      ].map((text, i) => (
+                      {individualConditions.map((text, i) => (
                         <div key={i} className="flex items-start gap-2.5 p-3 rounded-lg bg-gray-50 border border-gray-100 text-[13px] text-gray-700 leading-snug">
                           <div className="w-[18px] h-[18px] rounded bg-emerald-500 flex-shrink-0 flex items-center justify-center mt-0.5">
                             {CHECK_SVG}
@@ -469,102 +561,85 @@ export default function AdaptationReports() {
                       Contract signed · {aa.name} · April 9, 2026 · Coko Homes
                     </div>
                   </>
-                ) : (
-                  <div className="space-y-2">
-                    <p className="text-xs text-gray-400 mb-3">AM-level expectations — this is what the Acquisition Manager committed to for their team:</p>
-                    {[
-                      "Minimum 2 full-time AAs using the system at all times",
-                      "I will support the FlipIQ process — not a custom workflow",
-                      "I will attend weekly check-in meetings with Ramy",
-                      "I will act on FlipIQ's coaching prescriptions within 48 hours",
-                      "Goal: 2 closed deals per AA per month",
-                    ].map((text, i) => (
-                      <div key={i} className="flex items-center gap-2.5 p-3 rounded-lg bg-gray-50 text-[13px] text-gray-700">
-                        <div className="w-[18px] h-[18px] rounded bg-emerald-500 flex-shrink-0 flex items-center justify-center">
-                          {CHECK_SVG}
-                        </div>
-                        {text}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                ) : null}
               </div>
             </div>
 
-            {/* Section 3 — User Training */}
-            <div className="bg-white border border-gray-200 rounded-xl mb-4 overflow-hidden">
-              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
-                <SectionNum n={3} />
-                <span className="text-sm font-bold text-gray-900">User Training</span>
-                <span className="text-xs text-gray-400 font-normal ml-1">— what we showed you, and what we both agreed you know</span>
-                <span className="ml-auto text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-orange-50 text-orange-700">{aa.phase}</span>
-              </div>
-              <div className="p-5">
-                <div className="space-y-1.5">
-                  {trainingItems.map((item, i) => {
-                    const done = i < completedCount;
-                    return (
-                      <div key={i} className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] bg-gray-50">
-                        <div className={`w-[18px] h-[18px] rounded flex-shrink-0 flex items-center justify-center border-2 ${done ? "bg-emerald-500 border-emerald-500" : "border-gray-300"}`}>
-                          {done && CHECK_SVG}
+            {/* Section 3 — User Training (individual only) */}
+            {!isTeam && aa && (
+              <div className="bg-white border border-gray-200 rounded-xl mb-4 overflow-hidden">
+                <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
+                  <SectionNum n={3} />
+                  <span className="text-sm font-bold text-gray-900">User Training</span>
+                  <span className="text-xs text-gray-400 font-normal ml-1">— what we showed you, and what we both agreed you know</span>
+                  <span className="ml-auto text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-orange-50 text-orange-700">{aa.phase}</span>
+                </div>
+                <div className="p-5">
+                  <div className="space-y-1.5">
+                    {trainingItems.map((item, i) => {
+                      const done = i < completedCount;
+                      return (
+                        <div key={i} className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] bg-gray-50">
+                          <div className={`w-[18px] h-[18px] rounded flex-shrink-0 flex items-center justify-center border-2 ${done ? "bg-emerald-500 border-emerald-500" : "border-gray-300"}`}>
+                            {done && CHECK_SVG}
+                          </div>
+                          <span className={done ? "text-gray-800" : "text-gray-400"}>{item.text}</span>
+                          <span className="ml-auto text-[11px] font-mono text-gray-400">
+                            {!done && item.isNext
+                              ? <span className="text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full font-semibold text-[10px]">Next — Apr 15</span>
+                              : item.date
+                            }
+                          </span>
                         </div>
-                        <span className={done ? "text-gray-800" : "text-gray-400"}>{item.text}</span>
-                        <span className="ml-auto text-[11px] font-mono text-gray-400">
-                          {!done && item.isNext
-                            ? <span className="text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full font-semibold text-[10px]">Next — Apr 15</span>
-                            : item.date
-                          }
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Section 4 — Meeting Notes */}
-            <div className="bg-white border border-gray-200 rounded-xl mb-6 overflow-hidden">
-              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
-                <SectionNum n={4} />
-                <span className="text-sm font-bold text-gray-900">Meeting Notes</span>
-                <span className="text-xs text-gray-400 font-normal ml-1">— what we discussed, and what you committed to</span>
-                <span className="ml-auto text-xs text-gray-400">Latest on top</span>
-              </div>
-              <div className="p-5">
-                {/* Snapshot notice */}
-                <div className="flex items-start gap-2.5 bg-orange-50 border border-dashed border-orange-200 rounded-lg px-3 py-2.5 mb-4 text-xs text-gray-500">
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="flex-shrink-0 mt-0.5"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#F97316" strokeWidth="1.3" /><path d="M5 8h6M5 5h4M5 11h3" stroke="#F97316" strokeWidth="1.3" strokeLinecap="round" /></svg>
-                  <span>When you save a note, a <strong className="text-orange-500">snapshot</strong> of the current dashboard metrics (Section 1) will be automatically attached. You'll always see what the numbers looked like at the time of each meeting.</span>
-                </div>
-                {/* Add note */}
-                <div className="flex gap-2.5 mb-5">
-                  <textarea
-                    value={noteText}
-                    onChange={(e) => setNoteText(e.target.value)}
-                    placeholder={`What did you discuss? What did ${aa.name.split(" ")[0]} commit to? Write it here...`}
-                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 text-[13px] text-gray-800 resize-none min-h-[72px] outline-none bg-gray-50 focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100 placeholder:text-gray-300"
-                  />
-                  <div className="flex flex-col gap-1.5 justify-end">
-                    <button
-                      onClick={saveNote}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600 transition-colors whitespace-nowrap"
-                    >
-                      💾 Save + Snapshot
-                    </button>
-                    <button
-                      onClick={() => setNoteText("")}
-                      className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50 transition-colors"
-                    >
-                      Clear
-                    </button>
+                      );
+                    })}
                   </div>
                 </div>
-                {/* Note cards */}
-                {notes.map((note, i) => (
-                  <NoteCard key={i} note={note} />
-                ))}
               </div>
-            </div>
+            )}
+
+            {/* Section 4 (individual) / Section 3 (team) — Meeting Notes */}
+            {!isTeam && aa && (
+              <div className="bg-white border border-gray-200 rounded-xl mb-6 overflow-hidden">
+                <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100">
+                  <SectionNum n={4} />
+                  <span className="text-sm font-bold text-gray-900">Meeting Notes</span>
+                  <span className="text-xs text-gray-400 font-normal ml-1">— what we discussed, and what you committed to</span>
+                  <span className="ml-auto text-xs text-gray-400">Latest on top</span>
+                </div>
+                <div className="p-5">
+                  <div className="flex items-start gap-2.5 bg-orange-50 border border-dashed border-orange-200 rounded-lg px-3 py-2.5 mb-4 text-xs text-gray-500">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="flex-shrink-0 mt-0.5"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#F97316" strokeWidth="1.3" /><path d="M5 8h6M5 5h4M5 11h3" stroke="#F97316" strokeWidth="1.3" strokeLinecap="round" /></svg>
+                    <span>When you save a note, a <strong className="text-orange-500">snapshot</strong> of the current dashboard metrics will be automatically attached.</span>
+                  </div>
+                  <div className="flex gap-2.5 mb-5">
+                    <textarea
+                      value={noteText}
+                      onChange={(e) => setNoteText(e.target.value)}
+                      placeholder={`What did you discuss? What did ${aa.name.split(" ")[0]} commit to? Write it here...`}
+                      className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 text-[13px] text-gray-800 resize-none min-h-[72px] outline-none bg-gray-50 focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100 placeholder:text-gray-300"
+                    />
+                    <div className="flex flex-col gap-1.5 justify-end">
+                      <button
+                        onClick={saveNote}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600 transition-colors whitespace-nowrap"
+                      >
+                        💾 Save + Snapshot
+                      </button>
+                      <button
+                        onClick={() => setNoteText("")}
+                        className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50 transition-colors"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  </div>
+                  {notes.map((note, i) => (
+                    <NoteCard key={i} note={note} />
+                  ))}
+                </div>
+              </div>
+            )}
 
           </div>
         </div>
