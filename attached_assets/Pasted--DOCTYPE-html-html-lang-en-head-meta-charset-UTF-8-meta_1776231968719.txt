@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlipIQ — AA Individual View</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --orange:#F97316;
+  --orange-10:#FFF3E8;
+  --orange-20:#FED7AA;
+  --dark:#0F172A;
+  --g1:#1E293B;
+  --g2:#334155;
+  --g3:#64748B;
+  --g4:#94A3B8;
+  --g5:#CBD5E1;
+  --g6:#E2E8F0;
+  --g7:#F1F5F9;
+  --g8:#F8FAFC;
+  --white:#FFFFFF;
+  --green:#10B981;
+  --green-10:#ECFDF5;
+  --yellow:#F59E0B;
+  --yellow-10:#FFFBEB;
+  --red:#EF4444;
+  --red-10:#FEF2F2;
+  --blue:#3B82F6;
+  --blue-10:#EFF6FF;
+  --font:'Inter',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+
+body{font-family:var(--font);background:var(--g7);color:var(--dark);min-height:100vh}
+
+/* NAV */
+.nav{background:var(--white);border-bottom:1px solid var(--g6);height:52px;display:flex;align-items:center;padding:0 20px;gap:16px;position:sticky;top:0;z-index:200}
+.nav-logo{font-weight:800;font-size:16px;display:flex;align-items:center;gap:6px}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:var(--orange)}
+.nav-breadcrumb{font-size:12px;color:var(--g4);display:flex;align-items:center;gap:6px}
+.nav-breadcrumb span{color:var(--g2)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.view-chip{display:flex;background:var(--g7);border-radius:7px;padding:3px;gap:2px}
+.view-chip button{padding:4px 14px;border-radius:5px;border:none;font-family:var(--font);font-size:12px;font-weight:500;color:var(--g3);cursor:pointer;background:transparent;transition:.15s}
+.view-chip button.on{background:var(--white);color:var(--dark);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.av{width:28px;height:28px;border-radius:50%;background:var(--orange);color:white;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center}
+
+/* SHELL */
+.shell{display:flex;min-height:calc(100vh - 52px)}
+.sidebar{width:220px;background:var(--white);border-right:1px solid var(--g6);padding:16px 0;flex-shrink:0}
+.sb-group{padding:0 10px 12px}
+.sb-label{font-size:10px;font-weight:600;color:var(--g4);text-transform:uppercase;letter-spacing:.07em;padding:0 8px 6px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:6px;font-size:13px;color:var(--g2);cursor:pointer;transition:.12s}
+.sb-item:hover{background:var(--g7)}
+.sb-item.on{background:var(--orange-10);color:var(--orange);font-weight:600}
+.sb-div{height:1px;background:var(--g6);margin:6px 10px}
+.content{flex:1;padding:24px 28px;max-width:960px}
+
+/* PAGE HEADER */
+.pg-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+.pg-title{font-size:20px;font-weight:800;color:var(--dark);margin-bottom:2px}
+.pg-sub{font-size:12.5px;color:var(--g3)}
+
+/* AA SELECTOR */
+.aa-selector-wrap{display:flex;align-items:center;gap:10px;background:var(--white);border:1px solid var(--g6);border-radius:10px;padding:10px 14px;margin-bottom:20px}
+.aa-selector-label{font-size:12px;font-weight:600;color:var(--g3);white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
+.aa-select{flex:1;border:1px solid var(--g5);border-radius:7px;padding:7px 10px;font-family:var(--font);font-size:13.5px;font-weight:600;color:var(--dark);background:var(--g8);outline:none;cursor:pointer;max-width:300px}
+.aa-select:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-10)}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.tag-green{background:var(--green-10);color:#065F46}
+.tag-blue{background:var(--blue-10);color:#1D4ED8}
+.tag-yellow{background:var(--yellow-10);color:#92400E}
+.tag-orange{background:var(--orange-10);color:#C2410C}
+.tag-gray{background:var(--g6);color:var(--g3)}
+.tag-red{background:var(--red-10);color:#B91C1C}
+.aa-meta{display:flex;align-items:center;gap:8px;margin-left:auto}
+.aa-day{font-size:12px;color:var(--g3);font-family:var(--mono)}
+
+/* SECTIONS */
+.section{background:var(--white);border:1px solid var(--g6);border-radius:12px;margin-bottom:16px;overflow:hidden}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid var(--g6)}
+.section-title{font-size:14px;font-weight:700;color:var(--dark);display:flex;align-items:center;gap:8px}
+.section-title-num{width:22px;height:22px;background:var(--orange);color:white;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-body{padding:16px 18px}
+.section-action{font-size:12px;color:var(--orange);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px}
+.section-action:hover{text-decoration:underline}
+
+/* CONDITIONS FOR SUCCESS */
+.cfs-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cfs-item{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-radius:8px;background:var(--g8);border:1px solid var(--g6);font-size:13px;color:var(--g1);line-height:1.4}
+.cfs-check{width:18px;height:18px;border-radius:4px;background:var(--green);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.cfs-check svg{width:10px;height:10px}
+.signed-row{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--green-10);border:1px solid #A7F3D0;border-radius:8px;font-size:12.5px;color:#065F46;font-weight:500;margin-top:10px}
+
+/* TRAINING */
+.training-list{display:flex;flex-direction:column;gap:6px}
+.t-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;background:var(--g8);font-size:13px}
+.t-item.done{background:var(--green-10)}
+.t-item.done .t-text{color:var(--g1)}
+.t-item.pending .t-text{color:var(--g4)}
+.t-box{width:18px;height:18px;border-radius:4px;border:2px solid var(--g4);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.t-item.done .t-box{background:var(--green);border-color:var(--green)}
+.t-date{margin-left:auto;font-size:11px;color:var(--g4);font-family:var(--mono)}
+.t-next-badge{margin-left:auto;font-size:11px;color:var(--orange);background:var(--orange-10);padding:2px 8px;border-radius:12px;font-weight:600}
+
+/* DASHBOARD METRICS */
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.metric-card{background:var(--g8);border:1px solid var(--g6);border-radius:9px;padding:12px 14px}
+.metric-label{font-size:11px;color:var(--g3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.metric-value{font-size:22px;font-weight:800;color:var(--dark);line-height:1;margin-bottom:4px}
+.metric-vs{font-size:11.5px;color:var(--g3)}
+.metric-vs .up{color:var(--green);font-weight:600}
+.metric-vs .dn{color:var(--red);font-weight:600}
+.metric-bar{height:5px;background:var(--g5);border-radius:10px;margin-top:8px;overflow:hidden}
+.metric-fill{height:100%;border-radius:10px;background:var(--orange)}
+.metric-fill.good{background:var(--green)}
+.metric-fill.warn{background:var(--yellow)}
+.metric-fill.bad{background:var(--red)}
+
+/* DEAL SOURCE */
+.dsource{display:flex;flex-direction:column;gap:6px}
+.ds-row{display:flex;align-items:center;gap:8px;font-size:12.5px}
+.ds-label{width:130px;color:var(--g2);flex-shrink:0}
+.ds-bar-wrap{flex:1;height:8px;background:var(--g5);border-radius:10px;overflow:hidden}
+.ds-bar{height:100%;border-radius:10px;background:var(--orange)}
+.ds-pct{width:34px;text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--g2);font-weight:500}
+
+/* NOTES */
+.note-add{display:flex;gap:8px;margin-bottom:14px}
+.note-textarea{flex:1;border:1px solid var(--g5);border-radius:8px;padding:10px 12px;font-family:var(--font);font-size:13px;color:var(--dark);resize:vertical;min-height:72px;outline:none;background:var(--g8)}
+.note-textarea:focus{border-color:var(--orange);background:var(--white);box-shadow:0 0 0 3px var(--orange-10)}
+.note-add-actions{display:flex;flex-direction:column;gap:6px;justify-content:flex-end}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:7px;font-family:var(--font);font-size:12.5px;font-weight:600;cursor:pointer;border:none;transition:.12s;white-space:nowrap}
+.btn-primary{background:var(--orange);color:white}
+.btn-primary:hover{background:#EA6A0A}
+.btn-ghost{background:transparent;border:1px solid var(--g5);color:var(--g2)}
+.btn-ghost:hover{background:var(--g7)}
+.btn-sm{padding:5px 11px;font-size:12px}
+
+/* NOTE CARD */
+.note-card{border:1px solid var(--g5);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.note-top{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--g8);border-bottom:1px solid var(--g5)}
+.note-date{font-size:12px;font-weight:700;color:var(--dark);font-family:var(--mono)}
+.note-attendees{font-size:11.5px;color:var(--g3)}
+.note-body{padding:12px 14px;font-size:13px;color:var(--g1);line-height:1.65;border-bottom:1px solid var(--g5)}
+.note-actions-row{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px}
+.action-chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:500;padding:3px 10px;border-radius:20px}
+.ac-orange{background:var(--orange-10);color:#C2410C}
+.ac-blue{background:var(--blue-10);color:#1D4ED8}
+.ac-green{background:var(--green-10);color:#065F46}
+
+/* SNAPSHOT */
+.snapshot{background:var(--g8);border:1px solid var(--g5);border-radius:8px;margin:10px 14px 12px;padding:10px 12px}
+.snap-title{font-size:10.5px;font-weight:700;color:var(--g3);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.snap-dot{width:6px;height:6px;background:var(--orange);border-radius:50%}
+.snap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.snap-cell{background:var(--white);border:1px solid var(--g5);border-radius:6px;padding:7px 9px}
+.snap-cell-label{font-size:10px;color:var(--g4);margin-bottom:2px;font-weight:500}
+.snap-cell-val{font-size:14px;font-weight:700;color:var(--dark);font-family:var(--mono)}
+.snap-cell-sub{font-size:9.5px;color:var(--g4);margin-top:1px}
+
+/* NOTE INPUT PREVIEW */
+.snap-preview{background:var(--orange-10);border:1px dashed var(--orange-20);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--g2);display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.snap-preview strong{color:var(--orange)}
+
+/* AM VIEW CONDITIONS OVERLAY */
+.team-cfs{display:flex;flex-direction:column;gap:6px}
+.team-cfs-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;background:var(--g8);font-size:13px;color:var(--g1)}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--g6);margin:12px 0}
+
+/* TOOLTIP pill */
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600}
+.pill-on-track{background:var(--green-10);color:#065F46}
+.pill-coaching{background:var(--yellow-10);color:#92400E}
+.pill-at-risk{background:var(--red-10);color:#B91C1C}
+
+/* util */
+.flex{display:flex;align-items:center}
+.gap8{gap:8px}
+.gap12{gap:12px}
+.ml-auto{margin-left:auto}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo"><div class="nav-dot"></div>FlipIQ COMMAND</div>
+  <div class="nav-breadcrumb">My Stats <span>›</span> <span>AA Individual View</span></div>
+  <div class="nav-right">
+    <div class="view-chip">
+      <button class="on" onclick="setView('individual',this)">Individual View</button>
+      <button onclick="setView('team',this)">Team View</button>
+    </div>
+    <div class="av" id="viewer-av">RA</div>
+    <span style="font-size:13px;color:var(--g2);font-weight:500" id="viewer-name">Ramy (CSM)</span>
+  </div>
+</nav>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-group">
+      <div class="sb-label">Main</div>
+      <div class="sb-item">📊 iQ Dashboard</div>
+      <div class="sb-item">🏠 My Active Deals</div>
+      <div class="sb-item">📋 Deal Review</div>
+      <div class="sb-item">📣 Daily Outreach</div>
+    </div>
+    <div class="sb-div"></div>
+    <div class="sb-group">
+      <div class="sb-label">Tools</div>
+      <div class="sb-item">🔍 MLS Search</div>
+      <div class="sb-item">🔥 Hot Deals</div>
+      <div class="sb-item">👤 Agent Search</div>
+      <div class="sb-item">📢 Campaigns</div>
+    </div>
+    <div class="sb-div"></div>
+    <div class="sb-group">
+      <div class="sb-label">Account</div>
+      <div class="sb-item on">📈 My Stats</div>
+      <div class="sb-item">➕ Add Property</div>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- PAGE HEADER -->
+    <div class="pg-head">
+      <div>
+        <div class="pg-title">AA Individual View</div>
+        <div class="pg-sub" id="view-subtitle">Admin / Ramy can review any AA without logging in as them</div>
+      </div>
+    </div>
+
+    <!-- AA SELECTOR -->
+    <div class="aa-selector-wrap">
+      <div class="aa-selector-label">Viewing AA</div>
+      <select class="aa-select" onchange="switchAA(this.value)">
+        <option value="jenna">Jenna Castillo</option>
+        <option value="devon">Devon Okafor</option>
+        <option value="marcus">Marcus Webb</option>
+        <option value="priya">Priya Nair</option>
+      </select>
+      <div class="aa-meta" id="aa-meta">
+        <span class="tag tag-green" id="aa-tag">Power User</span>
+        <span class="aa-day" id="aa-day">Day 34 · Coko Homes</span>
+        <span class="pill pill-on-track" id="aa-status">On Track</span>
+      </div>
+    </div>
+
+    <!-- ── SECTION 1: CONDITIONS FOR SUCCESS ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="section-title-num">1</div>
+          <span id="cfs-title">Conditions for Success</span>
+          <span style="font-size:12px;color:var(--g3);font-weight:400;margin-left:4px" id="cfs-sub">(Our Agreement)</span>
+        </div>
+        <div class="section-action">Signed Apr 9, 2026</div>
+      </div>
+      <div class="section-body">
+
+        <!-- INDIVIDUAL VIEW CONDITIONS -->
+        <div id="cfs-individual">
+          <div class="cfs-grid">
+            <div class="cfs-item"><div class="cfs-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>I am a full-time user</div>
+            <div class="cfs-item"><div class="cfs-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>I will follow the FlipIQ process that is proven</div>
+            <div class="cfs-item"><div class="cfs-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>I know the system is not perfect — I am an early adopter</div>
+            <div class="cfs-item"><div class="cfs-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Feedback only — focused on reaching my goal of 2 deals/month</div>
+          </div>
+          <div class="signed-row">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 4L6.5 11 3 7.5" stroke="#065F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Contract signed &nbsp;·&nbsp; Jenna Castillo &nbsp;·&nbsp; April 9, 2026 &nbsp;·&nbsp; Coko Homes
+          </div>
+        </div>
+
+        <!-- TEAM VIEW CONDITIONS (AM looking at team) -->
+        <div id="cfs-team" style="display:none">
+          <div style="font-size:12px;color:var(--g3);margin-bottom:10px;font-weight:500">AM-level expectations — this is what the Acquisition Manager committed to for their team:</div>
+          <div class="team-cfs">
+            <div class="team-cfs-item"><div class="cfs-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Minimum 2 full-time AAs using the system at all times</div>
+            <div class="team-cfs-item"><div class="cfs-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>I will support the FlipIQ process — not a custom workflow</div>
+            <div class="team-cfs-item"><div class="cfs-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>I will attend weekly check-in meetings with Ramy</div>
+            <div class="team-cfs-item"><div class="cfs-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>I will act on FlipIQ's coaching prescriptions within 48 hours</div>
+            <div class="team-cfs-item"><div class="cfs-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Goal: 2 closed deals per AA per month</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── SECTION 2: USER TRAINING ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="section-title-num">2</div>
+          User Training
+          <span style="font-size:12px;color:var(--g3);font-weight:400;margin-left:4px">— what we showed you, and what we both agreed you know</span>
+        </div>
+        <span class="tag tag-orange" id="training-phase">Phase 1 — 9/11 Complete</span>
+      </div>
+      <div class="section-body">
+        <div class="training-list" id="training-list">
+          <div class="t-item done"><div class="t-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="t-text">Introduction to FlipIQ COMMAND</span><span class="t-date">Apr 9</span></div>
+          <div class="t-item done"><div class="t-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="t-text">Basic Navigation & Sidebar</span><span class="t-date">Apr 9</span></div>
+          <div class="t-item done"><div class="t-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="t-text">iQ Dashboard — Daily Check-In</span><span class="t-date">Apr 10</span></div>
+          <div class="t-item done"><div class="t-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="t-text">Adding an Agent</span><span class="t-date">Apr 10</span></div>
+          <div class="t-item done"><div class="t-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="t-text">Sending an Offer</span><span class="t-date">Apr 11</span></div>
+          <div class="t-item done"><div class="t-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="t-text">Following Up on Deals (Deal Review)</span><span class="t-date">Apr 11</span></div>
+          <div class="t-item done"><div class="t-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="t-text">PiQ — Property Analysis</span><span class="t-date">Apr 12</span></div>
+          <div class="t-item done"><div class="t-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="t-text">My Active Deals — Pipeline Process</span><span class="t-date">Apr 12</span></div>
+          <div class="t-item done"><div class="t-box"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="t-text">Campaigns — Setup & Templates</span><span class="t-date">Apr 13</span></div>
+          <div class="t-item pending"><div class="t-box"></div><span class="t-text">Auto Tracker — Setup & Monitoring</span><span class="t-next-badge">Next — Apr 15</span></div>
+          <div class="t-item pending"><div class="t-box"></div><span class="t-text">MLS Search — Hot Deals & Aged Inventory</span><span class="t-date">Not yet</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 3: DASHBOARD ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="section-title-num">3</div>
+          Dashboard
+          <span style="font-size:12px;color:var(--g3);font-weight:400;margin-left:4px">— what you're doing, and what you're not</span>
+        </div>
+        <span class="aa-day" style="font-size:11.5px">3/14/26 – 4/14/26 &nbsp;·&nbsp; 20 work days</span>
+      </div>
+      <div class="section-body">
+        <div class="metric-grid" id="metric-grid">
+          <div class="metric-card">
+            <div class="metric-label">1 · Engagement</div>
+            <div class="metric-value">75<span style="font-size:14px;color:var(--g4);font-weight:600">%</span></div>
+            <div class="metric-vs">20 days · 15 check-ins &nbsp;<span class="dn">↓ below 80% target</span></div>
+            <div class="metric-bar"><div class="metric-fill warn" style="width:75%"></div></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">2 · Avg Hours / Day</div>
+            <div class="metric-value">5.6<span style="font-size:14px;color:var(--g4);font-weight:600">h</span></div>
+            <div class="metric-vs">Team avg: 3.5h &nbsp;<span class="up">↑ 123% above avg</span></div>
+            <div class="metric-bar"><div class="metric-fill good" style="width:90%"></div></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">3 · System Adaptation</div>
+            <div class="metric-value">85<span style="font-size:14px;color:var(--g4);font-weight:600">%</span></div>
+            <div class="metric-vs">Team avg: 72% &nbsp;<span class="up">↑ leading team</span></div>
+            <div class="metric-bar"><div class="metric-fill good" style="width:85%"></div></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">4 · Pipeline Compliance</div>
+            <div class="metric-value">72<span style="font-size:14px;color:var(--g4);font-weight:600">%</span></div>
+            <div class="metric-vs">100 active · 38 overdue &nbsp;<span class="dn">↓ team: 65/102/59</span></div>
+            <div class="metric-bar"><div class="metric-fill warn" style="width:72%"></div></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">5 · Campaigns</div>
+            <div class="metric-value">75<span style="font-size:14px;color:var(--g4);font-weight:600">%</span></div>
+            <div class="metric-vs">20 days · 15 active &nbsp;<span class="dn">↓ 5 days missed</span></div>
+            <div class="metric-bar"><div class="metric-fill warn" style="width:75%"></div></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">7 · New Relationships / Day</div>
+            <div class="metric-value">3.5</div>
+            <div class="metric-vs">Team avg: 5.1 &nbsp;<span class="dn">↓ below target</span></div>
+            <div class="metric-bar"><div class="metric-fill warn" style="width:68%"></div></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">8 · Avg Offers / Day</div>
+            <div class="metric-value">3.4</div>
+            <div class="metric-vs">Team avg: 5.0 &nbsp;<span class="dn">↓ below target</span></div>
+            <div class="metric-bar"><div class="metric-fill warn" style="width:68%"></div></div>
+          </div>
+          <div class="metric-card" style="background:var(--white);border:1px solid var(--g5)">
+            <div class="metric-label">6 · Deal Source</div>
+            <div style="margin-top:6px" class="dsource">
+              <div class="ds-row"><div class="ds-label">Hot Properties</div><div class="ds-bar-wrap"><div class="ds-bar" style="width:50%"></div></div><div class="ds-pct">50%</div></div>
+              <div class="ds-row"><div class="ds-label">MLS Search</div><div class="ds-bar-wrap"><div class="ds-bar" style="width:20%"></div></div><div class="ds-pct">20%</div></div>
+              <div class="ds-row"><div class="ds-label">Deal Outreach</div><div class="ds-bar-wrap"><div class="ds-bar" style="width:15%"></div></div><div class="ds-pct">15%</div></div>
+              <div class="ds-row"><div class="ds-label">Off Market</div><div class="ds-bar-wrap"><div class="ds-bar" style="width:15%"></div></div><div class="ds-pct">15%</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION 4: MEETING NOTES ── -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="section-title-num">4</div>
+          Meeting Notes
+          <span style="font-size:12px;color:var(--g3);font-weight:400;margin-left:4px">— what we discussed, and what you committed to</span>
+        </div>
+        <span style="font-size:12px;color:var(--g4)">Latest on top</span>
+      </div>
+      <div class="section-body">
+
+        <!-- ADD NOTE (Ramy / Admin only) -->
+        <div id="add-note-block">
+          <div class="snap-preview">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="var(--orange)" stroke-width="1.3"/><path d="M5 8h6M5 5h4M5 11h3" stroke="var(--orange)" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <span>When you save a note, a <strong>snapshot</strong> of the current dashboard metrics (Section 3) will be automatically attached. You'll always see what the numbers looked like at the time of each meeting.</span>
+          </div>
+          <div class="note-add">
+            <textarea class="note-textarea" id="new-note-text" placeholder="What did you discuss? What did Jenna commit to? Write it here..."></textarea>
+            <div class="note-add-actions">
+              <button class="btn btn-primary" onclick="saveNote()">💾 Save + Snapshot</button>
+              <button class="btn btn-ghost btn-sm" onclick="clearNote()">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTE CARDS (latest first) -->
+        <div id="notes-container">
+
+          <!-- NOTE 2 — most recent -->
+          <div class="note-card">
+            <div class="note-top">
+              <span class="note-date">Apr 14, 2026</span>
+              <span class="note-attendees">Weekly Check-In · Ramy + Jenna · 15 min</span>
+              <span class="pill pill-coaching" style="margin-left:auto">Coaching Focus</span>
+            </div>
+            <div class="note-body">
+              Pipeline is healthy at 107 properties. Two focus areas: (1) offer rate is at 3.4/day vs target of 5 — Jenna will block 30 minutes daily specifically for offer sends. (2) 38 overdue properties identified — pipeline cleanup scheduled before Apr 16. Auto Tracker training moved to Apr 15 to help manage the overdue backlog. Engagement dipped to 75% — reinforced importance of daily check-in.
+            </div>
+            <!-- SNAPSHOT ATTACHED -->
+            <div class="snapshot">
+              <div class="snap-title"><div class="snap-dot"></div>Snapshot at time of meeting — Apr 14, 2026</div>
+              <div class="snap-grid">
+                <div class="snap-cell"><div class="snap-cell-label">Engagement</div><div class="snap-cell-val">75%</div><div class="snap-cell-sub">15/20 days</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Adaptation</div><div class="snap-cell-val">85%</div><div class="snap-cell-sub">↑ team avg 72%</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Pipeline</div><div class="snap-cell-val">100</div><div class="snap-cell-sub">38 overdue</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Offers/Day</div><div class="snap-cell-val">3.4</div><div class="snap-cell-sub">target: 5.0</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Campaigns</div><div class="snap-cell-val">75%</div><div class="snap-cell-sub">15/20 days</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Relationships</div><div class="snap-cell-val">3.5</div><div class="snap-cell-sub">team: 5.1/day</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Hours/Day</div><div class="snap-cell-val">5.6h</div><div class="snap-cell-sub">↑ 123% vs team</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Deal Source</div><div class="snap-cell-val">50%</div><div class="snap-cell-sub">Hot Properties</div></div>
+              </div>
+            </div>
+            <div class="note-actions-row">
+              <div class="action-chip ac-orange">Action: Pipeline cleanup by Apr 16</div>
+              <div class="action-chip ac-blue">Action: Auto Tracker training Apr 15</div>
+              <div class="action-chip ac-orange">Action: 30-min daily offer block</div>
+            </div>
+          </div>
+
+          <!-- NOTE 1 — older -->
+          <div class="note-card">
+            <div class="note-top">
+              <span class="note-date">Apr 7, 2026</span>
+              <span class="note-attendees">Onboarding Kickoff · Ramy + Jenna + Tony · 30 min</span>
+              <span class="pill pill-on-track" style="margin-left:auto">On Track</span>
+            </div>
+            <div class="note-body">
+              Contract signed. Proficiency assigned: Power User — Jenna is tech-savvy, no need to slow down on navigation basics. Training sequence confirmed: start immediately with deal review and PiQ. Goal established: 2 deals/month by end of 30 days. Jenna is motivated and understood the suspension policy clearly. Pipeline goal: build to 100 active properties in the first 10 days.
+            </div>
+            <div class="snapshot">
+              <div class="snap-title"><div class="snap-dot"></div>Snapshot at time of meeting — Apr 7, 2026</div>
+              <div class="snap-grid">
+                <div class="snap-cell"><div class="snap-cell-label">Engagement</div><div class="snap-cell-val">—</div><div class="snap-cell-sub">Day 1</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Adaptation</div><div class="snap-cell-val">—</div><div class="snap-cell-sub">Not started</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Pipeline</div><div class="snap-cell-val">0</div><div class="snap-cell-sub">Building</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Offers/Day</div><div class="snap-cell-val">—</div><div class="snap-cell-sub">Not started</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Campaigns</div><div class="snap-cell-val">—</div><div class="snap-cell-sub">Not started</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Relationships</div><div class="snap-cell-val">—</div><div class="snap-cell-sub">Not started</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Hours/Day</div><div class="snap-cell-val">—</div><div class="snap-cell-sub">Day 1</div></div>
+                <div class="snap-cell"><div class="snap-cell-label">Training</div><div class="snap-cell-val">0/11</div><div class="snap-cell-sub">Starting now</div></div>
+              </div>
+            </div>
+            <div class="note-actions-row">
+              <div class="action-chip ac-green">✓ Contract signed</div>
+              <div class="action-chip ac-green">✓ Tag: Power User</div>
+              <div class="action-chip ac-blue">Action: Build pipeline to 100 in 10 days</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const aaData = {
+  jenna:  { name:'Jenna Castillo',  tag:'Power User',  tagClass:'tag-green',  day:'Day 34 · Coko Homes',  status:'On Track',   statusClass:'pill-on-track',
+            eng:'75%', engW:'75%', engC:'warn', engSub:'20 days · 15 check-ins · ↓ below 80% target',
+            hours:'5.6h', hoursW:'90%', hoursC:'good', hoursSub:'Team avg: 3.5h · ↑ 123% above avg',
+            adapt:'85%', adaptW:'85%', adaptC:'good', adaptSub:'Team avg: 72% · ↑ leading team',
+            pip:'72%', pipW:'72%', pipC:'warn', pipSub:'100 active · 38 overdue · ↓ team: 65/102/59',
+            camp:'75%', campW:'75%', campC:'warn', campSub:'20 days · 15 active · ↓ 5 days missed',
+            rel:'3.5', relW:'68%', relC:'warn', relSub:'Team avg: 5.1 · ↓ below target',
+            off:'3.4', offW:'68%', offC:'warn', offSub:'Team avg: 5.0 · ↓ below target',
+            training:'9/11', phase:'Phase 1 — 9/11 Complete' },
+  devon:  { name:'Devon Okafor',    tag:'Capable',     tagClass:'tag-blue',   day:'Day 21 · Coko Homes',  status:'Coaching',   statusClass:'pill-coaching',
+            eng:'60%', engW:'60%', engC:'warn', engSub:'20 days · 12 check-ins · ↓ below 80% target',
+            hours:'3.8h', hoursW:'55%', hoursC:'warn', hoursSub:'Team avg: 3.5h · → near avg',
+            adapt:'74%', adaptW:'74%', adaptC:'warn', adaptSub:'Team avg: 72% · → on par',
+            pip:'55%', pipW:'55%', pipC:'bad', pipSub:'88 active · 44 overdue · ↓ below team',
+            camp:'60%', campW:'60%', campC:'warn', campSub:'20 days · 12 active · ↓ needs improvement',
+            rel:'2.8', relW:'55%', relC:'bad', relSub:'Team avg: 5.1 · ↓ significantly below',
+            off:'2.1', offW:'42%', offC:'bad', offSub:'Team avg: 5.0 · ↓ needs urgent attention',
+            training:'6/11', phase:'Phase 1 — 6/11 Complete' },
+  marcus: { name:'Marcus Webb',     tag:'Traditional', tagClass:'tag-yellow', day:'Day 18 · Coko Homes',  status:'At Risk',    statusClass:'pill-at-risk',
+            eng:'20%', engW:'20%', engC:'bad', engSub:'20 days · 4 check-ins · ↓↓ 3-day zero-activity flag',
+            hours:'1.1h', hoursW:'18%', hoursC:'bad', hoursSub:'Team avg: 3.5h · ↓↓ critical',
+            adapt:'52%', adaptW:'52%', adaptC:'bad', adaptSub:'Team avg: 72% · ↓ below baseline',
+            pip:'30%', pipW:'30%', pipC:'bad', pipSub:'41 active · 22 overdue · ↓↓ critical',
+            camp:'20%', campW:'20%', campC:'bad', campSub:'20 days · 4 active · ↓↓ not running',
+            rel:'0.8', relW:'16%', relC:'bad', relSub:'Team avg: 5.1 · ↓↓ not building',
+            off:'0.3', offW:'6%', offC:'bad', offSub:'Team avg: 5.0 · ↓↓ near zero',
+            training:'4/11', phase:'Phase 1 — 4/11 Complete' },
+  priya:  { name:'Priya Nair',      tag:'Novice',      tagClass:'tag-gray',   day:'Day 9 · Coko Homes',   status:'Coaching',   statusClass:'pill-coaching',
+            eng:'44%', engW:'44%', engC:'warn', engSub:'9 days · 4 check-ins · ↓ new user, needs habit',
+            hours:'2.5h', hoursW:'40%', hoursC:'warn', hoursSub:'Team avg: 3.5h · ↓ below avg',
+            adapt:'38%', adaptW:'38%', adaptC:'warn', adaptSub:'Team avg: 72% · early stage — expected',
+            pip:'18%', pipW:'18%', pipC:'bad', pipSub:'22 active · 8 overdue · building pipeline',
+            camp:'22%', campW:'22%', campC:'warn', campSub:'9 days · 2 active · just starting',
+            rel:'1.2', relW:'24%', relC:'warn', relSub:'Team avg: 5.1 · early stage',
+            off:'0.9', offW:'18%', offC:'warn', offSub:'Team avg: 5.0 · learning the flow',
+            training:'3/11', phase:'Phase 1 — 3/11 Complete' },
+};
+
+let currentView = 'individual';
+
+function setView(v, btn) {
+  currentView = v;
+  document.querySelectorAll('.view-chip button').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  if (v === 'individual') {
+    document.getElementById('cfs-individual').style.display = '';
+    document.getElementById('cfs-team').style.display = 'none';
+    document.getElementById('cfs-title').textContent = 'Conditions for Success';
+    document.getElementById('cfs-sub').textContent = '(Our Agreement)';
+    document.getElementById('add-note-block').style.display = '';
+    document.getElementById('view-subtitle').textContent = 'Admin / Ramy can review any AA without logging in as them';
+  } else {
+    document.getElementById('cfs-individual').style.display = 'none';
+    document.getElementById('cfs-team').style.display = '';
+    document.getElementById('cfs-title').textContent = 'AM Team Commitments';
+    document.getElementById('cfs-sub').textContent = '(Operator Agreement)';
+    document.getElementById('add-note-block').style.display = '';
+    document.getElementById('view-subtitle').textContent = 'Team lead view — AM-level agreements and team commitments';
+  }
+}
+
+function switchAA(id) {
+  const d = aaData[id];
+  document.getElementById('aa-tag').className = 'tag ' + d.tagClass;
+  document.getElementById('aa-tag').textContent = d.tag;
+  document.getElementById('aa-day').textContent = d.day;
+  document.getElementById('aa-status').className = 'pill ' + d.statusClass;
+  document.getElementById('aa-status').textContent = d.status.replace('pill-on-track','On Track');
+  // fix status label
+  const sl = {'pill-on-track':'On Track','pill-coaching':'Needs Coaching','pill-at-risk':'At Risk'};
+  document.getElementById('aa-status').textContent = sl[d.statusClass];
+  document.getElementById('training-phase').textContent = d.phase;
+
+  // Update metric cards
+  const g = document.getElementById('metric-grid');
+  g.children[0].querySelector('.metric-value').innerHTML = d.eng.replace('%','<span style="font-size:14px;color:var(--g4);font-weight:600">%</span>');
+  g.children[0].querySelector('.metric-vs').innerHTML = d.engSub.replace('↑','<span class="up">↑</span>').replace('↓','<span class="dn">↓</span>').replace('→','→');
+  g.children[0].querySelector('.metric-fill').style.width = d.engW;
+  g.children[0].querySelector('.metric-fill').className = 'metric-fill ' + d.engC;
+
+  g.children[1].querySelector('.metric-value').innerHTML = d.hours + '<span style="font-size:14px;color:var(--g4);font-weight:600">h</span>';
+  g.children[1].querySelector('.metric-vs').innerHTML = d.hoursSub.replace('↑','<span class="up">↑</span>').replace('↓','<span class="dn">↓</span>');
+  g.children[1].querySelector('.metric-fill').style.width = d.hoursW;
+  g.children[1].querySelector('.metric-fill').className = 'metric-fill ' + d.hoursC;
+
+  g.children[2].querySelector('.metric-value').innerHTML = d.adapt.replace('%','<span style="font-size:14px;color:var(--g4);font-weight:600">%</span>');
+  g.children[2].querySelector('.metric-vs').innerHTML = d.adaptSub.replace('↑','<span class="up">↑</span>').replace('↓','<span class="dn">↓</span>');
+  g.children[2].querySelector('.metric-fill').style.width = d.adaptW;
+  g.children[2].querySelector('.metric-fill').className = 'metric-fill ' + d.adaptC;
+
+  g.children[3].querySelector('.metric-value').innerHTML = d.pip.replace('%','<span style="font-size:14px;color:var(--g4);font-weight:600">%</span>');
+  g.children[3].querySelector('.metric-vs').innerHTML = d.pipSub.replace('↑','<span class="up">↑</span>').replace('↓','<span class="dn">↓</span>');
+  g.children[3].querySelector('.metric-fill').style.width = d.pipW;
+  g.children[3].querySelector('.metric-fill').className = 'metric-fill ' + d.pipC;
+
+  g.children[4].querySelector('.metric-value').innerHTML = d.camp.replace('%','<span style="font-size:14px;color:var(--g4);font-weight:600">%</span>');
+  g.children[4].querySelector('.metric-vs').innerHTML = d.campSub.replace('↑','<span class="up">↑</span>').replace('↓','<span class="dn">↓</span>');
+  g.children[4].querySelector('.metric-fill').style.width = d.campW;
+  g.children[4].querySelector('.metric-fill').className = 'metric-fill ' + d.campC;
+
+  g.children[5].querySelector('.metric-value').textContent = d.rel;
+  g.children[5].querySelector('.metric-vs').innerHTML = d.relSub.replace('↑','<span class="up">↑</span>').replace('↓','<span class="dn">↓</span>');
+  g.children[5].querySelector('.metric-fill').style.width = d.relW;
+  g.children[5].querySelector('.metric-fill').className = 'metric-fill ' + d.relC;
+
+  g.children[6].querySelector('.metric-value').textContent = d.off;
+  g.children[6].querySelector('.metric-vs').innerHTML = d.offSub.replace('↑','<span class="up">↑</span>').replace('↓','<span class="dn">↓</span>');
+  g.children[6].querySelector('.metric-fill').style.width = d.offW;
+  g.children[6].querySelector('.metric-fill').className = 'metric-fill ' + d.offC;
+}
+
+function getSnapshot() {
+  const g = document.getElementById('metric-grid');
+  return [
+    { label:'Engagement', val: g.children[0].querySelector('.metric-value').textContent.trim() },
+    { label:'Adaptation',  val: g.children[2].querySelector('.metric-value').textContent.trim() },
+    { label:'Pipeline',    val: g.children[3].querySelector('.metric-value').textContent.trim() },
+    { label:'Offers/Day',  val: g.children[6].querySelector('.metric-value').textContent.trim() },
+    { label:'Campaigns',   val: g.children[4].querySelector('.metric-value').textContent.trim() },
+    { label:'Relations',   val: g.children[5].querySelector('.metric-value').textContent.trim() },
+    { label:'Hours/Day',   val: g.children[1].querySelector('.metric-value').textContent.trim() },
+    { label:'Pipeline %',  val: g.children[3].querySelector('.metric-value').textContent.trim() },
+  ];
+}
+
+function saveNote() {
+  const text = document.getElementById('new-note-text').value.trim();
+  if (!text) { document.getElementById('new-note-text').focus(); return; }
+  const snap = getSnapshot();
+  const today = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  const aaName = document.querySelector('.aa-select').options[document.querySelector('.aa-select').selectedIndex].text;
+
+  const snapCells = snap.map(s => `
+    <div class="snap-cell">
+      <div class="snap-cell-label">${s.label}</div>
+      <div class="snap-cell-val">${s.val}</div>
+    </div>`).join('');
+
+  const card = document.createElement('div');
+  card.className = 'note-card';
+  card.style.animation = 'fadeIn .3s ease';
+  card.innerHTML = `
+    <div class="note-top">
+      <span class="note-date">${today}</span>
+      <span class="note-attendees">Meeting Note · Ramy + ${aaName.split(' ')[0]}</span>
+      <span class="pill pill-on-track" style="margin-left:auto">New</span>
+    </div>
+    <div class="note-body">${text.replace(/\n/g,'<br>')}</div>
+    <div class="snapshot">
+      <div class="snap-title"><div class="snap-dot"></div>Snapshot at time of meeting — ${today}</div>
+      <div class="snap-grid">${snapCells}</div>
+    </div>
+    <div class="note-actions-row"><div class="action-chip ac-blue">Saved ${today}</div></div>
+  `;
+  const container = document.getElementById('notes-container');
+  container.insertBefore(card, container.firstChild);
+  document.getElementById('new-note-text').value = '';
+}
+
+function clearNote() {
+  document.getElementById('new-note-text').value = '';
+}
+</script>
+
+<style>
+@keyframes fadeIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</body>
+</html>
