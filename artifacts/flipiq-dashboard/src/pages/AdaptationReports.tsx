@@ -229,11 +229,13 @@ function SectionNum({ n }: { n: number }) {
 
 function MetricCard({ label, value, sub, barW, barC }: { label: string; value: React.ReactNode; sub: string; barW: string; barC: string }) {
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-      <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">{label}</div>
-      <div className="text-2xl font-black text-gray-900 leading-none mb-1">{value}</div>
-      <div className="text-[11px] text-gray-400">{subText(sub)}</div>
-      <div className="h-1 bg-gray-200 rounded-full mt-2 overflow-hidden">
+    <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5">
+      <div className="flex items-baseline justify-between gap-2 mb-1">
+        <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider leading-none">{label}</div>
+        <div className="text-lg font-black text-gray-900 leading-none flex-shrink-0">{value}</div>
+      </div>
+      <div className="text-[10px] text-gray-400 leading-snug mb-1.5">{subText(sub)}</div>
+      <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
         <div className={`h-full rounded-full ${barColor(barC)}`} style={{ width: barW }} />
       </div>
     </div>
@@ -379,43 +381,43 @@ export default function AdaptationReports() {
               <div className="p-5">
                 <div className="grid grid-cols-4 gap-2.5 mb-2.5">
                   <MetricCard
-                    label="1 · Engagement"
+                    label="Engagement"
                     value={<>{aa.eng.replace("%", "")}<span className="text-sm text-gray-300 font-semibold">%</span></>}
                     sub={aa.engSub} barW={aa.engW} barC={aa.engC}
                   />
                   <MetricCard
-                    label="2 · Avg Hours / Day"
+                    label="Avg Hours / Day"
                     value={<>{aa.hours.replace("h", "")}<span className="text-sm text-gray-300 font-semibold">h</span></>}
                     sub={aa.hoursSub} barW={aa.hoursW} barC={aa.hoursC}
                   />
                   <MetricCard
-                    label="3 · System Adaptation"
+                    label="System Adaptation"
                     value={<>{aa.adapt.replace("%", "")}<span className="text-sm text-gray-300 font-semibold">%</span></>}
                     sub={aa.adaptSub} barW={aa.adaptW} barC={aa.adaptC}
                   />
                   <MetricCard
-                    label="4 · Pipeline Compliance"
+                    label="Pipeline Compliance"
                     value={<>{aa.pip.replace("%", "")}<span className="text-sm text-gray-300 font-semibold">%</span></>}
                     sub={aa.pipSub} barW={aa.pipW} barC={aa.pipC}
                   />
                   <MetricCard
-                    label="5 · Campaigns"
+                    label="Campaigns"
                     value={<>{aa.camp.replace("%", "")}<span className="text-sm text-gray-300 font-semibold">%</span></>}
                     sub={aa.campSub} barW={aa.campW} barC={aa.campC}
                   />
                   <MetricCard
-                    label="7 · New Relationships / Day"
+                    label="Relationships / Day"
                     value={aa.rel}
                     sub={aa.relSub} barW={aa.relW} barC={aa.relC}
                   />
                   <MetricCard
-                    label="8 · Avg Offers / Day"
+                    label="Avg Offers / Day"
                     value={aa.off}
                     sub={aa.offSub} barW={aa.offW} barC={aa.offC}
                   />
                   {/* Deal Source card */}
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                    <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2.5">6 · Deal Source</div>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5">
+                    <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Deal Source</div>
                     <div className="space-y-1.5">
                       {aa.dealSource.map((row, i) => (
                         <div key={i} className="flex items-center gap-2 text-xs">
