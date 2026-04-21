@@ -2,7 +2,7 @@ import { Settings, LogOut, Home, FileText, Phone, ChevronLeft } from "lucide-rea
 
 export default function Sidebar() {
   return (
-    <div className="w-[155px] bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
+    <div className="w-[192px] bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
       {/* Logo */}
       <div className="p-4 pt-5 pb-3">
         <FlipIQLogo />
