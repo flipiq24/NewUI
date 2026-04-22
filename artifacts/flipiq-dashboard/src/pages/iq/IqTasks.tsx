@@ -6,17 +6,17 @@ import { DAILY_OUTREACH_BUCKETS } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 
 const dealCategories = [
-  { label: "Priority", count: 9, color: "text-orange-500", border: "border-orange-300", tip: "Highest-urgency deals — call these agents first today." },
-  { label: "Hot", count: 6, color: "text-red-500", border: "border-red-300", tip: "Active conversations with strong recent engagement." },
-  { label: "Warm", count: 4, color: "text-amber-500", border: "border-amber-300", tip: "Engaged agents in the middle of the pipeline — keep them moving." },
-  { label: "Cold", count: 3, color: "text-blue-500", border: "border-blue-300", tip: "Low-engagement deals that need a re-warm touch." },
+  { label: "High", count: 9, color: "text-red-500", border: "border-red-300", tip: "Highest-urgency deals — call these agents first today." },
+  { label: "Mid", count: 6, color: "text-amber-500", border: "border-amber-300", tip: "Active conversations with solid recent engagement." },
+  { label: "Low", count: 4, color: "text-blue-500", border: "border-blue-300", tip: "Cooler deals — keep them moving with a touch today." },
+  { label: "New", count: 3, color: "text-gray-500", border: "border-gray-300", tip: "Brand-new or unworked deals — open the conversation." },
 ];
 
-const bucketMeta: Record<string, { color: string; border: string; tip: string }> = {
-  hot: { color: "text-red-500", border: "border-red-300", tip: "Hot agents — recent strong engagement, high reply likelihood." },
-  warm: { color: "text-amber-500", border: "border-amber-300", tip: "Warm agents — past engagement, worth re-engaging today." },
-  cold: { color: "text-blue-500", border: "border-blue-300", tip: "Cold agents — no recent activity, low engagement." },
-  unknown: { color: "text-gray-500", border: "border-gray-300", tip: "Unknown agents — no engagement history yet." },
+const bucketMeta: Record<string, { label: string; color: string; border: string; tip: string }> = {
+  hot: { label: "High", color: "text-red-500", border: "border-red-300", tip: "High-urgency agents — recent strong engagement, high reply likelihood." },
+  warm: { label: "Mid", color: "text-amber-500", border: "border-amber-300", tip: "Mid-tier agents — past engagement, worth re-engaging today." },
+  cold: { label: "Low", color: "text-blue-500", border: "border-blue-300", tip: "Low-engagement agents — no recent activity, need a re-warm touch." },
+  unknown: { label: "New", color: "text-gray-500", border: "border-gray-300", tip: "New agents — no engagement history yet." },
 };
 
 const pillTips: Record<NotificationKind, string> = {
@@ -197,7 +197,7 @@ export default function IqTasks() {
                     return (
                       <div
                         key={b.id}
-                        title={`${b.id.toUpperCase()} — ${b.pendingToday} pending today out of ${b.totalDB} in database. ${c.tip}`}
+                        title={`${c.label} — ${b.pendingToday} pending today out of ${b.totalDB} in database. ${c.tip}`}
                         className={`bg-white border ${c.border} rounded-lg p-4 text-center cursor-help`}
                       >
                         <p className={`text-3xl font-bold ${c.color} leading-none mb-1`}>
@@ -205,7 +205,7 @@ export default function IqTasks() {
                           <span className="text-base text-gray-400 font-normal"> / {b.totalDB}</span>
                         </p>
                         <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide">
-                          {b.id}
+                          {c.label}
                         </p>
                       </div>
                     );
