@@ -14,7 +14,9 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerCo
 
   function handleNextClick() {
     if (!onNext) return;
-    if (nextIncomplete) {
+    const alreadyShown = typeof window !== "undefined" && sessionStorage.getItem("iqProcessWarnShown") === "1";
+    if (nextIncomplete && !alreadyShown) {
+      sessionStorage.setItem("iqProcessWarnShown", "1");
       setShowWarn(true);
     } else {
       onNext();
@@ -95,7 +97,7 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerCo
             </div>
             <div className="flex-1">
               <h3 className="text-base font-bold text-gray-900 mb-1">Hold on, Josh.</h3>
-              <p className="text-sm text-gray-600">You're not following the process. You must follow the sequence in the right order.</p>
+              <p className="text-sm text-gray-600">You're not following the process. Make sure to follow it step by step — the system was designed for efficiency, not to be bypassed.</p>
             </div>
           </div>
           <div className="flex justify-end gap-2">
