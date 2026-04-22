@@ -62,7 +62,7 @@ export default function IqNewRelationships() {
             <div />
             <div className="flex justify-center">
               <span className="text-xs text-gray-600 font-medium">
-                <span className="font-bold text-gray-900">{calledCount} / {total}</span> new agent calls
+                <span className="font-bold text-gray-900">{calledCount} / 30</span> new agent calls
               </span>
             </div>
             <div className="flex items-center gap-2 justify-end">
