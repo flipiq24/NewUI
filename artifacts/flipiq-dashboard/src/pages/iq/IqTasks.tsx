@@ -29,6 +29,7 @@ interface CardProps {
   priority: number;
   title: string;
   subtitle: string;
+  description: string;
   onClick: () => void;
   notifications?: NotificationPill[];
   children: ReactNode;
@@ -77,7 +78,7 @@ function PillBadge({ pill }: { pill: NotificationPill }) {
   );
 }
 
-function DashboardCard({ priority, title, subtitle, onClick, notifications, children }: CardProps) {
+function DashboardCard({ priority, title, subtitle, description, onClick, notifications, children }: CardProps) {
   return (
     <button
       onClick={onClick}
@@ -88,7 +89,8 @@ function DashboardCard({ priority, title, subtitle, onClick, notifications, chil
           Priority #{priority}
         </p>
         <h3 className="text-lg font-bold text-gray-900 leading-tight">{title}</h3>
-        <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>
+        <p className="text-sm text-gray-600 mt-1 leading-snug">{description}</p>
+        <p className="text-xs text-gray-500 mt-1.5">{subtitle}</p>
         {notifications && notifications.length > 0 && (
           <div className="flex items-center flex-wrap gap-2 mt-3">
             <span className="text-xs font-medium text-gray-600">Check notifications:</span>
@@ -136,6 +138,7 @@ export default function IqTasks() {
               <DashboardCard
                 priority={1}
                 title="Deal Review"
+                description="Review active, pending, and closed deals — handle criticals and reminders first."
                 subtitle={`Total Deals: ${totalDeals}`}
                 onClick={() => startStep("/iq/deal-review")}
                 notifications={[
@@ -171,6 +174,7 @@ export default function IqTasks() {
               <DashboardCard
                 priority={2}
                 title="Email Campaigns"
+                description="Send today's outreach emails across hot, warm, cold, and unknown agent buckets."
                 subtitle={`${totalCampaigns} Campaigns • Total Emails: ${totalEmails}`}
                 onClick={() => startStep("/iq/daily-outreach")}
               >
@@ -198,6 +202,7 @@ export default function IqTasks() {
               <DashboardCard
                 priority={3}
                 title="Priority Agent Calls"
+                description="Call your highest-value agents to keep relationships warm and deals moving."
                 subtitle={`Total Priority: ${totalPriorityAgents}`}
                 onClick={() => startStep("/iq/priority-agents")}
               >
@@ -214,6 +219,7 @@ export default function IqTasks() {
               <DashboardCard
                 priority={4}
                 title="Build New Agent Relationships"
+                description="Reach out on high-propensity-to-sell properties to grow your agent network."
                 subtitle={`Total Properties: ${totalProperties}`}
                 onClick={() => startStep("/iq/new-relationships")}
               >
