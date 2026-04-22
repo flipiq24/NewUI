@@ -132,6 +132,11 @@ export default function IqTasks() {
                 title="Deal Review"
                 subtitle={`Total Deals: ${totalDeals}`}
                 onClick={() => startStep("/iq/deal-review")}
+                notifications={[
+                  { kind: "critical", count: 2, label: "Criticals" },
+                  { kind: "reminder", count: 4, label: "Reminders" },
+                  { kind: "unseen", count: 1, label: "Unseen" },
+                ]}
               >
                 <div className="grid grid-cols-4 gap-3">
                   {dealCategories.map((cat) => (
@@ -161,7 +166,6 @@ export default function IqTasks() {
                 title="Email Campaigns"
                 subtitle={`${totalCampaigns} Campaigns • Total Emails: ${totalEmails}`}
                 onClick={() => startStep("/iq/daily-outreach")}
-                notifications={[{ kind: "unseen", count: 1, label: "Unseen" }]}
               >
                 <div className="grid grid-cols-4 gap-3">
                   {DAILY_OUTREACH_BUCKETS.map((b) => {
@@ -189,10 +193,6 @@ export default function IqTasks() {
                 title="Priority Agent Calls"
                 subtitle={`Total Priority: ${totalPriorityAgents}`}
                 onClick={() => startStep("/iq/priority-agents")}
-                notifications={[
-                  { kind: "critical", count: 2, label: "Criticals" },
-                  { kind: "reminder", count: 4, label: "Reminders" },
-                ]}
               >
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-5 text-center">
                   <p className="text-4xl font-bold text-orange-500 leading-none mb-1">
