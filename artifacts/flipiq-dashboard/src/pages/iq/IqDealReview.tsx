@@ -5,7 +5,7 @@ import TaskTipBlock from "@/components/iq/TaskTipBlock";
 import PropertyRow from "@/components/iq/PropertyRow";
 import SegmentHeader from "@/components/iq/SegmentHeader";
 import { DEAL_REVIEW_PROPERTIES } from "@/lib/iq/mockData";
-import { loadIqState, saveIqState } from "@/lib/iq/storage";
+import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 
 const segments = [
   {
@@ -35,7 +35,7 @@ export default function IqDealReview() {
   const [, navigate] = useLocation();
 
   function handleNext() {
-    const state = loadIqState() ?? { date: "" };
+    const state = resetIqStateIfNewDay();
     saveIqState({ ...state, dealReviewComplete: true });
     navigate("/iq/daily-outreach");
   }

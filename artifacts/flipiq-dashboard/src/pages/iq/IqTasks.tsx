@@ -2,7 +2,7 @@ import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import { TODAYS_TASKS } from "@/lib/iq/mockData";
-import { loadIqState, saveIqState } from "@/lib/iq/storage";
+import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 
 const tasks = [
   { n: 1, prefix: "You have", count: TODAYS_TASKS.properties, suffix: "Properties you need to follow up on" },
@@ -15,7 +15,7 @@ export default function IqTasks() {
   const [, navigate] = useLocation();
 
   function handleStart() {
-    const state = loadIqState() ?? { date: "" };
+    const state = resetIqStateIfNewDay();
     saveIqState({ ...state, flowStarted: true });
     navigate("/iq/deal-review");
   }

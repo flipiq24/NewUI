@@ -6,7 +6,7 @@ import IqTopBar from "@/components/iq/IqTopBar";
 import TaskTipBlock from "@/components/iq/TaskTipBlock";
 import AudienceCard from "@/components/iq/AudienceCard";
 import { DAILY_OUTREACH_BUCKETS } from "@/lib/iq/mockData";
-import { loadIqState, saveIqState } from "@/lib/iq/storage";
+import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 
 export default function IqDailyOutreach() {
   const [, navigate] = useLocation();
@@ -27,14 +27,14 @@ export default function IqDailyOutreach() {
   const selectedCount = DAILY_OUTREACH_BUCKETS.filter((b) => selected.has(b.id)).reduce((acc, b) => acc + b.pendingToday, 0);
 
   function handleSend() {
-    const state = loadIqState() ?? { date: "" };
+    const state = resetIqStateIfNewDay();
     saveIqState({ ...state, outreachCampaignSent: true });
     toast({ title: "Campaign sent successfully!" });
     setTimeout(() => navigate("/iq/priority-agents"), 800);
   }
 
   function handleNext() {
-    const state = loadIqState() ?? { date: "" };
+    const state = resetIqStateIfNewDay();
     saveIqState({ ...state, outreachCampaignSent: true });
     navigate("/iq/priority-agents");
   }

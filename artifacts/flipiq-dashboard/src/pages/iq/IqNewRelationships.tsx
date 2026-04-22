@@ -6,7 +6,7 @@ import IqTopBar from "@/components/iq/IqTopBar";
 import TaskTipBlock from "@/components/iq/TaskTipBlock";
 import IqPropertyIntelligence from "@/components/iq/IqPropertyIntelligence";
 import { NEW_RELATIONSHIPS_DEALS } from "@/lib/iq/mockData";
-import { loadIqState, saveIqState } from "@/lib/iq/storage";
+import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 
 export default function IqNewRelationships() {
   const [, navigate] = useLocation();
@@ -21,7 +21,7 @@ export default function IqNewRelationships() {
     const next = currentIndex + 1;
     setCalledCount((c) => c + 1);
     if (next >= total) {
-      const state = loadIqState() ?? { date: "" };
+      const state = resetIqStateIfNewDay();
       saveIqState({ ...state, newRelationshipsComplete: true });
       toast({ title: "End of Day Stats coming soon!" });
       setTimeout(() => navigate("/iq/tasks"), 1200);
@@ -35,7 +35,7 @@ export default function IqNewRelationships() {
   }
 
   function handleTopNext() {
-    const state = loadIqState() ?? { date: "" };
+    const state = resetIqStateIfNewDay();
     saveIqState({ ...state, newRelationshipsComplete: true });
     toast({ title: "End of Day Stats coming soon!" });
     setTimeout(() => navigate("/iq/tasks"), 1200);

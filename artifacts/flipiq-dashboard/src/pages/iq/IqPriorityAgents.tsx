@@ -4,7 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import TaskTipBlock from "@/components/iq/TaskTipBlock";
 import AgentRecordCard from "@/components/iq/AgentRecordCard";
-import { loadIqState, saveIqState } from "@/lib/iq/storage";
+import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 
 const TOTAL_AGENTS = 1;
 
@@ -16,14 +16,14 @@ export default function IqPriorityAgents() {
     const next = calledCount + 1;
     setCalledCount(next);
     if (next >= TOTAL_AGENTS) {
-      const state = loadIqState() ?? { date: "" };
+      const state = resetIqStateIfNewDay();
       saveIqState({ ...state, priorityAgentsComplete: true });
       navigate("/iq/new-relationships");
     }
   }
 
   function handleTopNext() {
-    const state = loadIqState() ?? { date: "" };
+    const state = resetIqStateIfNewDay();
     saveIqState({ ...state, priorityAgentsComplete: true });
     navigate("/iq/new-relationships");
   }

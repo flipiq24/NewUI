@@ -2,22 +2,18 @@ import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import { TODAYS_TASKS } from "@/lib/iq/mockData";
-import { loadIqState, firstIncompleteRoute } from "@/lib/iq/storage";
+import { resetIqStateIfNewDay, firstIncompleteRoute } from "@/lib/iq/storage";
 
 export default function IqWelcomeBack() {
   const [, navigate] = useLocation();
-  const state = loadIqState();
+  const state = resetIqStateIfNewDay();
 
-  const dealDone = state?.dealReviewComplete ?? false;
-  const outreachDone = state?.outreachCampaignSent ?? false;
-  const agentsDone = state?.priorityAgentsComplete ?? false;
-  const relsDone = state?.newRelationshipsComplete ?? false;
+  const dealDone = state.dealReviewComplete ?? false;
+  const outreachDone = state.outreachCampaignSent ?? false;
+  const agentsDone = state.priorityAgentsComplete ?? false;
+  const relsDone = state.newRelationshipsComplete ?? false;
 
   function handleStart() {
-    if (!state) {
-      navigate("/iq");
-      return;
-    }
     navigate(firstIncompleteRoute(state));
   }
 
