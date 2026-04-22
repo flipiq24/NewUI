@@ -14,12 +14,15 @@ export default function Sidebar() {
 }
 
 function IqSidebar({ location }: { location: string }) {
-  const state = resetIqStateIfNewDay();
-  const iqDone = !!state.morningCheckin;
-  const dealReviewComplete = state.dealReviewComplete ?? false;
-  const priorityComplete = state.priorityAgentsComplete ?? false;
+  resetIqStateIfNewDay();
 
   const iqActive = location === "/iq" || location === "/iq/tasks" || location === "/iq/welcome-back";
+  const dealReviewActive = location === "/iq/deal-review";
+  const dailyOutreachLocations = ["/iq/daily-outreach", "/iq/priority-agents", "/iq/new-relationships"];
+  const dailyOutreachActive = dailyOutreachLocations.includes(location);
+
+  const showDealReview = dealReviewActive || dailyOutreachActive;
+  const showDailyOutreach = dailyOutreachActive;
 
   return (
     <div className="w-[192px] bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
@@ -36,24 +39,26 @@ function IqSidebar({ location }: { location: string }) {
             icon={<LightbulbIcon />}
             label="iQ"
             active={iqActive}
-            done={iqDone && !iqActive}
+            done={!iqActive}
           />
         </Link>
-        {dealReviewComplete && (
+        {showDealReview && (
           <Link href="/iq/deal-review">
             <IqNavItem
               icon={<FileTextIcon />}
               label="Deal Review"
-              done
+              active={dealReviewActive}
+              done={!dealReviewActive}
             />
           </Link>
         )}
-        {priorityComplete && (
+        {showDailyOutreach && (
           <Link href="/iq/daily-outreach">
             <IqNavItem
               icon={<PhoneIcon />}
               label="Daily Outreach"
-              done={priorityComplete}
+              active={dailyOutreachActive}
+              done={!dailyOutreachActive}
             />
           </Link>
         )}
