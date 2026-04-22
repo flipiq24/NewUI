@@ -116,7 +116,7 @@ export default function IqDealReview() {
           {segments.map((seg, segIdx) => {
             const props = DEAL_REVIEW_PROPERTIES.filter((p) => p.segment === seg.key);
             return (
-              <div key={seg.key} className="mb-6">
+              <div key={seg.key} className="mb-2">
                 <SegmentHeader
                   label={seg.label}
                   count={props.length}
