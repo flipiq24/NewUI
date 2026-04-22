@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
@@ -37,13 +38,43 @@ const segments = [
   },
 ];
 
+const segmentLabels: Record<typeof segments[number]["key"], string> = {
+  ACTIVE_OFF_MARKET: "3 Active & Off Market",
+  PENDING_BACKUP_HOLD: "Pending / Backup / Hold",
+  CLOSED_EXPIRED_CANCELED: "Closed / Expired / Canceled",
+};
+
+const segmentTaskCopy: Record<typeof segments[number]["key"], { task: string; tip: string }> = {
+  ACTIVE_OFF_MARKET: {
+    task: "Josh, you have a total of 9 High Priority deals. Start by calling the 3 Active & Off Market.",
+    tip: "These are high priorities — you must call first, then send text and email.",
+  },
+  PENDING_BACKUP_HOLD: {
+    task: "Now review your Pending / Backup / Hold properties. Call the agent to confirm the buyer is performing.",
+    tip: "Stay close until the deal is confirmed — protect your backup position.",
+  },
+  CLOSED_EXPIRED_CANCELED: {
+    task: "These properties are no longer available — that's your opening. Find out what happened and update the relationship.",
+    tip: "Ask if they have any other properties coming up.",
+  },
+};
+
 export default function IqDealReview() {
   const [, navigate] = useLocation();
+  const [segIdx, setSegIdx] = useState(0);
+
+  const currentSeg = segments[segIdx];
+  const isLastSeg = segIdx === segments.length - 1;
+  const nextLabel = isLastSeg ? "Daily Outreach" : segmentLabels[segments[segIdx + 1].key];
 
   function handleNext() {
-    const state = resetIqStateIfNewDay();
-    saveIqState({ ...state, dealReviewComplete: true });
-    navigate("/iq/daily-outreach");
+    if (isLastSeg) {
+      const state = resetIqStateIfNewDay();
+      saveIqState({ ...state, dealReviewComplete: true });
+      navigate("/iq/daily-outreach");
+    } else {
+      setSegIdx(segIdx + 1);
+    }
   }
 
   return (
@@ -51,13 +82,13 @@ export default function IqDealReview() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <IqTopBar
-          breadcrumb="Deal Review > 9 High Priority Deals > 3 Active & Off Market"
-          nextTask="Pending / Backup / Hold"
+          breadcrumb={`Deal Review > 9 High Priority Deals > ${segmentLabels[currentSeg.key]}`}
+          nextTask={nextLabel}
           onNext={handleNext}
         />
         <TaskTipBlock
-          task="Josh, you have a total of 9 High Priority deals. Start by calling the 3 Active & Off Market."
-          tip="These are high priorities — you must call first, then send text and email."
+          task={segmentTaskCopy[currentSeg.key].task}
+          tip={segmentTaskCopy[currentSeg.key].tip}
         />
 
         <div className="flex-1 overflow-y-auto p-4">
@@ -113,18 +144,17 @@ export default function IqDealReview() {
             </p>
           </div>
 
-          {segments.map((seg, segIdx) => {
-            const props = DEAL_REVIEW_PROPERTIES.filter((p) => p.segment === seg.key);
+          {(() => {
+            const props = DEAL_REVIEW_PROPERTIES.filter((p) => p.segment === currentSeg.key);
             return (
-              <div key={seg.key} className="mb-2">
+              <div className="mb-2">
                 <SegmentHeader
-                  label={seg.label}
+                  label={currentSeg.label}
                   count={props.length}
-                  subtitle={seg.subtitle}
-                  borderColor={seg.borderColor}
-                  bgColor={seg.bgColor}
-                  textColor={seg.textColor}
-                  active={segIdx === 0}
+                  subtitle={currentSeg.subtitle}
+                  borderColor={currentSeg.borderColor}
+                  bgColor={currentSeg.bgColor}
+                  textColor={currentSeg.textColor}
                 />
                 <div className="space-y-0 border border-gray-200 rounded-lg overflow-hidden">
                   {props.map((p, i) => (
@@ -133,7 +163,7 @@ export default function IqDealReview() {
                 </div>
               </div>
             );
-          })}
+          })()}
 
           {/* Pagination */}
           <div className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-2.5 mt-4">
