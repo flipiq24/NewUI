@@ -1,10 +1,10 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import {
   saveIqState,
-  clearIqState,
+  resetIqStateIfNewDay,
 } from "@/lib/iq/storage";
 
 export default function IqMorning() {
@@ -14,8 +14,17 @@ export default function IqMorning() {
   const [workExplain, setWorkExplain] = useState("");
   const [helpExplain, setHelpExplain] = useState("");
 
-  const stateRef = useRef(clearIqState());
+  const stateRef = useRef(resetIqStateIfNewDay());
   const state = stateRef.current;
+
+  // Re-login same day: if morning check-in is already done, skip straight
+  // to the tasks dashboard so the user can see their progress with checks.
+  useEffect(() => {
+    if (state.morningCheckin) {
+      navigate("/iq/tasks");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const bothAnswered = canWorkFullDay !== null && needsHelp !== null;
 

@@ -22,8 +22,8 @@ export default function IqNewRelationships() {
   function finishDay() {
     const state = resetIqStateIfNewDay();
     saveIqState({ ...state, newRelationshipsComplete: true });
-    toast({ title: "Great work! Heading to your End of Day Stats." });
-    setTimeout(() => navigate("/"), 600);
+    toast({ title: "Great work! Here's your day at a glance." });
+    setTimeout(() => navigate("/iq/tasks"), 600);
   }
 
   function handleNext() {

@@ -7,7 +7,7 @@ import {
   DEAL_REVIEW_PROPERTIES,
   type DealLevel,
 } from "@/lib/iq/mockData";
-import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
+import { resetIqStateIfNewDay, saveIqState, loadIqState, allTasksComplete } from "@/lib/iq/storage";
 import { isPropertyComplete, useChecklistVersion } from "@/lib/iq/dailyChecklist";
 
 const LEVEL_META: Record<
@@ -51,6 +51,21 @@ interface CardProps {
   onClick: () => void;
   notifications?: NotificationPill[];
   children?: ReactNode;
+  done?: boolean;
+}
+
+function CardCheck() {
+  return (
+    <span
+      title="Completed today"
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 border border-green-300 text-green-700 text-[11px] font-bold uppercase tracking-wide"
+    >
+      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+      Done
+    </span>
+  );
 }
 
 function PillBadge({ pill }: { pill: NotificationPill }) {
@@ -99,16 +114,21 @@ function PillBadge({ pill }: { pill: NotificationPill }) {
   );
 }
 
-function DashboardCard({ priority, title, subtitle, description, onClick, notifications, children }: CardProps) {
+function DashboardCard({ priority, title, subtitle, description, onClick, notifications, children, done }: CardProps) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-white border border-gray-200 rounded-xl shadow-sm p-5 hover:border-orange-300 hover:shadow-md transition-all cursor-pointer block"
+      className={`w-full text-left bg-white border rounded-xl shadow-sm p-5 hover:shadow-md transition-all cursor-pointer block ${
+        done ? "border-green-300 hover:border-green-400" : "border-gray-200 hover:border-orange-300"
+      }`}
     >
       <div className="mb-4">
-        <p className="text-[11px] font-bold text-orange-500 uppercase tracking-wider mb-1">
-          Priority #{priority}
-        </p>
+        <div className="flex items-center gap-2 mb-1">
+          <p className="text-[11px] font-bold text-orange-500 uppercase tracking-wider">
+            Priority #{priority}
+          </p>
+          {done && <CardCheck />}
+        </div>
         <h3 className="text-lg font-bold text-gray-900 leading-tight">{title}</h3>
         <p className="text-sm text-gray-600 mt-1 leading-snug">{description}</p>
         <p className="text-xs text-gray-500 mt-1.5">{subtitle}</p>
@@ -128,6 +148,16 @@ function DashboardCard({ priority, title, subtitle, description, onClick, notifi
 
 export default function IqTasks() {
   const [, navigate] = useLocation();
+  const checklistVersion = useChecklistVersion();
+
+  // Re-read persisted progress so badges reflect what's done today.
+  // Tracked via checklistVersion so toggles inside Deal Review propagate here.
+  const iqState = useMemo(() => loadIqState(), [checklistVersion]);
+  const dealDone = !!iqState?.dealReviewComplete;
+  const outreachDone = !!iqState?.outreachCampaignSent;
+  const priorityDone = !!iqState?.priorityAgentsComplete;
+  const newRelDone = !!iqState?.newRelationshipsComplete;
+  const dayDone = !!iqState && allTasksComplete(iqState);
 
   function startStep(route: string) {
     const state = resetIqStateIfNewDay();
@@ -137,7 +167,6 @@ export default function IqTasks() {
 
   // Subscribe to checklist updates so completion state reflects bilaterally
   // between this page and /iq/deal-review as properties get checked off.
-  const checklistVersion = useChecklistVersion();
   const { levelCounts, levelComplete } = useMemo(() => {
     const lc: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
     const ld: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
@@ -182,6 +211,7 @@ export default function IqTasks() {
                 description="Follow up on your properties — High priority first, then Mid, Low, and finally New. Update the offer status as you go, and check your notifications for each property."
                 subtitle={`Total Deals: ${totalDeals}`}
                 onClick={() => startStep("/iq/deal-review")}
+                done={dealDone}
                 notifications={[
                   { kind: "critical", count: 2, label: "Criticals" },
                   { kind: "reminder", count: 4, label: "Reminders" },
@@ -240,6 +270,7 @@ export default function IqTasks() {
                 description="Send today's outreach emails across hot, warm, cold, and unknown agent buckets."
                 subtitle={`${totalCampaigns} Campaigns • Total Emails: ${totalEmails}`}
                 onClick={() => startStep("/iq/daily-outreach")}
+                done={outreachDone}
               >
                 <div className="grid grid-cols-4 gap-3">
                   {DAILY_OUTREACH_BUCKETS.map((b) => {
@@ -269,6 +300,7 @@ export default function IqTasks() {
                 description="Call your highest-value agents to keep relationships warm and deals moving."
                 subtitle={`Total Priority: ${totalPriorityAgents}`}
                 onClick={() => startStep("/iq/priority-agents")}
+                done={priorityDone}
               >
                 <div
                   title={`${totalPriorityAgents} priority agents to call today — your highest-value relationships flagged for a personal phone call.`}
@@ -289,6 +321,7 @@ export default function IqTasks() {
                 description="Reach out on high-propensity-to-sell properties to grow your agent network."
                 subtitle={`Total Properties: ${totalProperties}`}
                 onClick={() => startStep("/iq/new-relationships")}
+                done={newRelDone}
               >
                 <div
                   title={`${totalProperties} high-propensity-to-sell properties to call today — owners likely to list soon, great targets for new agent relationships.`}
@@ -306,15 +339,27 @@ export default function IqTasks() {
             </div>
 
             <div className="mt-8 flex justify-center">
-              <button
-                onClick={() => startStep("/iq/deal-review")}
-                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold text-base px-8 py-3 rounded-lg shadow-sm transition-colors cursor-pointer flex items-center gap-2"
-              >
-                Get Started
-                <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="6,3 11,8 6,13" />
-                </svg>
-              </button>
+              {dayDone ? (
+                <button
+                  onClick={() => navigate("/")}
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold text-base px-8 py-3 rounded-lg shadow-sm transition-colors cursor-pointer flex items-center gap-2"
+                >
+                  View End of Day Stats
+                  <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="6,3 11,8 6,13" />
+                  </svg>
+                </button>
+              ) : (
+                <button
+                  onClick={() => startStep("/iq/deal-review")}
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-semibold text-base px-8 py-3 rounded-lg shadow-sm transition-colors cursor-pointer flex items-center gap-2"
+                >
+                  Get Started
+                  <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="6,3 11,8 6,13" />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
         </div>
