@@ -181,17 +181,16 @@ function IqNavItem({ icon, label, active, done }: {
   active?: boolean;
   done?: boolean;
 }) {
-  const displayIcon = done ? (
-    <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="2,8 6,12 14,4" />
-    </svg>
-  ) : icon;
-
   return (
-    <div className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer ${
+    <div className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md cursor-pointer ${
       active ? "bg-orange-500 text-white" : "text-gray-600 hover:bg-gray-100"
     }`}>
-      <span className={`flex-shrink-0 w-3.5 h-3.5 ${active ? "text-white" : "text-gray-500"}`}>{displayIcon}</span>
+      {done && !active && (
+        <svg className="w-3.5 h-3.5 flex-shrink-0 text-green-600" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="2,8 6,12 14,4" />
+        </svg>
+      )}
+      <span className={`flex-shrink-0 w-3.5 h-3.5 ${active ? "text-white" : "text-gray-500"}`}>{icon}</span>
       <span className={`text-xs font-medium flex-1 ${active ? "text-white" : ""}`}>{label}</span>
     </div>
   );
