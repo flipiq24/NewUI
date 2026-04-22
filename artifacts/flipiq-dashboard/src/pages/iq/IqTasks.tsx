@@ -221,6 +221,18 @@ export default function IqTasks() {
               </DashboardCard>
 
             </div>
+
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={() => startStep("/iq/deal-review")}
+                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold text-base px-8 py-3 rounded-lg shadow-sm transition-colors cursor-pointer flex items-center gap-2"
+              >
+                Get Started
+                <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="6,3 11,8 6,13" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
