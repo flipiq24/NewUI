@@ -76,7 +76,16 @@ function IqSidebar({ location }: { location: string }) {
         )}
       </div>
 
-      <div className="mt-auto px-3 pb-3">
+      <div className="px-3 pb-2 mt-2">
+        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-2 py-1">Revenue Pipeline</p>
+        <NavItem icon={<FolderIcon />} label="My Deals" />
+      </div>
+
+      <div className="mt-auto px-3 pb-3 space-y-1">
+        <button className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-xs font-medium text-gray-800">
+          Add Property
+          <span className="text-orange-500 font-bold">+</span>
+        </button>
         <Link href="/">
           <IqNavItem icon={<BackIcon />} label="← Back to COMMAND" />
         </Link>

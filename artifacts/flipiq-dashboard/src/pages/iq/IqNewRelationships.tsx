@@ -17,14 +17,18 @@ export default function IqNewRelationships() {
   const total = NEW_RELATIONSHIPS_DEALS.length;
   const deal = NEW_RELATIONSHIPS_DEALS[currentIndex];
 
+  function finishDay() {
+    const state = resetIqStateIfNewDay();
+    saveIqState({ ...state, newRelationshipsComplete: true });
+    toast({ title: "Great work! Heading to your End of Day Stats." });
+    setTimeout(() => navigate("/"), 600);
+  }
+
   function handleNext() {
     const next = currentIndex + 1;
     setCalledCount((c) => c + 1);
     if (next >= total) {
-      const state = resetIqStateIfNewDay();
-      saveIqState({ ...state, newRelationshipsComplete: true });
-      toast({ title: "End of Day Stats coming soon!" });
-      setTimeout(() => navigate("/iq/tasks"), 1200);
+      finishDay();
     } else {
       setCurrentIndex(next);
     }
@@ -35,10 +39,7 @@ export default function IqNewRelationships() {
   }
 
   function handleTopNext() {
-    const state = resetIqStateIfNewDay();
-    saveIqState({ ...state, newRelationshipsComplete: true });
-    toast({ title: "End of Day Stats coming soon!" });
-    setTimeout(() => navigate("/iq/tasks"), 1200);
+    finishDay();
   }
 
   return (
