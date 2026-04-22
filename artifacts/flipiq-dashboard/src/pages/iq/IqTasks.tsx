@@ -1,16 +1,25 @@
 import { useLocation } from "wouter";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
-import { DAILY_OUTREACH_BUCKETS } from "@/lib/iq/mockData";
+import {
+  DAILY_OUTREACH_BUCKETS,
+  DEAL_REVIEW_PROPERTIES,
+  type DealLevel,
+} from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
+import { isPropertyComplete, useChecklistVersion } from "@/lib/iq/dailyChecklist";
 
-const dealCategories = [
-  { label: "High", count: 9, color: "text-red-500", border: "border-red-300", tip: "Highest-urgency deals — call these agents first today." },
-  { label: "Mid", count: 6, color: "text-amber-500", border: "border-amber-300", tip: "Active conversations with solid recent engagement." },
-  { label: "Low", count: 4, color: "text-blue-500", border: "border-blue-300", tip: "Cooler deals — keep them moving with a touch today." },
-  { label: "New", count: 3, color: "text-gray-500", border: "border-gray-300", tip: "Brand-new or unworked deals — open the conversation." },
-];
+const LEVEL_META: Record<
+  DealLevel,
+  { label: string; color: string; border: string; tip: string }
+> = {
+  high: { label: "High", color: "text-red-500", border: "border-red-300", tip: "Highest-urgency deals — call these agents first today." },
+  mid: { label: "Mid", color: "text-amber-500", border: "border-amber-300", tip: "Active conversations with solid recent engagement." },
+  low: { label: "Low", color: "text-blue-500", border: "border-blue-300", tip: "Cooler deals — keep them moving with a touch today." },
+  new: { label: "New", color: "text-gray-500", border: "border-gray-300", tip: "Brand-new or unworked deals — open the conversation." },
+};
+const LEVEL_ORDER: DealLevel[] = ["high", "mid", "low", "new"];
 
 const bucketMeta: Record<string, { label: string; color: string; border: string; tip: string }> = {
   hot: { label: "High", color: "text-red-500", border: "border-red-300", tip: "High-urgency agents — recent strong engagement, high reply likelihood." },
@@ -126,7 +135,27 @@ export default function IqTasks() {
     navigate(route);
   }
 
-  const totalDeals = dealCategories.reduce((s, c) => s + c.count, 0);
+  // Subscribe to checklist updates so completion state reflects bilaterally
+  // between this page and /iq/deal-review as properties get checked off.
+  const checklistVersion = useChecklistVersion();
+  const { levelCounts, levelComplete } = useMemo(() => {
+    const lc: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
+    const ld: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
+    for (const p of DEAL_REVIEW_PROPERTIES) {
+      lc[p.level] += 1;
+      if (isPropertyComplete(p.id)) ld[p.level] += 1;
+    }
+    const complete: Record<DealLevel, boolean> = {
+      high: lc.high > 0 && ld.high === lc.high,
+      mid: lc.mid > 0 && ld.mid === lc.mid,
+      low: lc.low > 0 && ld.low === lc.low,
+      new: lc.new > 0 && ld.new === lc.new,
+    };
+    return { levelCounts: lc, levelComplete: complete };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checklistVersion]);
+
+  const totalDeals = LEVEL_ORDER.reduce((s, l) => s + levelCounts[l], 0);
   const totalCampaigns = 4;
   const totalEmails = 5;
   const totalPriorityAgents = 9;
@@ -159,7 +188,45 @@ export default function IqTasks() {
                   { kind: "unseen", count: 1, label: "Unseen" },
                   { kind: "text", count: 3, label: "Texts" },
                 ]}
-              />
+              >
+                <div className="grid grid-cols-4 gap-3">
+                  {LEVEL_ORDER.map((level) => {
+                    const meta = LEVEL_META[level];
+                    const count = levelCounts[level];
+                    const isDone = levelComplete[level];
+                    const cls = isDone
+                      ? "bg-green-50 border-green-300"
+                      : `bg-white ${meta.border}`;
+                    return (
+                      <div
+                        key={level}
+                        title={`${meta.label} — ${count} ${count === 1 ? "deal" : "deals"}${
+                          isDone ? " (all complete)" : ""
+                        }. ${meta.tip}`}
+                        className={`relative border ${cls} rounded-lg p-4 text-center cursor-help`}
+                      >
+                        {isDone && (
+                          <svg
+                            className="absolute top-1.5 right-1.5 w-4 h-4 text-green-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                        <p className={`text-3xl font-bold ${meta.color} leading-none mb-1`}>
+                          {count}
+                        </p>
+                        <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide">
+                          {meta.label}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </DashboardCard>
             </div>
 
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">
