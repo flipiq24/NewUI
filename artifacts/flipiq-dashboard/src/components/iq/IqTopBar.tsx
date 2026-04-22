@@ -49,6 +49,16 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerCo
         <div className="flex-1 flex justify-center">{centerContent}</div>
       )}
       {nextTask && (
+        <div className="flex items-center gap-2">
+        <button
+          onClick={() => window.history.back()}
+          aria-label="Go back"
+          className="w-6 h-6 rounded flex items-center justify-center text-orange-500 hover:bg-orange-50 cursor-pointer"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="10,3 5,8 10,13" />
+          </svg>
+        </button>
         <button
           onClick={handleNextClick}
           className={`text-xs flex items-center gap-1 ${onNext ? "cursor-pointer" : "cursor-default"}`}
@@ -61,6 +71,7 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerCo
             </svg>
           )}
         </button>
+        </div>
       )}
       <div className="flex items-center gap-4">
         <button className="flex items-center gap-1.5 group">
