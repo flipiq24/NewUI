@@ -113,7 +113,7 @@ export default function IqDealReview() {
             </p>
           </div>
 
-          {segments.map((seg) => {
+          {segments.map((seg, segIdx) => {
             const props = DEAL_REVIEW_PROPERTIES.filter((p) => p.segment === seg.key);
             return (
               <div key={seg.key} className="mb-6">
@@ -124,6 +124,7 @@ export default function IqDealReview() {
                   borderColor={seg.borderColor}
                   bgColor={seg.bgColor}
                   textColor={seg.textColor}
+                  active={segIdx === 0}
                 />
                 <div className="space-y-0 border border-gray-200 rounded-lg overflow-hidden">
                   {props.map((p, i) => (

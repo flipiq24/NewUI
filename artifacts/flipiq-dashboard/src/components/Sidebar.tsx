@@ -16,13 +16,15 @@ export default function Sidebar() {
 function IqSidebar({ location }: { location: string }) {
   resetIqStateIfNewDay();
 
-  const iqActive = location === "/iq" || location === "/iq/tasks" || location === "/iq/welcome-back";
+  const welcomeBackActive = location === "/iq/welcome-back";
+  const iqActive = location === "/iq" || location === "/iq/tasks";
   const dealReviewActive = location === "/iq/deal-review";
   const dailyOutreachLocations = ["/iq/daily-outreach", "/iq/priority-agents", "/iq/new-relationships"];
   const dailyOutreachActive = dailyOutreachLocations.includes(location);
 
-  const showDealReview = dealReviewActive || dailyOutreachActive;
-  const showDailyOutreach = dailyOutreachActive;
+  const showDealReview = dealReviewActive || dailyOutreachActive || welcomeBackActive;
+  const showDailyOutreach = dailyOutreachActive || welcomeBackActive;
+  const showWelcomeBack = welcomeBackActive;
 
   return (
     <div className="w-[192px] bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
@@ -59,6 +61,16 @@ function IqSidebar({ location }: { location: string }) {
               label="Daily Outreach"
               active={dailyOutreachActive}
               done={!dailyOutreachActive}
+            />
+          </Link>
+        )}
+        {showWelcomeBack && (
+          <Link href="/iq/welcome-back">
+            <IqNavItem
+              icon={<LightbulbIcon />}
+              label="Welcome Back"
+              active={welcomeBackActive}
+              done={false}
             />
           </Link>
         )}
@@ -106,6 +118,10 @@ function DefaultSidebar({ location }: { location: string }) {
       <div className="px-3 pb-2">
         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-2 py-1">Revenue Pipeline</p>
         <NavItem icon={<FolderIcon />} label="My Deals" />
+        <button className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 my-1 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-xs font-medium text-gray-800">
+          Add Property
+          <span className="text-orange-500 font-bold">+</span>
+        </button>
         <NavItem icon={<ChartIcon />} label="Revenue Pipeline" />
       </div>
 
@@ -132,10 +148,6 @@ function DefaultSidebar({ location }: { location: string }) {
       </div>
 
       <div className="mt-auto px-3 pb-3 space-y-1">
-        <button className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-xs font-medium text-gray-800">
-          Add Property
-          <span className="text-orange-500 font-bold">+</span>
-        </button>
         <NavItem icon={<CollapseIcon />} label="Collapse sidebar" />
         <NavItem icon={<LogInIcon />} label="Log in as..." />
       </div>
