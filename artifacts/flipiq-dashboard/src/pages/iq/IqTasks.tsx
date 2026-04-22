@@ -6,10 +6,10 @@ import { DAILY_OUTREACH_BUCKETS } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 
 const dealCategories = [
-  { label: "Priority", count: 9, color: "text-orange-500", bg: "bg-orange-50", border: "border-orange-200" },
-  { label: "Hot", count: 6, color: "text-red-500", bg: "bg-red-50", border: "border-red-200" },
-  { label: "Warm", count: 4, color: "text-amber-500", bg: "bg-amber-50", border: "border-amber-200" },
-  { label: "Cold", count: 3, color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200" },
+  { label: "Priority", count: 9, color: "text-red-500", bg: "bg-red-50", border: "border-red-200" },
+  { label: "Hot", count: 6, color: "text-amber-500", bg: "bg-amber-50", border: "border-amber-200" },
+  { label: "Warm", count: 4, color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200" },
+  { label: "Cold", count: 3, color: "text-gray-500", bg: "bg-gray-50", border: "border-gray-200" },
 ];
 
 const bucketColors: Record<string, { color: string; bg: string; border: string }> = {
