@@ -12,9 +12,17 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title }: IqTopB
         {title && (
           <span className="text-base font-semibold text-gray-700">{title}</span>
         )}
-        {breadcrumb && (
-          <span className="text-lg font-semibold text-gray-700">{breadcrumb}</span>
-        )}
+        {breadcrumb && (() => {
+          const idx = breadcrumb.lastIndexOf(">");
+          const head = idx >= 0 ? breadcrumb.slice(0, idx + 1) : "";
+          const tail = idx >= 0 ? breadcrumb.slice(idx + 1).trim() : breadcrumb;
+          return (
+            <span className="text-lg font-semibold text-gray-700">
+              {head && <span>{head} </span>}
+              <span className="underline decoration-orange-500 decoration-2 underline-offset-4">{tail}</span>
+            </span>
+          );
+        })()}
       </div>
       {nextTask && (
         <button
