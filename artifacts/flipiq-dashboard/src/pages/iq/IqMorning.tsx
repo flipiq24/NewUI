@@ -81,6 +81,7 @@ export default function IqMorning() {
                 onChange={setNeedsHelp}
                 explain={helpExplain}
                 onExplainChange={setHelpExplain}
+                explainOn={true}
               />
               <Question
                 label="Can you send out 5 offers today?"
@@ -128,13 +129,16 @@ function Question({
   onChange,
   explain,
   onExplainChange,
+  explainOn = false,
 }: {
   label: string;
   value: boolean | null;
   onChange: (v: boolean) => void;
   explain: string;
   onExplainChange: (v: string) => void;
+  explainOn?: boolean;
 }) {
+  const showExplain = value === explainOn;
   return (
     <div>
       <p className="text-sm font-medium text-gray-800 mb-2">{label}</p>
@@ -149,7 +153,7 @@ function Question({
           selected={value === false}
           onClick={() => onChange(false)}
         />
-        {value === false && (
+        {showExplain && (
           <textarea
             placeholder="Explain..."
             value={explain}
