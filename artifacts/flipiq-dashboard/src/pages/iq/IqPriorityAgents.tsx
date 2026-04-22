@@ -12,7 +12,7 @@ const TOTAL_AGENTS = 1;
 export default function IqPriorityAgents() {
   const [, navigate] = useLocation();
   const [calledCount, setCalledCount] = useState(0);
-  const { started } = useStartGate("priorityAgents");
+  const { started, start } = useStartGate("priorityAgents");
 
   function handleNext() {
     const next = calledCount + 1;
@@ -43,7 +43,8 @@ export default function IqPriorityAgents() {
         <TaskTipBlock
           task="Josh, these are your high-priority relationships. Follow the next steps right below the agent's record information and click each of the checkboxes to get moving. If the agent doesn't respond, click Follow Up, make notes, then click Next Agent on the top for the next phone call."
           tip="Once you speak to the agent, based on the relationship, make sure you update the agent status."
-          storageKey="priorityAgents"
+          showStartButton={!started}
+          onStart={start}
         />
 
         {started && (

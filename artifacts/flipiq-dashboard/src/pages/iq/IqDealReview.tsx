@@ -63,7 +63,7 @@ const segmentTaskCopy: Record<typeof segments[number]["key"], { task: string; ti
 export default function IqDealReview() {
   const [, navigate] = useLocation();
   const [segIdx, setSegIdx] = useState(0);
-  const { started } = useStartGate("dealReview");
+  const { started, start } = useStartGate("dealReview");
 
   const currentSeg = segments[segIdx];
   const isLastSeg = segIdx === segments.length - 1;
@@ -91,7 +91,8 @@ export default function IqDealReview() {
         <TaskTipBlock
           task={segmentTaskCopy[currentSeg.key].task}
           tip={segmentTaskCopy[currentSeg.key].tip}
-          storageKey="dealReview"
+          showStartButton={!started}
+          onStart={start}
         />
 
         {started && (
