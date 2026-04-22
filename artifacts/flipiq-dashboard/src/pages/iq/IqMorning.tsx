@@ -149,13 +149,15 @@ function Question({
           selected={value === false}
           onClick={() => onChange(false)}
         />
-        <textarea
-          placeholder="Explain..."
-          value={explain}
-          onChange={(e) => onExplainChange(e.target.value)}
-          rows={2}
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-200 flex-1 bg-white resize-none"
-        />
+        {value === false && (
+          <textarea
+            placeholder="Explain..."
+            value={explain}
+            onChange={(e) => onExplainChange(e.target.value)}
+            rows={2}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-200 flex-1 bg-white resize-none"
+          />
+        )}
       </div>
     </div>
   );
