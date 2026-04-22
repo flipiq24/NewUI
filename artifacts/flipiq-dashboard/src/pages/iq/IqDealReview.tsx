@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
@@ -101,21 +101,46 @@ export default function IqDealReview() {
 
   const allLevelsDone = LEVEL_ORDER.every((l) => levelCounts[l] === 0 || levelComplete[l]);
 
-  // Auto-advance the active level as each one is completed, so the checkmark
-  // "moves along" from High → Mid → Low → New as Josh works through them.
+  // One-time initial focus: when this segment first opens, point Josh at the
+  // first level that still has work. After that, manual tab clicks are
+  // respected — including clicking back to a completed level to review it,
+  // or clearing the filter (null).
+  const didInitFocus = useRef(false);
   useEffect(() => {
-    if (allLevelsDone) return;
-    const nextIncomplete = LEVEL_ORDER.find(
-      (l) => levelCounts[l] > 0 && !levelComplete[l],
-    ) ?? null;
-    if (activeLevel === null) {
-      if (nextIncomplete) setActiveLevel(nextIncomplete);
+    if (didInitFocus.current) return;
+    if (allLevelsDone) {
+      didInitFocus.current = true;
       return;
     }
-    if (levelComplete[activeLevel] && nextIncomplete && nextIncomplete !== activeLevel) {
-      setActiveLevel(nextIncomplete);
+    const firstIncomplete = LEVEL_ORDER.find(
+      (l) => levelCounts[l] > 0 && !levelComplete[l],
+    );
+    if (firstIncomplete) {
+      setActiveLevel(firstIncomplete);
+      didInitFocus.current = true;
     }
-  }, [levelComplete, levelCounts, activeLevel, allLevelsDone]);
+  }, [levelCounts, levelComplete, allLevelsDone]);
+
+  // Auto-advance only on the transition where the *currently active* level
+  // flips from incomplete to complete. This makes the checkmark "move along"
+  // as Josh finishes a level, without overriding deliberate tab clicks.
+  const prevActiveCompleteRef = useRef<boolean>(false);
+  useEffect(() => {
+    if (activeLevel === null) {
+      prevActiveCompleteRef.current = false;
+      return;
+    }
+    const isComplete = levelComplete[activeLevel];
+    const wasComplete = prevActiveCompleteRef.current;
+    prevActiveCompleteRef.current = isComplete;
+    if (!wasComplete && isComplete && !allLevelsDone) {
+      const startIdx = LEVEL_ORDER.indexOf(activeLevel);
+      const nextIncomplete = LEVEL_ORDER.slice(startIdx + 1)
+        .concat(LEVEL_ORDER.slice(0, startIdx))
+        .find((l) => levelCounts[l] > 0 && !levelComplete[l]);
+      if (nextIncomplete) setActiveLevel(nextIncomplete);
+    }
+  }, [activeLevel, levelComplete, levelCounts, allLevelsDone]);
 
   // Properties shown in the current segment, after applying filters
   const visibleProps = useMemo(() => {
