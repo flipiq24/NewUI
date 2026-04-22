@@ -34,6 +34,12 @@ export function saveIqState(s: IqState): void {
   localStorage.setItem(KEY, JSON.stringify(s));
 }
 
+export function clearIqState(): IqState {
+  const fresh: IqState = { date: todayStr() };
+  saveIqState(fresh);
+  return fresh;
+}
+
 export function resetIqStateIfNewDay(): IqState {
   const today = todayStr();
   const existing = loadIqState();

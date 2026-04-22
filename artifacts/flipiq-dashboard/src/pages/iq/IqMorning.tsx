@@ -1,11 +1,10 @@
-import { useState } from "react";
-import { useLocation, Redirect } from "wouter";
+import { useState, useRef } from "react";
+import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import {
   saveIqState,
-  resetIqStateIfNewDay,
-  allTasksComplete,
+  clearIqState,
 } from "@/lib/iq/storage";
 
 export default function IqMorning() {
@@ -15,29 +14,8 @@ export default function IqMorning() {
   const [workExplain, setWorkExplain] = useState("");
   const [helpExplain, setHelpExplain] = useState("");
 
-  const state = resetIqStateIfNewDay();
-
-  if (allTasksComplete(state)) {
-    return (
-      <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
-        <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <IqTopBar title="FlipIQ Assistant" />
-          <div className="flex-1 overflow-y-auto flex items-center justify-center">
-            <div className="max-w-lg text-center">
-              <div className="text-4xl mb-4">🎉</div>
-              <h1 className="text-2xl font-bold text-orange-500 mb-2">All tasks complete!</h1>
-              <p className="text-gray-600">Great work today, Josh! You've completed all your tasks for the day.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (state.morningCheckin) {
-    return <Redirect to="/iq/welcome-back" />;
-  }
+  const stateRef = useRef(clearIqState());
+  const state = stateRef.current;
 
   const bothAnswered = canWorkFullDay !== null && needsHelp !== null;
 
