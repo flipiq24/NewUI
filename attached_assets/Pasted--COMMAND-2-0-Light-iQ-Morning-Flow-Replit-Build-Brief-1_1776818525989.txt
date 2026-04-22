@@ -1,0 +1,543 @@
+# COMMAND 2.0 Light — iQ Morning Flow
+## Replit Build Brief
+
+---
+
+## 1. Context (READ FIRST)
+
+This is **not** a new project. You are working inside the existing `artifacts/flipiq-dashboard` workspace in this repo (`NewUI`). Do not scaffold a new app. Do not create a new folder outside `artifacts/flipiq-dashboard`. Do not install new dependency families — everything you need is already in `package.json` (React, Vite, wouter, shadcn/ui, Tailwind, lucide-react, framer-motion).
+
+The existing app currently routes:
+- `/` → `MyStats`
+- `/adaptation-reports` → `AdaptationReports`
+
+You will add a new top-level flow mounted at `/iq` that drives the entire COMMAND 2.0 Light experience.
+
+**What you are building:** a seven-step guided daily workflow that replaces free navigation with a linear "iQ tells the AA what to do next" experience. The AA logs in, iQ walks them screen by screen, and the sidebar unlocks items as they progress. When they leave and come back, iQ resumes them at the exact step they left off.
+
+---
+
+## 2. Hard Design Rules (DO NOT VIOLATE)
+
+1. **White / light theme only.** Background is `#f5f6f8` (matches `MyStats`). Sidebar is `bg-white` with a right border. No dark dashboards. No dark sidebars.
+2. **Brand accent is orange `#F97316` (Tailwind `orange-500`).** All primary buttons, active nav states, active step indicators, and "iQ" branding use this orange. No green, no blue primaries.
+3. **Font is the existing app font** (Plus Jakarta Sans via Tailwind `font-sans`). No new font imports.
+4. **Do NOT embed the reference PDF screenshots as images.** Build every UI element as native React + Tailwind. Pixel-sharp borders, crisp text, no blurry assets.
+5. **All buttons, inputs, and cards use consistent sizing** — pull from shadcn/ui primitives (`Button`, `Card`, `Input`, `Badge`) that already exist in `src/components/ui/`. Do not roll new button styles.
+6. **Typography hierarchy**: orange bold for screen titles and section headers, dark gray (`text-gray-800`) for body, light gray (`text-gray-400`) for metadata, `text-gray-600` for labels.
+7. **Never remove existing functionality.** `MyStats` and `AdaptationReports` must continue to work exactly as they do today.
+
+---
+
+## 3. The Flow (7 Screens)
+
+The AA moves through these in order. Each screen has the same top bar layout (see §4) and unlocks the next sidebar item when complete.
+
+| # | Route | Screen | Trigger to next |
+|---|-------|--------|-----------------|
+| 1 | `/iq` | Morning Check-in | Answers both questions |
+| 2 | `/iq/tasks` | Today's Tasks summary | Clicks "Click here to get started" |
+| 3 | `/iq/deal-review` | Deal Review (9 properties, 3 segments) | Clicks "Next Task" in top bar |
+| 4 | `/iq/daily-outreach` | Daily Outreach — Campaigns | Clicks "Send Campaign" then "Next Task" |
+| 5 | `/iq/priority-agents` | Daily Outreach — Call Priority Agents | Clicks "Next Agent" through all agents |
+| 6 | `/iq/new-relationships` | Start New Relationship Building (high-propensity deals + iQ Property Intelligence) | Clicks "Next Deal" through all deals |
+| 7 | `/iq/welcome-back` | Welcome Back (shown on return if flow was not completed same day) | Clicks "Click here to get started" → resumes at last incomplete step |
+
+---
+
+## 4. Shared Layout (every screen)
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ SIDEBAR (white, 192px)    │ TOP BAR (white, 56px)         │
+│                           │ ┌──────────────────────────┐  │
+│ • iQ [orange when active] │ │ Breadcrumb   │ Next Task │  │
+│ • Deal Review 3/426 ✓     │ │              │ Need Help?│  │
+│ • Daily Outreach 0/12     │ └──────────────────────────┘  │
+│ • ...                     │                                │
+│                           │  MAIN CONTENT AREA             │
+│ [Add Property +]          │  (bg #f5f6f8)                  │
+│ [Collapse sidebar <]      │                                │
+│ [Log in as…]              │                                │
+│ Josh Santos               │                                │
+│ joshs@fair-close.com      │                                │
+│ ⚙ ⎋  [← Back to COMMAND]  │                                │
+└───────────────────────────┴────────────────────────────────┘
+```
+
+### 4.1 Sidebar (reuse existing `src/components/Sidebar.tsx`)
+
+Modify the existing Sidebar to add a new mode: when the URL starts with `/iq`, the sidebar collapses to ONLY the `TODAY'S PLAN` section. Hide Revenue Pipeline, Find Deals, Insights, Tools sections entirely. The AA does not get to pick where to go.
+
+Sidebar items in iQ mode:
+- **iQ** (always shown, active on `/iq` and `/iq/tasks` and `/iq/welcome-back`)
+- **Deal Review 3/9** (shown once user reaches screen 3; active on `/iq/deal-review`; shows `✓` when complete)
+- **Daily Outreach 0/12** (shown once user reaches screen 4 OR 5 — they are sub-steps of the same sidebar item; use the active state when URL matches either)
+- Items NOT yet reached are hidden entirely (not greyed out — invisible).
+
+**Add a new sidebar footer item: `← Back to COMMAND`** above the user profile block. On click, navigate to `/` (MyStats). This is the only escape hatch.
+
+### 4.2 Top Bar (new component: `src/components/iq/IqTopBar.tsx`)
+
+Three props: `breadcrumb: string`, `nextTask: string | null`, `onNext?: () => void`.
+
+Layout:
+- **Left**: Breadcrumb in medium gray text (e.g., `Deal Review > 9 High Priority Deals > 3 Active & Off Market`)
+- **Right**: `Next Task: <nextTask>` label (small, gray) next to a `Need Help?` button (ghost style, orange text, orange outline on hover). If `onNext` is provided, the `Next Task` label is clickable and advances the flow.
+
+No page-level H1 — the top bar IS the location indicator.
+
+### 4.3 Task + Tip block (new component: `src/components/iq/TaskTipBlock.tsx`)
+
+Two props: `task: string`, `tip: string`.
+
+Renders directly under the top bar on screens 3–6:
+```
+Task:  <task copy>
+Tip:   <tip copy>
+```
+- `Task:` label is orange bold, body is dark gray.
+- `Tip:` label is blue-gray bold, body is medium gray.
+- Left-aligned, 24px left padding, 16px vertical padding.
+
+---
+
+## 5. Screen-by-Screen Specs
+
+### Screen 1 — Morning Check-in (`/iq`)
+
+**Top bar**: `FlipIQ Assistant` on left (with orange lightbulb icon `lucide-react` `Lightbulb`). `Need Help?` on right. No Next Task yet.
+
+**Sidebar**: only `iQ` visible.
+
+**Main content** (centered, max-width 640px, left-aligned within that):
+
+```
+Good morning, Josh!      <-- orange, 28px, bold
+
+Are you able to work full day?    [Yes] [No]    [Explain____________]
+
+Do you need any help today?       [Yes] [No]    [Explain____________]
+```
+
+- Buttons: small pill shape, orange filled when selected, white with orange outline when not.
+- `Yes` / `No` are a toggle pair per question.
+- `Explain` is a text input, placeholder `Explain`, shown at 50% opacity until focused.
+- Below both questions, a **Continue** button (orange, right-aligned) appears only after both questions are answered. Clicking it persists the answers to localStorage under key `iq:morning-checkin` with shape `{ date: "YYYY-MM-DD", canWorkFullDay: boolean, needsHelp: boolean, workExplain: string, helpExplain: string }` and navigates to `/iq/tasks`.
+
+### Screen 2 — Today's Tasks (`/iq/tasks`)
+
+**Top bar**: same FlipIQ Assistant header, no breadcrumb.
+
+**Sidebar**: `iQ` active. No other items.
+
+**Main content**:
+
+```
+Here are your tasks today, Josh!        <-- orange, 28px, bold
+
+Task 1)  You have 426 Properties you need to follow up on
+Task 2)  You have 5 Agents you need to send text and emails to
+Task 3)  You have 2 Priority agents you need to call
+Task 4)  You have 30 High-propensity deals to chase
+
+                                            [Click here to get started!]
+```
+
+- Task labels (`Task 1)` etc.) are orange bold.
+- Counts (`426 Properties`, `5 Agents`, etc.) are bold dark gray.
+- The numbers are hardcoded for now — `tasks` config comes from a constant in `src/lib/iq/mockData.ts` (see §7).
+- "Click here to get started!" button is orange, right-aligned at the bottom of the task list. Clicking it persists `iq:flow-started = true` and navigates to `/iq/deal-review`.
+
+### Screen 3 — Deal Review (`/iq/deal-review`)
+
+**Top bar breadcrumb**: `Deal Review > 9 High Priority Deals > 3 Active & Off Market`
+**Top bar Next Task**: `Pending / Backup / Hold` (clickable — scrolls to that section or advances).
+
+**Sidebar**: `iQ` (checked), `Deal Review 0/9` (active, orange, count increments as user works through).
+
+**Task / Tip block**:
+- Task: `Josh, you have a total of 9 High Priority deals. Start by calling the 3 Active & Off Market.`
+- Tip: `These are high priorities — you must call first, then send text and email.`
+
+**Filter chips row** (top right of the list, above the segments): `2 Criticals` (red pill), `3 Reminders` (blue pill), `1 Unseen` (blue-gray pill). These are visual indicators only, no filter functionality yet.
+
+**Segments** — render three grouped sections. Each segment has a colored header bar with count.
+
+#### Segment 1: `ACTIVE & OFF MARKET` (3 properties)
+Subtitle: `These are your highest-priority active and off-market properties. MUST call first. Follow up with text and email after the phone call is made.`
+
+#### Segment 2: `PENDING / BACKUP / HOLD` (2 properties)
+Subtitle: `These properties are in contract. Call the agent. Find out if the buyer is performing. Stay close until it's confirmed.`
+
+#### Segment 3: `CLOSED / EXPIRED / CANCELED` (4 properties)
+Subtitle: `This property is no longer available — that's your opening. Find out who the buyer was, did it sell for more or less than your offer, and update the relationship. Then ask if they have any other properties coming up.`
+
+#### Property row layout (reuse shadcn `Card`)
+
+Each row is a card with 4 horizontal columns:
+
+**Col 1 — Identity (left, ~35%)**
+- Priority badge (`High` in light pink) · bullet · Status badge (`To do: Adjust terms`, orange pill)
+- Email icon / Phone icon / Person icon stack (left edge, small, gray)
+- Address line (bold, 14px): `73750 Desert Vista Court, Palm Desert, CA 92260` with a globe icon and `STD` badge (gray)
+- Property specs line (12px, gray): `Condominium / 3Br / 2Ba / 2Gar / 1976 / 1,248ft² / 2,613ft² / Pool: In Ground...`
+- Days line (11px, gray): `107 Days • DOM: 107 / CDOM: 107`
+- Source line: `Source: MLS - Active` (green "Active")
+
+**Col 2 — Price / Propensity (~18%)**
+- Price bold 18px: `$399,000`
+- `Propensity: 6 | No Pain` (small, gray, `|` separator)
+- Tag chips stacked: `Absentee Owner` (blue), `High Equity (>50%)` (green), `Corporate/Trust Ownership` (blue), `+1 more` link if more tags
+
+**Col 3 — Last Open / Called (~18%)**
+- `Last Open Date: 04/21/26` with small `reopened today` in orange below
+- `Last Called Date: 01/30/26`
+
+**Col 4 — Offer Status / Source (right, ~29%)**
+- Offer % badge: `60% In Negotiations` (orange pill for 60%, gray for 30%, white-outline for 0%)
+- `Next Steps: Adjust terms` (dark orange text)
+- `Offer Negotiator: Josh Santos`
+- `Assigned User: Josh Santos` (or `Not Assigned` in gray)
+
+Each row is clickable (navigates to a placeholder `/iq/deal-review/:address` route that just shows "Property detail — not yet built" for now, but the click must be hooked).
+
+**Bottom pagination**: `Showing 1 to 9 of 9 entries` / `5 / page` dropdown / `Previous [1] Next`. Visual only.
+
+**Data**: use the exact 9 properties from §7. Do not invent new ones.
+
+When the user clicks the `Next Task` button in the top bar, persist `iq:deal-review-complete = true`, update the sidebar badge to `9/9 ✓`, and navigate to `/iq/daily-outreach`.
+
+### Screen 4 — Daily Outreach: Send Text & Emails (`/iq/daily-outreach`)
+
+**Breadcrumb**: `Daily Outreach > Send Text and Emails`
+**Next Task**: `Call Priority Agents`
+
+**Sidebar**: `iQ` ✓, `Deal Review 9/9` ✓, `Daily Outreach 0/12` (active, orange).
+
+**Task**: `Josh, you have a total of 5 Agent relationships to send campaigns to today. Start by clicking the box of each group — Hot, Warm, Cold, Unknown — on the top right of each card. Then choose a template, or configure a custom SMS or email message.`
+
+**Tip**: `You can choose from pending emails or send a custom email for each.`
+
+**Main content — Campaign Configuration card**:
+
+Header row: `Campaign Configuration` (left, 16px bold) / subtitle `You have a total of 38 agent relationships (Hot, Warm, Cold, Unknown)` / right-side `CAMPAIGNS SENT 0 / 4`
+
+**1. Select Audience** — 4 cards in a row:
+
+| Card | Total DB | Pending Today | Last Created | Last Template |
+|---|---|---|---|---|
+| **HOT AGENTS** (red header) | 7 | 1 | 03/14/26 (38 days ago) | Text - direct to agent test |
+| **WARM AGENTS** (yellow header) | 8 | 1 | 02/15/26 (65 days ago) | Email Direct to Agent - Weekly Campaigns |
+| **COLD AGENTS** (blue header) | 2 | 1 | 02/02/26 (78 days ago) | Text - direct to agent test |
+| **UNKNOWN AGENTS** (gray header) | 21 | 2 | 03/17/26 (35 days ago) | Text - direct to agent test |
+
+Each card has a checkbox top-right. When selected, the card gets an orange outline.
+
+**2. Configure Message (Sends to 1 Agents)** — 3 columns:
+- **SMS Text** (checkbox on) — dropdown: `Text - direct to agent test` — preview eye icon
+- **Email** (checkbox off) — dropdown: `Email Direct to Agent - Weekly Campaigns` — disabled preview
+- **Voicemail** (checkbox off, `SOON` badge gray) — dropdown disabled
+
+**Footer row**: `You are sending to 1 Agents.` on left / `Send Campaign →` orange button on right.
+
+Clicking `Send Campaign` persists `iq:outreach-campaign-sent = true`, shows a success toast (use `sonner`), and advances to Screen 5 automatically.
+
+### Screen 5 — Call Priority Agents (`/iq/priority-agents`)
+
+**Breadcrumb**: `Daily Outreach > Call Priority Agents`
+**Next Task**: `Start New Relationship Building`
+
+**Sidebar**: `iQ` ✓, `Deal Review 9/9` ✓, `Daily Outreach 4/12` (in progress after campaign send).
+
+**Task**: `Josh, these are your high-priority relationships. Follow the next steps right below the agent's record information and click each of the checkboxes to get moving. If the agent doesn't respond, click Follow Up, make notes, then click Next Agent on the top for the next phone call.`
+
+**Tip**: `Once you speak to the agent, based on the relationship, make sure you update the agent status.`
+
+**Pagination bar**: `1 Total Priority Agents` (left) · `[< Previous Agent] Agents Called 0 of 1 [Next Agent >]` (centered) — `Next Agent` button is orange.
+
+**Agent record card** (reuse shadcn Card):
+
+Header: Agent name `Jose Ponce` (bold, orange) + rename icon · `Assigned: Josh Santos` (dropdown) · Right side: `⚠ 1 Critical` red pill · `🔔 0 Reminders` blue pill · `Do Not Call` toggle (off).
+
+Three-column info block:
+- **Agent Record**: Phone `909-266-0934` · Email `joseponce909@yahoo.com` · Company `PONCE & PONCE REALTY, INC` · Address `SAN BERNARDINO, SAN BERNARDINO, CA` · Social icons row (LinkedIn, Facebook, Instagram, website)
+- **Last Communication**: `Last Communication Date: –` · `Last Communication Type: –` · `Last Address Discussed: –` · `Last Communicated AA: Josh Santos`
+- **Performance**: `Licensed Since: 2017` · `License #: 01307544` · `Active In Last 2 Years: TRUE` (green) · `Average Deals Per Year: 56` · `Double Ended: 0` · `Investor Source: 19`
+
+**NEXT STEPS row** (checkbox strip): `Call Agent` · `Agent Rating - Unknown` · `Set reminder` · `Run agent iQ reports` (checked, orange) · `Relationship Status - Priority` (checked, orange) · `+ Add`
+
+**Two-panel grid below**:
+
+- **Agent Status** (left panel): `Relationship Status: Priority` (dropdown) · `Basket: Select…` · `Agent Investor: Yes`
+- **Follow Up** (right panel): `Follow Up Status: Relationship Built` (dropdown) · `Follow Up Status Date: 03/18/2026` · top-right `Set Reminder` link (orange)
+
+**Agent Info Details** (collapsible, closed by default)
+
+**Agent Notes** (collapsible, open by default):
+- Text input with placeholder `Start typing...` + `📎` attach icon · `Communication` checkbox · `Critical` checkbox · `Post Note` button (orange)
+- Below: three mock notes (Josh Santos, tags `Critical` / `Communication`, timestamps `1mo` / `3mo`).
+
+When the user clicks `Next Agent` and `Agents Called` reaches total, persist `iq:priority-agents-complete = true` and auto-navigate to `/iq/new-relationships`.
+
+### Screen 6 — Start New Relationships Building (`/iq/new-relationships`)
+
+**Breadcrumb**: `Daily Outreach > Start New Relationships Building`
+**Next Task**: `End of Day Stats`
+
+**Sidebar**: `Daily Outreach 10/12` (in progress).
+
+**Task**: `Josh, great job following up with your properties and sending campaigns. Now it's time to chase high-propensity-to-sell properties with agents you already work with.`
+
+**Tip**: `Look at the Propensity to Sell score in the top middle of the page and read the iQ Property Intelligence for instructions. Click on the address to enter the property and start making calls.`
+
+**Counter bar**: `0 / 2 new agent calls` (left) · `[< Previous Deal] [Next Deal >]` (right, orange Next Deal button).
+
+**Property row card** — single property at a time:
+
+- Photo thumbnail (use a gray placeholder `<div>` 80×80 with house icon)
+- Address: `3025 Fairmount, Los Angeles, CA 90063` · `NOD` red badge
+- Specs: `2-4 UNITS • 2Br • 2Ba • 3Gar • 1924 • 1,780ft² • 5,259ft² • Pool: None` · `8 Days • DOM 8 • CDOM 8`
+- Tag chips: `investor` `investor` `tenant` `lease` `fixer` `opportunity`
+- Agent note: `Agent has only this listing`
+- Middle column: `$749,000` · `Propensity: 12 | Moderate Pain` (orange) · `Notice of Default` (red) · `Absentee Owner` `High Equity (>50%)`
+- Right column: `LOD: N/A` · `LCD: N/A` · Source: `MLS - Active` · Offer status dropdown `0% None` · `Next Steps: Call buyer agent`
+
+**iQ Property Intelligence panel** (below the property row, full width, light orange tinted bg `bg-orange-50`):
+
+Header: orange lightbulb icon · `iQ Property Intelligence` (bold) · green check `Analysis complete` · yellow `Tier 2` badge
+
+```
+iQ Property Intelligence Summary
+DFI: Heavy Fixer + Active (8-44 DOM) + Moderate Pain + Inactive
+
+PROPERTY
+• Status: Active - 8 days
+• Condition: Heavy Fixer (verified)
+• Occupancy: One-bedroom unit tenant-occupied with a long-term tenant; main unit vacant
+• Price Action: No reduction (listed at $749k)
+
+SELLER
+Pain Level: Moderate Pain
+Pain Score: 6
+Distress Indicators:
+• RED Notice of Default (NOD) (+6 pts)
+Why It Matters: Foreclosure has started — seller is behind on payments and under bank pressure.
+
+AGENT - AGUSTINGOMEZ
+CRM Data:
+• Active in Last 2 Years: FALSE
+• Avg Deals Per Year: 1
+• Double Ended: 0
+• Investor Source: 0
+• Buyer Agent: Call buyer's agent AGUSTINGOMEZ at (not provided)
+
+DYNAMIC SCRIPT
+"AGUSTINGOMEZ, I'm calling about your listing at 3025 Fairmount. I've done my homework on you.
+We're a tech-driven investment company that buys in your area at competitive prices — exactly where you sell.
+Your seller has Notice of Default here — time is critical.
+We can typically get you a written offer within 24 hours and close in 10-14 days. What would it take for me to earn a shot at this one?"
+
+IF INTERESTED:
+"Perfect. I'll get you proof of funds and a written offer within 24 hours. Can you double-end this or do I need my own agent?"
+
+IF RESISTANT:
+"I understand you're probably getting a lot of calls. But I'm not a wholesaler — we're actual buyers. What would make you comfortable giving us a shot?"
+```
+
+Render this block with proper headers (PROPERTY / SELLER / AGENT / DYNAMIC SCRIPT / IF INTERESTED / IF RESISTANT in small-caps orange), monospace for the script block, 14px line-height 1.6.
+
+When the user works through the 2 deals and clicks `Next Deal` past the last one, persist `iq:new-relationships-complete = true` and the next action is an "End of Day" screen (out of scope for this build — for now just show a placeholder toast "End of Day Stats coming soon" and navigate back to `/iq/tasks`).
+
+### Screen 7 — Welcome Back (`/iq/welcome-back`)
+
+Shown when:
+- User lands on `/iq` AND `iq:morning-checkin` exists for today AND flow is incomplete.
+- Replace Screen 1 with Screen 7 in that case.
+
+**Main content**:
+
+```
+Josh, welcome back!              <-- orange, 28px, bold
+
+Task 1)  You completed 426 Properties, great job - Done
+Task 2)  You still have 5 Agents you need to send text and emails to
+Task 3)  You have 2 Priority agents you need to call
+Task 4)  You have 30 High-propensity deals to chase
+
+                                            [Click here to get started!]
+```
+
+- For each task, read localStorage flags (`iq:deal-review-complete`, `iq:outreach-campaign-sent`, `iq:priority-agents-complete`, `iq:new-relationships-complete`). If complete, label is `You completed X, great job - Done`. Otherwise show the pending version.
+- The `Click here to get started!` button navigates to the FIRST incomplete step in the sequence Deal Review → Daily Outreach → Priority Agents → New Relationships.
+
+---
+
+## 6. State Persistence Model (localStorage)
+
+Create `src/lib/iq/storage.ts` with a typed wrapper:
+
+```ts
+export type IqState = {
+  date: string;               // "YYYY-MM-DD"
+  morningCheckin?: {
+    canWorkFullDay: boolean;
+    needsHelp: boolean;
+    workExplain: string;
+    helpExplain: string;
+  };
+  flowStarted?: boolean;
+  dealReviewComplete?: boolean;
+  outreachCampaignSent?: boolean;
+  priorityAgentsComplete?: boolean;
+  newRelationshipsComplete?: boolean;
+};
+
+const KEY = "iq:state";
+
+export function loadIqState(): IqState | null { ... }
+export function saveIqState(s: IqState): void { ... }
+export function resetIqStateIfNewDay(): IqState { ... }  // called on mount of /iq
+```
+
+**Rules**:
+- On mount of any `/iq/*` route, call `resetIqStateIfNewDay()`. If the stored date !== today's date (local time), clear everything.
+- After morning check-in is saved, if the user navigates to `/iq` again the same day, redirect to `/iq/welcome-back` (not `/iq`).
+- After ALL four task flags are true, navigating to `/iq` shows a "All tasks complete — great work today, Josh!" screen (small stub for now).
+
+---
+
+## 7. Mock Data File
+
+Create `src/lib/iq/mockData.ts` with exported constants:
+
+### `TODAYS_TASKS`
+```ts
+export const TODAYS_TASKS = {
+  properties: 426,
+  agentsToMessage: 5,
+  priorityAgentsToCall: 2,
+  highPropensityDeals: 30,
+};
+```
+
+### `DEAL_REVIEW_PROPERTIES`
+Nine properties split across three segments. Use the exact data below — do not invent.
+
+**Segment: ACTIVE_OFF_MARKET (3)**
+
+1. `73750 Desert Vista Court, Palm Desert, CA 92260` — STD, Condominium, 3Br/2Ba/2Gar/1976, 1,248ft², 2,613ft², Pool: In Ground, Community, Gunite, Electric Heat · 107 Days · DOM 107 / CDOM 107 · $399,000 · Propensity 6 / No Pain · Tags: Absentee Owner, High Equity (>50%), Corporate/Trust Ownership, +1 more · Last Open 04/21/26 (reopened today) · Last Called 01/30/26 · Source MLS - Active · 60% In Negotiations · Next Steps: Adjust terms · Negotiator: Josh Santos · Assigned: Josh Santos · To do: Adjust terms
+
+2. `9283 Atsina Road, Phelan, CA 92371` — REO, Manufactured 433, 3Br/2Ba/2Gar/1986, 1,576ft², 95,396ft², Pool: None · 54 Days · DOM 54 / CDOM 108 · $335,800 · Propensity 5 / No Pain · Tags: High Equity (>50%), Long-term Owner (20+ yrs), Corporate/Trust Ownership · Last Open 12/29/25 (reopened 112 days ago) · Last Called 12/30/25 · Source MLS - Active · 30% Back Up · Next Steps: Prepare backup offer · Negotiator: Josh Santos · Assigned: Not Assigned · To do: Prepare backup offer
+
+3. `338 W Magnolia Street, Compton, CA 90220` — STD, Other (L), 4Br/4Ba/4Gar/1939, 2,360ft², 7,203ft², Pool: None · 131 Days · DOM 131 / CDOM 131 · $895,000 · Last Open 01/01/26 (reopened 109 days ago) · Last Called 01/01/26 · Source MLS - Active · 30% Back Up · Next Steps: Prepare backup offer · Negotiator: Josh Santos · Assigned: Josh Santos · To do: Prepare backup offer
+
+**Segment: PENDING_BACKUP_HOLD (2)**
+
+4. `921 Warren Street, Hayward, CA 94541` — STD, Single Family, 3Br/2Ba/3Gar/1930, 3,488ft², 30,297ft², Pool: In Ground · 133 Days · DOM 133 / CDOM 179 · $1,800,000 · Last Open 01/01/26 (reopened 109 days ago) · Last Called 01/01/26 · Source MLS - Back Up Offer · 30% Back Up · Next Steps: Reminder scheduled · Negotiator: Josh Santos · Assigned: Not Assigned · To do: Reminder scheduled
+
+5. `33087 Wood St, Lake Elsinore, CA 92530` — STD, Single Family, 2Br/1Ba/N/AGar/1947, 1,025ft², 5,227ft², Pool: None · 123 Days · DOM 123 / CDOM 123 · $299,000 · Propensity 2 / No Pain · Tags: High Equity (>50%) · Last Open 01/05/26 (opened 105 days ago) · Last Called N/A · Source MLS - Hold · 0% None · Next Steps: Call agent · Negotiator: Josh Santos · Assigned: Not Assigned · To do: Not set
+
+**Segment: CLOSED_EXPIRED_CANCELED (4)**
+
+6. `132 Nissen Road 3, Salinas, CA 93901` — STD, Townhouse, 3Br/2Ba/2Gar/1985, 1,385ft², N/Aft², Pool: Community · 7 Days · DOM 7 / CDOM 7 · $635,000 · Propensity 10 / Moderate Pain · Tags: Affidavit of Death, High Equity (>50%), Long-term Owner (20+ yrs), +1 more · Last Open 03/02/26 (reopened 48 days ago) · Last Called 03/02/26 · Source MLS - Closed · 10% Initial Contact Started · Next Steps: Call and update offer status · Negotiator: Josh Santos · Assigned: Josh Santos · To do: Not set
+
+7. `902 Ballista Avenue, La Puente, CA 91744` — STD, Single Family, 3Br/1.75Ba/N/AGar/1953, 1,095ft², 6,431ft², Pool: None · 35 Days · DOM 35 / CDOM 35 · $749,000 · Propensity 5 / No Pain · Tags: Absentee Owner, High Equity (>50%), Adjustable Rate Mortgage, +1 more · Last Open 04/14/26 (reopened 7 days ago) · Last Called N/A · Source MLS - Cancelled · 10% Initial Contact Started · Next Steps: Call and update offer status · Negotiator: Josh Santos · Assigned: Not Assigned · To do: Not set
+
+8. `18635 Keyes, Banning, CA 92220` — STD, Single Family, 3Br/2Ba/N/AGar/1955, 1,089ft², 13,068ft², Pool: None · 9 Days · DOM 9 / CDOM 9 · $65,000 · Propensity 7 / Moderate Pain · Tags: Tax Delinquency, High Equity (>50%) · Last Open 01/02/26 (reopened 109 days ago) · Last Called 01/01/26 · Source MLS - Closed · 30% Back Up · Next Steps: Follow up and send offer · Negotiator: Josh Santos · Assigned: Not Assigned · To do: Not set
+
+9. `9461 Lotus, Westminster, CA 92683` — STD, Single Family, 4Br/3Ba/2Gar/1962, 1,751ft², 6,500ft², Pool: None · 10 Days · DOM 10 / CDOM 10 · $1,350,000 · Propensity 3 / No Pain · Tags: High Equity (>50%), Corporate/Trust Ownership, Recent Transfer (<2 yrs) · Last Open 04/15/26 (reopened 6 days ago) · Last Called 04/14/26 · Source MLS - Closed · 0% None · Next Steps: Call agent · Negotiator: Josh Santos · Assigned: Not Assigned · To do: Not set
+
+### Other mock data
+- `DAILY_OUTREACH_BUCKETS` — 4 agent buckets per §5 Screen 4 table.
+- `PRIORITY_AGENT_JOSE` — single agent record for Jose Ponce per §5 Screen 5.
+- `NEW_RELATIONSHIPS_DEALS` — the Fairmount property with full iQ Property Intelligence block per §5 Screen 6.
+
+---
+
+## 8. Routing Additions
+
+In `src/App.tsx`, add these routes inside `<Switch>`, BEFORE the `<Route component={NotFound} />` catchall:
+
+```tsx
+<Route path="/iq" component={IqMorning} />
+<Route path="/iq/tasks" component={IqTasks} />
+<Route path="/iq/deal-review" component={IqDealReview} />
+<Route path="/iq/daily-outreach" component={IqDailyOutreach} />
+<Route path="/iq/priority-agents" component={IqPriorityAgents} />
+<Route path="/iq/new-relationships" component={IqNewRelationships} />
+<Route path="/iq/welcome-back" component={IqWelcomeBack} />
+```
+
+Create page files in `src/pages/iq/` — one file per route.
+
+---
+
+## 9. File Structure to Create
+
+```
+src/
+  pages/
+    iq/
+      IqMorning.tsx
+      IqTasks.tsx
+      IqDealReview.tsx
+      IqDailyOutreach.tsx
+      IqPriorityAgents.tsx
+      IqNewRelationships.tsx
+      IqWelcomeBack.tsx
+  components/
+    iq/
+      IqTopBar.tsx
+      TaskTipBlock.tsx
+      PropertyRow.tsx            // reused on Deal Review
+      SegmentHeader.tsx
+      AudienceCard.tsx            // for Daily Outreach
+      AgentRecordCard.tsx         // for Priority Agents
+      IqPropertyIntelligence.tsx  // for New Relationships
+  lib/
+    iq/
+      storage.ts
+      mockData.ts
+  components/
+    Sidebar.tsx  // MODIFIED — adds iQ mode + Back to COMMAND link
+```
+
+---
+
+## 10. Acceptance Criteria
+
+Before considering this done, verify every one of these:
+
+1. Navigating to `/` still renders `MyStats` exactly as it does today. No visual regression.
+2. Navigating to `/iq` shows the Morning Check-in with only "iQ" in the sidebar.
+3. Both check-in questions must be answered before the Continue button appears.
+4. After check-in, `/iq/tasks` shows the 4 tasks with the counts from `TODAYS_TASKS`.
+5. Clicking "Click here to get started!" advances to Deal Review.
+6. Deal Review renders 9 properties in 3 segments with every field from §7 visible and correctly styled.
+7. Clicking `Next Task` in the top bar on Deal Review advances to Daily Outreach AND adds a ✓ to the Deal Review sidebar item.
+8. Daily Outreach renders 4 audience cards with correct data. Selecting Hot Agents highlights the card in orange. `Send Campaign` button works and advances to Priority Agents.
+9. Priority Agents renders the Jose Ponce card with all fields from §5 Screen 5. `Next Agent` button advances through the flow.
+10. New Relationships renders the Fairmount property + iQ Property Intelligence panel exactly as specified. `Next Deal` advances through.
+11. Closing the browser tab and reopening `/iq` shows the Welcome Back screen (Screen 7) with correct "completed" vs "still have" labels derived from localStorage.
+12. Clicking `← Back to COMMAND` in the sidebar footer from ANY `/iq/*` route returns the user to `/` (MyStats).
+13. The sidebar never shows dark backgrounds. Every button that isn't a ghost/outline variant is orange `orange-500`. No green buttons anywhere.
+14. No screenshots from the reference PDF are embedded. Every screen is native React + Tailwind.
+15. `pnpm run typecheck` passes with zero errors.
+
+---
+
+## 11. Out of Scope (do NOT build yet)
+
+- Property detail page (when clicking a property row). Stub only.
+- End of Day Stats screen (Screen 6 `Next Task`). Placeholder toast only.
+- Real SMS/Email sending (the `Send Campaign` button fires the success toast only — no backend call).
+- Audio recording, agent phone dialer integration.
+- Multi-user session management / real auth. Hardcode `Josh Santos / joshs@fair-close.com`.
+- Any connection to the `api-server` workspace package. This entire build is frontend-only using localStorage and mock data.
+
+---
+
+## 12. If You Have Questions
+
+Do not guess. Do not "improve" the spec by adding features not listed here. If any section is ambiguous, stop and ask. The hard rules in §2 override any interpretation you might be tempted to make.
