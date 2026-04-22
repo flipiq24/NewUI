@@ -150,7 +150,7 @@ export default function IqTasks() {
               <DashboardCard
                 priority={1}
                 title="Deal Review"
-                description="Review active, pending, and closed deals — handle criticals and reminders first."
+                description="Follow up on your properties — High priority first, then Mid, Low, and finally New. Update the offer status as you go, and check your notifications for each property."
                 subtitle={`Total Deals: ${totalDeals}`}
                 onClick={() => startStep("/iq/deal-review")}
                 notifications={[
