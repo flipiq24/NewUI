@@ -27,12 +27,14 @@ export default function TaskTipBlock({ task, tip, storageKey, onStart }: TaskTip
         <span className="text-base text-gray-600">{tip}</span>
       </div>
       {showButton && (
-        <button
-          onClick={handleClick}
-          className="mt-3 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2 rounded cursor-pointer"
-        >
-          Get Started
-        </button>
+        <div className="flex justify-end mt-3">
+          <button
+            onClick={handleClick}
+            className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2 rounded cursor-pointer"
+          >
+            Get Started
+          </button>
+        </div>
       )}
     </div>
   );
