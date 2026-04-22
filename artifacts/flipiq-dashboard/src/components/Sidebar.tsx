@@ -17,7 +17,6 @@ function IqSidebar({ location }: { location: string }) {
   const state = resetIqStateIfNewDay();
   const iqDone = !!state.morningCheckin;
   const dealReviewComplete = state.dealReviewComplete ?? false;
-  const outreachSent = state.outreachCampaignSent ?? false;
   const priorityComplete = state.priorityAgentsComplete ?? false;
 
   const iqActive = location === "/iq" || location === "/iq/tasks" || location === "/iq/welcome-back";
@@ -49,7 +48,7 @@ function IqSidebar({ location }: { location: string }) {
             />
           </Link>
         )}
-        {(outreachSent || priorityComplete) && (
+        {priorityComplete && (
           <Link href="/iq/daily-outreach">
             <IqNavItem
               icon={<PhoneIcon />}
