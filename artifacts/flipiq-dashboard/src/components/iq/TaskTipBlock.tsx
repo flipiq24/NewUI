@@ -1,11 +1,21 @@
+import { useStartGate } from "./useStartGate";
+
 interface TaskTipBlockProps {
   task: string;
   tip: string;
-  showStartButton?: boolean;
+  storageKey?: string;
   onStart?: () => void;
 }
 
-export default function TaskTipBlock({ task, tip, showStartButton, onStart }: TaskTipBlockProps) {
+export default function TaskTipBlock({ task, tip, storageKey, onStart }: TaskTipBlockProps) {
+  const { started, start } = useStartGate(storageKey ?? "__none__");
+  const showButton = !!storageKey && !started;
+
+  function handleClick() {
+    start();
+    onStart?.();
+  }
+
   return (
     <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
       <div className="flex gap-2 mb-2">
@@ -16,9 +26,9 @@ export default function TaskTipBlock({ task, tip, showStartButton, onStart }: Ta
         <span className="text-base font-bold text-blue-600 flex-shrink-0">Tip:</span>
         <span className="text-base text-gray-600">{tip}</span>
       </div>
-      {showStartButton && (
+      {showButton && (
         <button
-          onClick={onStart}
+          onClick={handleClick}
           className="mt-3 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2 rounded cursor-pointer"
         >
           Get Started

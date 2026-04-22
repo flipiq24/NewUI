@@ -57,7 +57,7 @@ export default function IqNewRelationships() {
         <TaskTipBlock
           task="Josh, great job following up with your properties and sending campaigns. Now it's time to chase high-propensity-to-sell properties with agents you already work with."
           tip="Look at the Propensity to Sell score in the top middle of the page and read the iQ Property Intelligence for instructions. Click on the address to enter the property and start making calls."
-          showStartButton={!started}
+          storageKey="newRelationships"
           onStart={start}
         />
 

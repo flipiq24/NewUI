@@ -91,7 +91,7 @@ export default function IqDealReview() {
         <TaskTipBlock
           task={segmentTaskCopy[currentSeg.key].task}
           tip={segmentTaskCopy[currentSeg.key].tip}
-          showStartButton={!started}
+          storageKey="dealReview"
           onStart={start}
         />
 

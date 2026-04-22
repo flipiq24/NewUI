@@ -64,7 +64,7 @@ export default function IqDailyOutreach() {
         <TaskTipBlock
           task="Josh, you have a total of 5 Agent relationships to send campaigns to today. Start by clicking the box of each group — Hot, Warm, Cold, Unknown — on the top right of each card. Then choose a template, or configure a custom SMS or email message."
           tip="You can choose from pending emails or send a custom email for each."
-          showStartButton={!started}
+          storageKey="dailyOutreach"
           onStart={start}
         />
 
