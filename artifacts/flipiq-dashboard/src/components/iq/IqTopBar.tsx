@@ -7,7 +7,7 @@ interface IqTopBarProps {
 
 export default function IqTopBar({ breadcrumb, nextTask, onNext, title }: IqTopBarProps) {
   return (
-    <div className="min-h-16 bg-white border-b border-gray-200 grid grid-cols-[1fr_auto_1fr] items-center px-6 flex-shrink-0 py-3 gap-4">
+    <div className="min-h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0 py-3 gap-6">
       <div className="flex items-center gap-3">
         {title && (
           <span className="text-base font-semibold text-gray-700">{title}</span>
@@ -16,23 +16,21 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title }: IqTopB
           <span className="text-lg font-semibold text-gray-700">{breadcrumb}</span>
         )}
       </div>
-      <div className="flex items-center justify-center">
-        {nextTask && (
-          <button
-            onClick={onNext}
-            className={`text-xs flex items-center gap-1 ${onNext ? "cursor-pointer" : "cursor-default"}`}
-          >
-            <span className="font-semibold text-orange-500">Next Task:</span>
-            <span className="text-gray-600">{nextTask}</span>
-            {onNext && (
-              <svg className="w-3.5 h-3.5 text-orange-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="6,3 11,8 6,13" />
-              </svg>
-            )}
-          </button>
-        )}
-      </div>
-      <div className="flex items-center justify-end gap-4">
+      {nextTask && (
+        <button
+          onClick={onNext}
+          className={`text-xs flex items-center gap-1 ${onNext ? "cursor-pointer" : "cursor-default"}`}
+        >
+          <span className="font-semibold text-orange-500">Next Task:</span>
+          <span className="text-gray-600">{nextTask}</span>
+          {onNext && (
+            <svg className="w-3.5 h-3.5 text-orange-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="6,3 11,8 6,13" />
+            </svg>
+          )}
+        </button>
+      )}
+      <div className="flex items-center gap-4">
         <button className="flex items-center gap-1.5 group">
           <span className="text-xs font-semibold text-orange-500 group-hover:text-orange-600 transition-colors">Need Help?</span>
           <span className="w-7 h-7 bg-orange-500 group-hover:bg-orange-600 rounded flex items-center justify-center transition-colors flex-shrink-0">
