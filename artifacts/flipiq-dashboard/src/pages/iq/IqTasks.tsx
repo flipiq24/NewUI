@@ -20,7 +20,7 @@ const bucketColors: Record<string, { color: string; bg: string; border: string }
 };
 
 interface NotificationPill {
-  kind: "critical" | "reminder" | "unseen";
+  kind: "critical" | "reminder" | "unseen" | "text";
   count: number;
   label: string;
 }
@@ -38,7 +38,8 @@ function PillBadge({ pill }: { pill: NotificationPill }) {
   const styles = {
     critical: "bg-red-50 text-red-600 border-red-200",
     reminder: "bg-blue-50 text-blue-600 border-blue-200",
-    unseen: "bg-gray-50 text-gray-600 border-gray-200",
+    unseen: "bg-green-50 text-green-600 border-green-200",
+    text: "bg-green-50 text-green-600 border-green-200",
   }[pill.kind];
 
   const icon = {
@@ -59,6 +60,11 @@ function PillBadge({ pill }: { pill: NotificationPill }) {
       <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
         <rect x="2" y="3.5" width="12" height="9" rx="1" />
         <path d="M2.5 4.5 L8 9 L13.5 4.5" />
+      </svg>
+    ),
+    text: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M2 4 a1 1 0 0 1 1-1 h10 a1 1 0 0 1 1 1 v6 a1 1 0 0 1 -1 1 h-6 l-3 2.5 v-2.5 h-1 a1 1 0 0 1 -1 -1 z" />
       </svg>
     ),
   }[pill.kind];
@@ -136,6 +142,7 @@ export default function IqTasks() {
                   { kind: "critical", count: 2, label: "Criticals" },
                   { kind: "reminder", count: 4, label: "Reminders" },
                   { kind: "unseen", count: 1, label: "Unseen" },
+                  { kind: "text", count: 3, label: "Texts" },
                 ]}
               >
                 <div className="grid grid-cols-4 gap-3">
