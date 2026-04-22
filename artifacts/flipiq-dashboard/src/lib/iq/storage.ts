@@ -3,8 +3,14 @@ export type IqState = {
   morningCheckin?: {
     canWorkFullDay: boolean;
     needsHelp: boolean;
+    canSendOffers: boolean;
+    canSendCampaigns: boolean;
+    canReviewNewDeals: boolean;
     workExplain: string;
     helpExplain: string;
+    offersExplain: string;
+    campaignsExplain: string;
+    newDealsExplain: string;
   };
   flowStarted?: boolean;
   dealReviewComplete?: boolean;

@@ -11,8 +11,14 @@ export default function IqMorning() {
   const [, navigate] = useLocation();
   const [canWorkFullDay, setCanWorkFullDay] = useState<boolean | null>(null);
   const [needsHelp, setNeedsHelp] = useState<boolean | null>(null);
+  const [canSendOffers, setCanSendOffers] = useState<boolean | null>(null);
+  const [canSendCampaigns, setCanSendCampaigns] = useState<boolean | null>(null);
+  const [canReviewNewDeals, setCanReviewNewDeals] = useState<boolean | null>(null);
   const [workExplain, setWorkExplain] = useState("");
   const [helpExplain, setHelpExplain] = useState("");
+  const [offersExplain, setOffersExplain] = useState("");
+  const [campaignsExplain, setCampaignsExplain] = useState("");
+  const [newDealsExplain, setNewDealsExplain] = useState("");
 
   const stateRef = useRef(resetIqStateIfNewDay());
   const state = stateRef.current;
@@ -26,7 +32,12 @@ export default function IqMorning() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const bothAnswered = canWorkFullDay !== null && needsHelp !== null;
+  const allAnswered =
+    canWorkFullDay !== null &&
+    needsHelp !== null &&
+    canSendOffers !== null &&
+    canSendCampaigns !== null &&
+    canReviewNewDeals !== null;
 
   function handleContinue() {
     saveIqState({
@@ -34,8 +45,14 @@ export default function IqMorning() {
       morningCheckin: {
         canWorkFullDay: canWorkFullDay!,
         needsHelp: needsHelp!,
+        canSendOffers: canSendOffers!,
+        canSendCampaigns: canSendCampaigns!,
+        canReviewNewDeals: canReviewNewDeals!,
         workExplain,
         helpExplain,
+        offersExplain,
+        campaignsExplain,
+        newDealsExplain,
       },
     });
     navigate("/iq/tasks");
@@ -65,9 +82,30 @@ export default function IqMorning() {
                 explain={helpExplain}
                 onExplainChange={setHelpExplain}
               />
+              <Question
+                label="Can you send out 5 offers today?"
+                value={canSendOffers}
+                onChange={setCanSendOffers}
+                explain={offersExplain}
+                onExplainChange={setOffersExplain}
+              />
+              <Question
+                label="Can you send out your campaigns?"
+                value={canSendCampaigns}
+                onChange={setCanSendCampaigns}
+                explain={campaignsExplain}
+                onExplainChange={setCampaignsExplain}
+              />
+              <Question
+                label="Can you go through the 30 new deals?"
+                value={canReviewNewDeals}
+                onChange={setCanReviewNewDeals}
+                explain={newDealsExplain}
+                onExplainChange={setNewDealsExplain}
+              />
             </div>
 
-            {bothAnswered && (
+            {allAnswered && (
               <div className="flex justify-end mt-8">
                 <button
                   onClick={handleContinue}
