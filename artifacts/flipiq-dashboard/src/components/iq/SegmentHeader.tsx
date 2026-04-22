@@ -10,7 +10,7 @@ interface SegmentHeaderProps {
 
 export default function SegmentHeader({ label, count, subtitle, borderColor, bgColor, textColor, active }: SegmentHeaderProps) {
   return (
-    <div className={`mb-1 border-l-4 ${borderColor} ${bgColor} rounded-sm`}>
+    <div className={`mb-1 border-l-4 ${borderColor} bg-white rounded-sm`}>
       <div className="px-4 pt-1.5 pb-0.5">
         <span className={`text-xs font-bold tracking-wider ${textColor}`}>
           {label} ({count} properties)
