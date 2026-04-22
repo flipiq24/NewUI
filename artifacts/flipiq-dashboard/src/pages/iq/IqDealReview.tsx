@@ -258,24 +258,18 @@ export default function IqDealReview() {
                       count === 0
                         ? "border-gray-200 bg-gray-50 text-gray-400"
                         : done
-                          ? "border-gray-200 bg-gray-100 text-gray-400"
+                          ? "border-green-300 bg-green-50 text-green-800"
                           : "border-gray-200 bg-white text-gray-800"
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <p className="text-[10px] font-bold uppercase tracking-wider opacity-70">
-                        {level}
-                      </p>
-                      {done && (
-                        <span className="inline-flex items-center justify-center w-4 h-4 rounded-sm bg-gray-300 text-white text-[10px] font-bold leading-none">
-                          ✓
-                        </span>
-                      )}
-                    </div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider opacity-70">
+                      {level}
+                    </p>
                     <div className="flex items-baseline gap-1 mt-0.5">
-                      <span className={`text-lg font-bold ${done ? "line-through" : ""}`}>
-                        {count}
-                      </span>
+                      <span className="text-lg font-bold">{count}</span>
+                      {done && (
+                        <span className="text-[10px] font-semibold">✓ Done</span>
+                      )}
                     </div>
                   </div>
                 ))}
