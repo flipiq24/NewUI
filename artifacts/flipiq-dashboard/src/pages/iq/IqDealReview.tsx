@@ -117,24 +117,6 @@ export default function IqDealReview() {
     return { levelCounts: lc, levelComplete: complete, notificationCounts: nc };
   }, [checklistVersion]);
 
-  // Per-segment level breakdown — shown as a preview before Get Started is
-  // clicked so the user sees what's in this step.
-  const segLevelCounts = useMemo(() => {
-    const lc: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
-    const ld: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
-    for (const p of DEAL_REVIEW_PROPERTIES) {
-      if (p.segment !== currentSeg.key) continue;
-      lc[p.level] += 1;
-      if (isPropertyComplete(p.id)) ld[p.level] += 1;
-    }
-    return LEVEL_ORDER.map((l) => ({
-      level: l,
-      count: lc[l],
-      done: lc[l] > 0 && ld[l] === lc[l],
-    }));
-  }, [currentSeg.key, checklistVersion]);
-  const segTotal = segLevelCounts.reduce((s, x) => s + x.count, 0);
-
   const allLevelsDone = LEVEL_ORDER.every((l) => levelCounts[l] === 0 || levelComplete[l]);
 
   // One-time initial focus: when this segment first opens, point Josh at the
@@ -233,49 +215,15 @@ export default function IqDealReview() {
         />
 
         {!started && (
-          <div className="px-4 pt-4">
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                    {segmentLabels[currentSeg.key]}
-                  </p>
-                  <p className="text-sm text-gray-700 mt-0.5">
-                    {segTotal} {segTotal === 1 ? "property" : "properties"} in this step
-                  </p>
-                </div>
-                <span
-                  className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border ${currentSeg.borderColor} ${currentSeg.bgColor} ${currentSeg.textColor}`}
-                >
-                  {currentSeg.label}
-                </span>
-              </div>
-              <div className="grid grid-cols-4 gap-2">
-                {segLevelCounts.map(({ level, count, done }) => (
-                  <div
-                    key={level}
-                    className={`rounded-lg border px-3 py-2 ${
-                      count === 0
-                        ? "border-gray-200 bg-gray-50 text-gray-400"
-                        : done
-                          ? "border-green-300 bg-green-50 text-green-800"
-                          : "border-gray-200 bg-white text-gray-800"
-                    }`}
-                  >
-                    <p className="text-[10px] font-bold uppercase tracking-wider opacity-70">
-                      {level}
-                    </p>
-                    <div className="flex items-baseline gap-1 mt-0.5">
-                      <span className="text-lg font-bold">{count}</span>
-                      {done && (
-                        <span className="text-[10px] font-semibold">✓ Done</span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <DealReviewHeader
+            levelCounts={levelCounts}
+            levelComplete={levelComplete}
+            notificationCounts={notificationCounts}
+            activeLevel={null}
+            activeNotifications={new Set()}
+            onLevelClick={() => {}}
+            onNotificationClick={() => {}}
+          />
         )}
 
         {started && (
