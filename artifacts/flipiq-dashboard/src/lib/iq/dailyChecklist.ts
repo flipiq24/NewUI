@@ -42,6 +42,17 @@ export function isPropertyComplete(propertyId: number): boolean {
   return ACTION_KEYS.every((k) => s[k]);
 }
 
+/** Mark every action done (or undo) for a property in one shot. */
+export function setPropertyComplete(propertyId: number, complete: boolean) {
+  const next: ChecklistState = {
+    call: complete,
+    text: complete,
+    email: complete,
+    notes: complete,
+  };
+  writeState(propertyId, next);
+}
+
 export function useDailyChecklist(propertyId: number) {
   const [state, setState] = useState<ChecklistState>(() => readState(propertyId));
 
