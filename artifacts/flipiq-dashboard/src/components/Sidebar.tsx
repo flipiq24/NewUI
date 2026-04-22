@@ -34,7 +34,7 @@ function IqSidebar({ location }: { location: string }) {
         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-2 py-1">Today's Plan</p>
         <Link href="/iq">
           <IqNavItem
-            icon={iqDone ? <CheckIcon /> : <LightbulbIcon />}
+            icon={<LightbulbIcon />}
             label="iQ"
             active={iqActive}
             done={iqDone && !iqActive}
@@ -43,9 +43,8 @@ function IqSidebar({ location }: { location: string }) {
         {dealReviewComplete && (
           <Link href="/iq/deal-review">
             <IqNavItem
-              icon={<CheckIcon />}
+              icon={<FileTextIcon />}
               label="Deal Review"
-              badge="9/9"
               done
             />
           </Link>
@@ -53,9 +52,8 @@ function IqSidebar({ location }: { location: string }) {
         {(outreachSent || priorityComplete) && (
           <Link href="/iq/daily-outreach">
             <IqNavItem
-              icon={priorityComplete ? <CheckIcon /> : <PhoneIcon />}
+              icon={<PhoneIcon />}
               label="Daily Outreach"
-              badge={priorityComplete ? "12/12" : "4/12"}
               done={priorityComplete}
             />
           </Link>
@@ -162,8 +160,15 @@ function IqNavItem({ icon, label, badge, active, done }: {
     }`}>
       {icon && <span className={`flex-shrink-0 w-3.5 h-3.5 ${active ? "text-white" : "text-gray-500"}`}>{icon}</span>}
       <span className={`text-xs font-medium flex-1 ${active ? "text-white" : ""}`}>{label}</span>
-      {badge && (
-        <span className={`text-[10px] font-medium ${done ? "text-green-600" : active ? "text-orange-100" : "text-gray-400"}`}>
+      {done && !active && (
+        <span className="text-green-500 flex-shrink-0">
+          <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <polyline points="2,8 6,12 14,4" />
+          </svg>
+        </span>
+      )}
+      {badge && !done && (
+        <span className={`text-[10px] font-medium ${active ? "text-orange-100" : "text-gray-400"}`}>
           {badge}
         </span>
       )}
