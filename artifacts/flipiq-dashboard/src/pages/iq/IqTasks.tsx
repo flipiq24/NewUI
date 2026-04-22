@@ -3,6 +3,7 @@ import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import TaskDashboardCard from "@/components/iq/TaskDashboardCard";
 import { DAILY_OUTREACH_BUCKETS } from "@/lib/iq/mockData";
+import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 
 const dealCategories = [
   { label: "Priority", count: 9, color: "text-orange-500", bg: "bg-orange-50", border: "border-orange-200" },
@@ -20,6 +21,12 @@ const bucketColors: Record<string, { color: string; bg: string; border: string }
 
 export default function IqTasks() {
   const [, navigate] = useLocation();
+
+  function startStep(route: string) {
+    const state = resetIqStateIfNewDay();
+    saveIqState({ ...state, flowStarted: true });
+    navigate(route);
+  }
 
   const totalDeals = dealCategories.reduce((s, c) => s + c.count, 0);
   const totalCampaigns = DAILY_OUTREACH_BUCKETS.reduce((s, b) => s + b.pendingToday, 0);
@@ -46,7 +53,7 @@ export default function IqTasks() {
                 priority={1}
                 title="Deal Review"
                 subtitle={`Total Deals: ${totalDeals}`}
-                onStart={() => navigate("/iq/deal-review")}
+                onStart={() => startStep("/iq/deal-review")}
               >
                 <div className="grid grid-cols-4 gap-3">
                   {dealCategories.map((cat) => (
@@ -77,7 +84,7 @@ export default function IqTasks() {
                 priority={2}
                 title="Email Campaigns"
                 subtitle={`${totalCampaigns} campaigns to send today`}
-                onStart={() => navigate("/iq/daily-outreach")}
+                onStart={() => startStep("/iq/daily-outreach")}
               >
                 <div className="grid grid-cols-4 gap-3">
                   {DAILY_OUTREACH_BUCKETS.map((b) => {
@@ -105,7 +112,7 @@ export default function IqTasks() {
                 priority={3}
                 title="Priority Agent Calls"
                 subtitle="Call your highest-priority agents"
-                onStart={() => navigate("/iq/priority-agents")}
+                onStart={() => startStep("/iq/priority-agents")}
               >
                 <div className="flex items-center gap-6">
                   <div className="flex-1 bg-orange-50 border border-orange-200 rounded-lg p-5 text-center cursor-default">
@@ -136,7 +143,7 @@ export default function IqTasks() {
                 priority={4}
                 title="Build New Agent Relationships"
                 subtitle="Chase high-propensity-to-sell properties"
-                onStart={() => navigate("/iq/new-relationships")}
+                onStart={() => startStep("/iq/new-relationships")}
               >
                 <div className="flex items-center gap-6">
                   <div className="flex-1 bg-orange-50 border border-orange-200 rounded-lg p-5 text-center cursor-default">
