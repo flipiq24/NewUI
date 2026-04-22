@@ -206,6 +206,36 @@ export default function IqDealReview() {
           breadcrumb={`Deal Review > 9 High Priority Deals > ${segmentLabels[currentSeg.key]}`}
           nextTask={nextLabel}
           onNext={handleNext}
+          filterContent={
+            started && filterActive ? (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-gray-500 uppercase tracking-wide">Filters:</span>
+                {activeLevel && (
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-orange-100 text-orange-700">
+                    {activeLevel.toUpperCase()}
+                  </span>
+                )}
+                {Array.from(activeNotifications).map((n) => (
+                  <span
+                    key={n}
+                    className="text-[11px] font-semibold px-2 py-0.5 rounded bg-orange-100 text-orange-700 capitalize"
+                  >
+                    {n}
+                  </span>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveLevel(null);
+                    setActiveNotifications(new Set());
+                  }}
+                  className="text-[11px] text-gray-500 hover:text-gray-700 underline ml-1"
+                >
+                  Clear all
+                </button>
+              </div>
+            ) : null
+          }
         />
         <TaskTipBlock
           task={segmentTaskCopy[currentSeg.key].task}
@@ -240,35 +270,6 @@ export default function IqDealReview() {
 
         {started && (
           <div className="flex-1 overflow-y-auto p-4">
-            {filterActive && (
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-[11px] text-gray-500 uppercase tracking-wide">Filters:</span>
-                {activeLevel && (
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-orange-100 text-orange-700">
-                    {activeLevel.toUpperCase()}
-                  </span>
-                )}
-                {Array.from(activeNotifications).map((n) => (
-                  <span
-                    key={n}
-                    className="text-[11px] font-semibold px-2 py-0.5 rounded bg-orange-100 text-orange-700 capitalize"
-                  >
-                    {n}
-                  </span>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveLevel(null);
-                    setActiveNotifications(new Set());
-                  }}
-                  className="text-[11px] text-gray-500 hover:text-gray-700 underline ml-1"
-                >
-                  Clear all
-                </button>
-              </div>
-            )}
-
             <div className="mb-2">
               <SegmentHeader
                 label={currentSeg.label}

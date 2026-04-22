@@ -7,9 +7,10 @@ interface IqTopBarProps {
   title?: string;
   centerContent?: React.ReactNode;
   nextIncomplete?: boolean;
+  filterContent?: React.ReactNode;
 }
 
-export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerContent, nextIncomplete }: IqTopBarProps) {
+export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerContent, nextIncomplete, filterContent }: IqTopBarProps) {
   const [showWarn, setShowWarn] = useState(false);
 
   function handleNextClick() {
@@ -49,6 +50,9 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerCo
       </div>
       {centerContent && (
         <div className="flex-1 flex justify-center">{centerContent}</div>
+      )}
+      {filterContent && (
+        <div className="flex items-center">{filterContent}</div>
       )}
       {nextTask && (
         <div className="flex items-center gap-2">
