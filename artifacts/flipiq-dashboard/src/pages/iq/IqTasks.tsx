@@ -6,17 +6,17 @@ import { DAILY_OUTREACH_BUCKETS } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 
 const dealCategories = [
-  { label: "Priority", count: 9, color: "text-orange-500", bg: "bg-orange-50", border: "border-orange-200" },
-  { label: "Hot", count: 6, color: "text-red-500", bg: "bg-red-50", border: "border-red-200" },
-  { label: "Warm", count: 4, color: "text-amber-500", bg: "bg-amber-50", border: "border-amber-200" },
-  { label: "Cold", count: 3, color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200" },
+  { label: "Priority", count: 9, color: "text-orange-500", border: "border-orange-300" },
+  { label: "Hot", count: 6, color: "text-red-500", border: "border-red-300" },
+  { label: "Warm", count: 4, color: "text-amber-500", border: "border-amber-300" },
+  { label: "Cold", count: 3, color: "text-blue-500", border: "border-blue-300" },
 ];
 
-const bucketColors: Record<string, { color: string; bg: string; border: string }> = {
-  hot: { color: "text-red-500", bg: "bg-red-50", border: "border-red-200" },
-  warm: { color: "text-amber-500", bg: "bg-amber-50", border: "border-amber-200" },
-  cold: { color: "text-blue-500", bg: "bg-blue-50", border: "border-blue-200" },
-  unknown: { color: "text-gray-500", bg: "bg-gray-50", border: "border-gray-200" },
+const bucketColors: Record<string, { color: string; border: string }> = {
+  hot: { color: "text-red-500", border: "border-red-300" },
+  warm: { color: "text-amber-500", border: "border-amber-300" },
+  cold: { color: "text-blue-500", border: "border-blue-300" },
+  unknown: { color: "text-gray-500", border: "border-gray-300" },
 };
 
 interface NotificationPill {
@@ -152,7 +152,7 @@ export default function IqTasks() {
                   {dealCategories.map((cat) => (
                     <div
                       key={cat.label}
-                      className={`${cat.bg} border ${cat.border} rounded-lg p-4 text-center`}
+                      className={`bg-white border ${cat.border} rounded-lg p-4 text-center`}
                     >
                       <p className={`text-3xl font-bold ${cat.color} leading-none mb-1`}>
                         {cat.count}
@@ -184,7 +184,7 @@ export default function IqTasks() {
                     return (
                       <div
                         key={b.id}
-                        className={`${c.bg} border ${c.border} rounded-lg p-4 text-center`}
+                        className={`bg-white border ${c.border} rounded-lg p-4 text-center`}
                       >
                         <p className={`text-3xl font-bold ${c.color} leading-none mb-1`}>
                           {b.pendingToday}
@@ -206,7 +206,7 @@ export default function IqTasks() {
                 subtitle={`Total Priority: ${totalPriorityAgents}`}
                 onClick={() => startStep("/iq/priority-agents")}
               >
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-5 text-center">
+                <div className="bg-white border border-orange-300 rounded-lg p-5 text-center">
                   <p className="text-4xl font-bold text-orange-500 leading-none mb-1">
                     {totalPriorityAgents}
                   </p>
@@ -223,7 +223,7 @@ export default function IqTasks() {
                 subtitle={`Total Properties: ${totalProperties}`}
                 onClick={() => startStep("/iq/new-relationships")}
               >
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-5 text-center">
+                <div className="bg-white border border-orange-300 rounded-lg p-5 text-center">
                   <p className="text-4xl font-bold text-orange-500 leading-none mb-1">
                     {totalProperties}
                   </p>
