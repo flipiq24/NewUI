@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
@@ -100,6 +100,22 @@ export default function IqDealReview() {
   }, [checklistVersion]);
 
   const allLevelsDone = LEVEL_ORDER.every((l) => levelCounts[l] === 0 || levelComplete[l]);
+
+  // Auto-advance the active level as each one is completed, so the checkmark
+  // "moves along" from High → Mid → Low → New as Josh works through them.
+  useEffect(() => {
+    if (allLevelsDone) return;
+    const nextIncomplete = LEVEL_ORDER.find(
+      (l) => levelCounts[l] > 0 && !levelComplete[l],
+    ) ?? null;
+    if (activeLevel === null) {
+      if (nextIncomplete) setActiveLevel(nextIncomplete);
+      return;
+    }
+    if (levelComplete[activeLevel] && nextIncomplete && nextIncomplete !== activeLevel) {
+      setActiveLevel(nextIncomplete);
+    }
+  }, [levelComplete, levelCounts, activeLevel, allLevelsDone]);
 
   // Properties shown in the current segment, after applying filters
   const visibleProps = useMemo(() => {
