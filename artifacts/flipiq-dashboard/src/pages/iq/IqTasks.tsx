@@ -52,6 +52,7 @@ interface CardProps {
   notifications?: NotificationPill[];
   children?: ReactNode;
   done?: boolean;
+  interactive?: boolean;
 }
 
 function CardCheck() {
@@ -114,13 +115,19 @@ function PillBadge({ pill }: { pill: NotificationPill }) {
   );
 }
 
-function DashboardCard({ priority, title, subtitle, description, onClick, notifications, children, done }: CardProps) {
+function DashboardCard({ priority, title, subtitle, description, onClick, notifications, children, done, interactive = true }: CardProps) {
+  const baseBorder = done ? "border-green-300" : "border-gray-200";
+  const interactiveCls = interactive
+    ? `cursor-pointer hover:shadow-md ${done ? "hover:border-green-400" : "hover:border-orange-300"}`
+    : "cursor-default";
   return (
     <button
-      onClick={onClick}
-      className={`w-full text-left bg-white border rounded-xl shadow-sm p-5 hover:shadow-md transition-all cursor-pointer block ${
-        done ? "border-green-300 hover:border-green-400" : "border-gray-200 hover:border-orange-300"
-      }`}
+      type="button"
+      onClick={interactive ? onClick : undefined}
+      disabled={!interactive}
+      title={interactive ? undefined : "Click Get Started below to begin your day"}
+      aria-disabled={!interactive}
+      className={`w-full text-left bg-white border rounded-xl shadow-sm p-5 transition-all block ${baseBorder} ${interactiveCls}`}
     >
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-1">
@@ -153,6 +160,7 @@ export default function IqTasks() {
   // Re-read persisted progress so badges reflect what's done today.
   // Tracked via checklistVersion so toggles inside Deal Review propagate here.
   const iqState = useMemo(() => loadIqState(), [checklistVersion]);
+  const flowStarted = !!iqState?.flowStarted;
   const outreachFlag = !!iqState?.outreachCampaignSent;
   const priorityFlag = !!iqState?.priorityAgentsComplete;
   const newRelFlag = !!iqState?.newRelationshipsComplete;
@@ -217,6 +225,7 @@ export default function IqTasks() {
                 subtitle={`Total Deals: ${totalDeals}`}
                 onClick={() => startStep("/iq/deal-review")}
                 done={dealDone}
+                interactive={flowStarted}
                 notifications={[
                   { kind: "critical", count: 2, label: "Criticals" },
                   { kind: "reminder", count: 4, label: "Reminders" },
@@ -276,6 +285,7 @@ export default function IqTasks() {
                 subtitle={`${totalCampaigns} Campaigns • Total Emails: ${totalEmails}`}
                 onClick={() => startStep("/iq/daily-outreach")}
                 done={outreachDone}
+                interactive={flowStarted}
               >
                 <div className="grid grid-cols-4 gap-3">
                   {DAILY_OUTREACH_BUCKETS.map((b) => {
@@ -318,6 +328,7 @@ export default function IqTasks() {
                 subtitle={`Total Priority: ${totalPriorityAgents}`}
                 onClick={() => startStep("/iq/priority-agents")}
                 done={priorityDone}
+                interactive={flowStarted}
               >
                 <div
                   title={`${totalPriorityAgents} priority agents to call today — your highest-value relationships flagged for a personal phone call.`}
@@ -350,6 +361,7 @@ export default function IqTasks() {
                 subtitle={`Total Properties: ${totalProperties}`}
                 onClick={() => startStep("/iq/new-relationships")}
                 done={newRelDone}
+                interactive={flowStarted}
               >
                 <div
                   title={`${totalProperties} high-propensity-to-sell properties to call today — owners likely to list soon, great targets for new agent relationships.`}
