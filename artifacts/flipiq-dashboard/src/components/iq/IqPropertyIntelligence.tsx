@@ -19,7 +19,7 @@ interface IntelligenceData {
 
 export default function IqPropertyIntelligence({ data }: { data: IntelligenceData }) {
   return (
-    <div className="bg-orange-50 border border-orange-200 rounded-xl p-5 mt-4">
+    <div className="bg-white border border-gray-200 rounded-xl p-5 mt-4">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <LightbulbIcon />
