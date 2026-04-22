@@ -129,12 +129,13 @@ function DefaultSidebar({ location }: { location: string }) {
         </Link>
         <NavItem label="Deal Dashboard" icon={<DashboardIcon />} />
         <NavItem label="DispoPro" icon={<DispoIcon />} />
-        <div className="pl-4">
-          <NavItem label="Add Property +" icon={null} small />
-        </div>
       </div>
 
-      <div className="mt-auto px-3 pb-3">
+      <div className="mt-auto px-3 pb-3 space-y-1">
+        <button className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-xs font-medium text-gray-800">
+          Add Property
+          <span className="text-orange-500 font-bold">+</span>
+        </button>
         <NavItem icon={<CollapseIcon />} label="Collapse sidebar" />
         <NavItem icon={<LogInIcon />} label="Log in as..." />
       </div>
