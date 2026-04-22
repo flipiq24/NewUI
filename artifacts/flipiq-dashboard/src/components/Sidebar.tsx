@@ -1,19 +1,27 @@
 import { Settings, LogOut } from "lucide-react";
 import { useLocation, Link } from "wouter";
-import { resetIqStateIfNewDay } from "@/lib/iq/storage";
+import { resetIqStateIfNewDay, startNewIqDay } from "@/lib/iq/storage";
 
 export default function Sidebar() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const isIqMode = location.startsWith("/iq");
 
-  if (isIqMode) {
-    return <IqSidebar location={location} />;
+  // Prototype helper: clicking the logo wipes today's iQ progress and
+  // sends the user back to the Morning Check-in so the full flow can be
+  // demoed from scratch.
+  function startFresh() {
+    startNewIqDay();
+    navigate("/iq");
   }
 
-  return <DefaultSidebar location={location} />;
+  if (isIqMode) {
+    return <IqSidebar location={location} onLogoClick={startFresh} />;
+  }
+
+  return <DefaultSidebar location={location} onLogoClick={startFresh} />;
 }
 
-function IqSidebar({ location }: { location: string }) {
+function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: () => void }) {
   resetIqStateIfNewDay();
 
   const welcomeBackActive = location === "/iq/welcome-back";
@@ -29,9 +37,13 @@ function IqSidebar({ location }: { location: string }) {
   return (
     <div className="w-[192px] bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
       <div className="p-4 pt-5 pb-3">
-        <Link href="/iq">
+        <button
+          onClick={onLogoClick}
+          title="Start a new morning (resets today's progress)"
+          className="block w-full text-left cursor-pointer"
+        >
           <FlipIQLogo />
-        </Link>
+        </button>
       </div>
 
       <div className="px-3 pb-2">
@@ -105,16 +117,20 @@ function IqSidebar({ location }: { location: string }) {
   );
 }
 
-function DefaultSidebar({ location }: { location: string }) {
+function DefaultSidebar({ location, onLogoClick }: { location: string; onLogoClick: () => void }) {
   const myStatsActive = location === "/";
   const reportsActive = location === "/adaptation-reports";
 
   return (
     <div className="w-[192px] bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
       <div className="p-4 pt-5 pb-3">
-        <Link href="/iq">
+        <button
+          onClick={onLogoClick}
+          title="Start a new morning (resets today's progress)"
+          className="block w-full text-left cursor-pointer"
+        >
           <FlipIQLogo />
-        </Link>
+        </button>
       </div>
 
       <div className="px-3 pb-2">

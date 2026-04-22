@@ -46,6 +46,28 @@ export function clearIqState(): IqState {
   return fresh;
 }
 
+/**
+ * Reset the entire iQ day so the user lands on a fresh Morning Check-in.
+ * Wipes:
+ *  - the master iq:state object (morning answers + step completion flags)
+ *  - per-segment "Get Started" gate flags (iqStarted:*)
+ *  - per-property action checklists (iqRowActions:*)
+ */
+export function startNewIqDay(): IqState {
+  if (typeof window !== "undefined") {
+    const toRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k) continue;
+      if (k === KEY || k.startsWith("iqStarted:") || k.startsWith("iqRowActions:")) {
+        toRemove.push(k);
+      }
+    }
+    toRemove.forEach((k) => localStorage.removeItem(k));
+  }
+  return clearIqState();
+}
+
 export function resetIqStateIfNewDay(): IqState {
   const today = todayStr();
   const existing = loadIqState();
