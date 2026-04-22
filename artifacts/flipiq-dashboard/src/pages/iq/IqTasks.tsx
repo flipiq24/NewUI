@@ -19,15 +19,59 @@ const bucketColors: Record<string, { color: string; bg: string; border: string }
   unknown: { color: "text-gray-500", bg: "bg-gray-50", border: "border-gray-200" },
 };
 
+interface NotificationPill {
+  kind: "critical" | "reminder" | "unseen";
+  count: number;
+  label: string;
+}
+
 interface CardProps {
   priority: number;
   title: string;
   subtitle: string;
   onClick: () => void;
+  notifications?: NotificationPill[];
   children: ReactNode;
 }
 
-function DashboardCard({ priority, title, subtitle, onClick, children }: CardProps) {
+function PillBadge({ pill }: { pill: NotificationPill }) {
+  const styles = {
+    critical: "bg-red-50 text-red-600 border-red-200",
+    reminder: "bg-blue-50 text-blue-600 border-blue-200",
+    unseen: "bg-gray-50 text-gray-600 border-gray-200",
+  }[pill.kind];
+
+  const icon = {
+    critical: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M8 2 L14 13 L2 13 Z" />
+        <line x1="8" y1="6" x2="8" y2="9" />
+        <circle cx="8" cy="11" r="0.5" fill="currentColor" />
+      </svg>
+    ),
+    reminder: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M4 7 a4 4 0 0 1 8 0 v3 l1.5 2 h-11 l1.5-2 z" />
+        <path d="M6.5 13 a1.5 1.5 0 0 0 3 0" />
+      </svg>
+    ),
+    unseen: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <rect x="2" y="3.5" width="12" height="9" rx="1" />
+        <path d="M2.5 4.5 L8 9 L13.5 4.5" />
+      </svg>
+    ),
+  }[pill.kind];
+
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold ${styles}`}>
+      {icon}
+      {pill.count} {pill.label}
+    </span>
+  );
+}
+
+function DashboardCard({ priority, title, subtitle, onClick, notifications, children }: CardProps) {
   return (
     <button
       onClick={onClick}
@@ -39,6 +83,14 @@ function DashboardCard({ priority, title, subtitle, onClick, children }: CardPro
         </p>
         <h3 className="text-lg font-bold text-gray-900 leading-tight">{title}</h3>
         <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>
+        {notifications && notifications.length > 0 && (
+          <div className="flex items-center flex-wrap gap-2 mt-3">
+            <span className="text-xs font-medium text-gray-600">Check notifications:</span>
+            {notifications.map((pill, i) => (
+              <PillBadge key={i} pill={pill} />
+            ))}
+          </div>
+        )}
       </div>
       {children}
     </button>
@@ -109,6 +161,7 @@ export default function IqTasks() {
                 title="Email Campaigns"
                 subtitle={`${totalCampaigns} Campaigns • Total Emails: ${totalEmails}`}
                 onClick={() => startStep("/iq/daily-outreach")}
+                notifications={[{ kind: "unseen", count: 1, label: "Unseen" }]}
               >
                 <div className="grid grid-cols-4 gap-3">
                   {DAILY_OUTREACH_BUCKETS.map((b) => {
@@ -136,6 +189,10 @@ export default function IqTasks() {
                 title="Priority Agent Calls"
                 subtitle={`Total Priority: ${totalPriorityAgents}`}
                 onClick={() => startStep("/iq/priority-agents")}
+                notifications={[
+                  { kind: "critical", count: 2, label: "Criticals" },
+                  { kind: "reminder", count: 4, label: "Reminders" },
+                ]}
               >
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-5 text-center">
                   <p className="text-4xl font-bold text-orange-500 leading-none mb-1">
