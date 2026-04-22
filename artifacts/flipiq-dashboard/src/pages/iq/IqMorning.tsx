@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useState } from "react";
+import { useLocation, Redirect } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import {
-  loadIqState,
   saveIqState,
   resetIqStateIfNewDay,
   allTasksComplete,
+  firstIncompleteRoute,
 } from "@/lib/iq/storage";
 
 export default function IqMorning() {
@@ -16,18 +16,9 @@ export default function IqMorning() {
   const [workExplain, setWorkExplain] = useState("");
   const [helpExplain, setHelpExplain] = useState("");
 
-  useEffect(() => {
-    const state = resetIqStateIfNewDay();
-    if (state.morningCheckin) {
-      if (allTasksComplete(state)) {
-        return;
-      }
-      navigate("/iq/welcome-back");
-    }
-  }, []);
+  const state = resetIqStateIfNewDay();
 
-  const state = loadIqState();
-  if (state && allTasksComplete(state)) {
+  if (allTasksComplete(state)) {
     return (
       <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
         <Sidebar />
@@ -45,12 +36,15 @@ export default function IqMorning() {
     );
   }
 
+  if (state.morningCheckin) {
+    return <Redirect to={firstIncompleteRoute(state)} />;
+  }
+
   const bothAnswered = canWorkFullDay !== null && needsHelp !== null;
 
   function handleContinue() {
-    const current = loadIqState() ?? { date: "" };
     saveIqState({
-      ...current,
+      ...state,
       morningCheckin: {
         canWorkFullDay: canWorkFullDay!,
         needsHelp: needsHelp!,
