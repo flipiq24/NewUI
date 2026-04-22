@@ -45,6 +45,7 @@ function IqSidebar({ location }: { location: string }) {
             <IqNavItem
               icon={<FileTextIcon />}
               label="Deal Review"
+              badge="9/9"
               done
             />
           </Link>
@@ -54,6 +55,7 @@ function IqSidebar({ location }: { location: string }) {
             <IqNavItem
               icon={<PhoneIcon />}
               label="Daily Outreach"
+              badge={priorityComplete ? "12/12" : "4/12"}
               done={priorityComplete}
             />
           </Link>
@@ -160,16 +162,16 @@ function IqNavItem({ icon, label, badge, active, done }: {
     }`}>
       {icon && <span className={`flex-shrink-0 w-3.5 h-3.5 ${active ? "text-white" : "text-gray-500"}`}>{icon}</span>}
       <span className={`text-xs font-medium flex-1 ${active ? "text-white" : ""}`}>{label}</span>
+      {badge && (
+        <span className={`text-[10px] font-medium ${done ? "text-green-600" : active ? "text-orange-100" : "text-gray-400"}`}>
+          {badge}
+        </span>
+      )}
       {done && !active && (
         <span className="text-green-500 flex-shrink-0">
           <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
             <polyline points="2,8 6,12 14,4" />
           </svg>
-        </span>
-      )}
-      {badge && !done && (
-        <span className={`text-[10px] font-medium ${active ? "text-orange-100" : "text-gray-400"}`}>
-          {badge}
         </span>
       )}
     </div>
@@ -203,14 +205,6 @@ function FlipIQLogo() {
         className="w-[110px] object-contain"
       />
     </div>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="2,8 6,12 14,4" />
-    </svg>
   );
 }
 
