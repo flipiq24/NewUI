@@ -64,6 +64,24 @@ const segmentTaskCopy: Record<typeof segments[number]["key"], { task: string; ti
 
 const LEVEL_ORDER: DealLevel[] = ["high", "mid", "low", "new"];
 
+function InfoDot() {
+  return (
+    <svg className="w-3 h-3 text-gray-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <circle cx="8" cy="8" r="6.5" />
+      <line x1="8" y1="7" x2="8" y2="11.5" strokeLinecap="round" />
+      <circle cx="8" cy="5" r="0.6" fill="currentColor" />
+    </svg>
+  );
+}
+
+function FilterIcon() {
+  return (
+    <svg className="w-3 h-3 text-gray-500" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M2 3 h12 l-4.5 6 v4 l-3 1.5 v-5.5 z" />
+    </svg>
+  );
+}
+
 export default function IqDealReview() {
   const [, navigate] = useLocation();
   const [segIdx, setSegIdx] = useState(0);
@@ -253,7 +271,34 @@ export default function IqDealReview() {
                   No properties match the current filters in this segment.
                 </div>
               ) : (
-                <div className="space-y-0 border border-gray-200 rounded-lg overflow-hidden">
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  {/* Column header row */}
+                  <div
+                    className="hidden md:grid items-center gap-4 px-3 py-2 bg-gray-50 border-b border-gray-200 text-[10px] font-bold text-gray-500 uppercase tracking-wider"
+                    style={{
+                      gridTemplateColumns:
+                        "32px minmax(0,2.4fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1.2fr)",
+                    }}
+                  >
+                    <span />
+                    <span className="flex items-center gap-3">
+                      <span className="inline-flex items-center gap-1">
+                        Property <InfoDot />
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-gray-400 normal-case font-semibold">
+                        <FilterIcon /> Segments
+                      </span>
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      Price / Propensity <InfoDot />
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      Last Open / Called <InfoDot />
+                    </span>
+                    <span className="inline-flex items-center gap-1 justify-end">
+                      Offer Status / Source <InfoDot />
+                    </span>
+                  </div>
                   {visibleProps.map((p, i) => (
                     <PropertyRow key={p.id} property={p} last={i === visibleProps.length - 1} />
                   ))}
