@@ -212,6 +212,8 @@ export default function IqDealReview() {
           tip={segmentTaskCopy[currentSeg.key].tip}
           storageKey={segKey}
           onStart={start}
+          onContinue={handleNext}
+          continueLabel={nextLabel}
         />
 
         {started && (
