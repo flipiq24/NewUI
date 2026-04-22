@@ -7,12 +7,14 @@ import TaskTipBlock from "@/components/iq/TaskTipBlock";
 import IqPropertyIntelligence from "@/components/iq/IqPropertyIntelligence";
 import { NEW_RELATIONSHIPS_DEALS } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
+import { useStartGate } from "@/components/iq/useStartGate";
 
 export default function IqNewRelationships() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [calledCount, setCalledCount] = useState(0);
+  const { started } = useStartGate("newRelationships");
 
   const total = NEW_RELATIONSHIPS_DEALS.length;
   const deal = NEW_RELATIONSHIPS_DEALS[currentIndex];
@@ -55,8 +57,10 @@ export default function IqNewRelationships() {
         <TaskTipBlock
           task="Josh, great job following up with your properties and sending campaigns. Now it's time to chase high-propensity-to-sell properties with agents you already work with."
           tip="Look at the Propensity to Sell score in the top middle of the page and read the iQ Property Intelligence for instructions. Click on the address to enter the property and start making calls."
+          storageKey="newRelationships"
         />
 
+        {started && (
         <div className="flex-1 overflow-y-auto p-4">
           {/* Counter bar */}
           <div className="grid grid-cols-3 items-center bg-white border border-gray-200 rounded-lg px-4 py-2.5 mb-4">
@@ -151,6 +155,7 @@ export default function IqNewRelationships() {
             )}
           </div>
         </div>
+        )}
       </div>
     </div>
   );

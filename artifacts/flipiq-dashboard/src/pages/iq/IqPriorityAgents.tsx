@@ -5,12 +5,14 @@ import IqTopBar from "@/components/iq/IqTopBar";
 import TaskTipBlock from "@/components/iq/TaskTipBlock";
 import AgentRecordCard from "@/components/iq/AgentRecordCard";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
+import { useStartGate } from "@/components/iq/useStartGate";
 
 const TOTAL_AGENTS = 1;
 
 export default function IqPriorityAgents() {
   const [, navigate] = useLocation();
   const [calledCount, setCalledCount] = useState(0);
+  const { started } = useStartGate("priorityAgents");
 
   function handleNext() {
     const next = calledCount + 1;
@@ -41,8 +43,10 @@ export default function IqPriorityAgents() {
         <TaskTipBlock
           task="Josh, these are your high-priority relationships. Follow the next steps right below the agent's record information and click each of the checkboxes to get moving. If the agent doesn't respond, click Follow Up, make notes, then click Next Agent on the top for the next phone call."
           tip="Once you speak to the agent, based on the relationship, make sure you update the agent status."
+          storageKey="priorityAgents"
         />
 
+        {started && (
         <div className="flex-1 overflow-y-auto p-4">
           {/* Pagination bar */}
           <div className="grid grid-cols-3 items-center bg-white border border-gray-200 rounded-lg px-4 py-2.5 mb-4">
@@ -74,6 +78,7 @@ export default function IqPriorityAgents() {
 
           <AgentRecordCard />
         </div>
+        )}
       </div>
     </div>
   );

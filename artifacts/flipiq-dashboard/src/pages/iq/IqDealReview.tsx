@@ -7,6 +7,7 @@ import PropertyRow from "@/components/iq/PropertyRow";
 import SegmentHeader from "@/components/iq/SegmentHeader";
 import { DEAL_REVIEW_PROPERTIES } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
+import { useStartGate } from "@/components/iq/useStartGate";
 
 const segments = [
   {
@@ -62,6 +63,7 @@ const segmentTaskCopy: Record<typeof segments[number]["key"], { task: string; ti
 export default function IqDealReview() {
   const [, navigate] = useLocation();
   const [segIdx, setSegIdx] = useState(0);
+  const { started } = useStartGate("dealReview");
 
   const currentSeg = segments[segIdx];
   const isLastSeg = segIdx === segments.length - 1;
@@ -89,8 +91,10 @@ export default function IqDealReview() {
         <TaskTipBlock
           task={segmentTaskCopy[currentSeg.key].task}
           tip={segmentTaskCopy[currentSeg.key].tip}
+          storageKey="dealReview"
         />
 
+        {started && (
         <div className="flex-1 overflow-y-auto p-4">
           {/* Filter chips — all same size with icons */}
           <div className="flex items-center gap-2 mb-4 justify-end">
@@ -179,6 +183,7 @@ export default function IqDealReview() {
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

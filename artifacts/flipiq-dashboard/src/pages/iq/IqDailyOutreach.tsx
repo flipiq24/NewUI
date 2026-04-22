@@ -7,6 +7,7 @@ import TaskTipBlock from "@/components/iq/TaskTipBlock";
 import AudienceCard from "@/components/iq/AudienceCard";
 import { DAILY_OUTREACH_BUCKETS } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
+import { useStartGate } from "@/components/iq/useStartGate";
 
 const SMS_TEMPLATES = ["Text - direct to agent test", "Text - follow up #1", "Text - follow up #2"];
 const EMAIL_TEMPLATES = ["Email Direct to Agent - Weekly Campaigns", "Email - Monthly Update", "Email - Market Report"];
@@ -19,6 +20,7 @@ export default function IqDailyOutreach() {
   const [emailChecked, setEmailChecked] = useState(false);
   const [smsTemplate, setSmsTemplate] = useState(SMS_TEMPLATES[0]);
   const [emailTemplate, setEmailTemplate] = useState(EMAIL_TEMPLATES[0]);
+  const { started } = useStartGate("dailyOutreach");
 
   function toggleBucket(id: string) {
     setSelected((prev) => {
@@ -62,8 +64,10 @@ export default function IqDailyOutreach() {
         <TaskTipBlock
           task="Josh, you have a total of 5 Agent relationships to send campaigns to today. Start by clicking the box of each group — Hot, Warm, Cold, Unknown — on the top right of each card. Then choose a template, or configure a custom SMS or email message."
           tip="You can choose from pending emails or send a custom email for each."
+          storageKey="dailyOutreach"
         />
 
+        {started && (
         <div className="flex-1 overflow-y-auto px-5 py-4">
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
 
@@ -215,6 +219,7 @@ export default function IqDailyOutreach() {
 
           </div>
         </div>
+        )}
       </div>
     </div>
   );
