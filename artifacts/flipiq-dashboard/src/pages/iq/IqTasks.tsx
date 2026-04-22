@@ -153,10 +153,9 @@ export default function IqTasks() {
   // Re-read persisted progress so badges reflect what's done today.
   // Tracked via checklistVersion so toggles inside Deal Review propagate here.
   const iqState = useMemo(() => loadIqState(), [checklistVersion]);
-  const dealDone = !!iqState?.dealReviewComplete;
-  const outreachDone = !!iqState?.outreachCampaignSent;
-  const priorityDone = !!iqState?.priorityAgentsComplete;
-  const newRelDone = !!iqState?.newRelationshipsComplete;
+  const outreachFlag = !!iqState?.outreachCampaignSent;
+  const priorityFlag = !!iqState?.priorityAgentsComplete;
+  const newRelFlag = !!iqState?.newRelationshipsComplete;
   const dayDone = !!iqState && allTasksComplete(iqState);
 
   function startStep(route: string) {
@@ -189,6 +188,12 @@ export default function IqTasks() {
   const totalEmails = 5;
   const totalPriorityAgents = 9;
   const totalProperties = 30;
+
+  // Card-level "DONE" only when every cell in that priority is complete.
+  const dealDone = totalDeals > 0 && LEVEL_ORDER.every((l) => levelCounts[l] === 0 || levelComplete[l]);
+  const outreachDone = outreachFlag; // 4 buckets sent in one shot today
+  const priorityDone = priorityFlag; // single cell
+  const newRelDone = newRelFlag; // single cell
 
   return (
     <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
@@ -275,12 +280,24 @@ export default function IqTasks() {
                 <div className="grid grid-cols-4 gap-3">
                   {DAILY_OUTREACH_BUCKETS.map((b) => {
                     const c = bucketMeta[b.id];
+                    const cellDone = outreachDone;
                     return (
                       <div
                         key={b.id}
                         title={`${c.label} — ${b.pendingToday} pending today out of ${b.totalDB} in database. ${c.tip}`}
-                        className={`bg-white border ${c.border} rounded-lg p-4 text-center cursor-help`}
+                        className={`relative border ${cellDone ? "bg-green-50 border-green-300" : `bg-white ${c.border}`} rounded-lg p-4 text-center cursor-help`}
                       >
+                        {cellDone && (
+                          <svg
+                            className="absolute top-1.5 right-1.5 w-4 h-4 text-green-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
                         <p className={`text-3xl font-bold ${c.color} leading-none mb-1`}>
                           {b.pendingToday}
                           <span className="text-base text-gray-400 font-normal"> / {b.totalDB}</span>
@@ -304,8 +321,19 @@ export default function IqTasks() {
               >
                 <div
                   title={`${totalPriorityAgents} priority agents to call today — your highest-value relationships flagged for a personal phone call.`}
-                  className="bg-white border border-orange-300 rounded-lg p-5 text-center cursor-help"
+                  className={`relative border rounded-lg p-5 text-center cursor-help ${priorityDone ? "bg-green-50 border-green-300" : "bg-white border-orange-300"}`}
                 >
+                  {priorityDone && (
+                    <svg
+                      className="absolute top-1.5 right-1.5 w-4 h-4 text-green-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
                   <p className="text-4xl font-bold text-orange-500 leading-none mb-1">
                     {totalPriorityAgents}
                   </p>
@@ -325,8 +353,19 @@ export default function IqTasks() {
               >
                 <div
                   title={`${totalProperties} high-propensity-to-sell properties to call today — owners likely to list soon, great targets for new agent relationships.`}
-                  className="bg-white border border-orange-300 rounded-lg p-5 text-center cursor-help"
+                  className={`relative border rounded-lg p-5 text-center cursor-help ${newRelDone ? "bg-green-50 border-green-300" : "bg-white border-orange-300"}`}
                 >
+                  {newRelDone && (
+                    <svg
+                      className="absolute top-1.5 right-1.5 w-4 h-4 text-green-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
                   <p className="text-4xl font-bold text-orange-500 leading-none mb-1">
                     {totalProperties}
                   </p>
