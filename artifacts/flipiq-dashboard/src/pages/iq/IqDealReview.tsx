@@ -124,32 +124,6 @@ export default function IqDealReview() {
             </span>
           </div>
 
-          {/* Table header */}
-          <div className="grid grid-cols-[36px_auto_160px_150px_200px] gap-0 px-3 pb-1.5 mb-1">
-            <div />
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-              PROPERTY
-              <svg className="w-3 h-3 text-gray-300" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="1.5"><circle cx="6" cy="6" r="4.5" /><line x1="6" y1="4" x2="6" y2="6" /><circle cx="6" cy="8" r="0.5" fill="currentColor" /></svg>
-              <span className="text-gray-300 font-normal">|</span>
-              <span className="flex items-center gap-0.5">
-                <svg className="w-3 h-3 text-gray-300" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="1.5"><path d="M2 9L5 3l3 4 2-2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                Segments
-              </span>
-            </p>
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-              PRICE / PROPENSITY
-              <svg className="w-3 h-3 text-gray-300" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="1.5"><circle cx="6" cy="6" r="4.5" /><line x1="6" y1="4" x2="6" y2="6" /><circle cx="6" cy="8" r="0.5" fill="currentColor" /></svg>
-            </p>
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-              LAST OPEN / CALLED
-              <svg className="w-3 h-3 text-gray-300" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="1.5"><circle cx="6" cy="6" r="4.5" /><line x1="6" y1="4" x2="6" y2="6" /><circle cx="6" cy="8" r="0.5" fill="currentColor" /></svg>
-            </p>
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-              NEXT STEPS / OWNER
-              <svg className="w-3 h-3 text-gray-300" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="1.5"><circle cx="6" cy="6" r="4.5" /><line x1="6" y1="4" x2="6" y2="6" /><circle cx="6" cy="8" r="0.5" fill="currentColor" /></svg>
-            </p>
-          </div>
-
           {(() => {
             const props = DEAL_REVIEW_PROPERTIES.filter((p) => p.segment === currentSeg.key);
             return (
