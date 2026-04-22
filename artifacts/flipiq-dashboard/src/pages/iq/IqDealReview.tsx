@@ -78,8 +78,8 @@ export default function IqDealReview() {
               </svg>
               3 Reminders
             </span>
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 16 16" stroke="currentColor" strokeWidth="1.8">
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-green-50 text-green-700">
+              <svg className="w-3.5 h-3.5 text-green-600" fill="none" viewBox="0 0 16 16" stroke="currentColor" strokeWidth="1.8">
                 <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" strokeLinecap="round" />
                 <polyline points="1.5,4.5 8,9.5 14.5,4.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
