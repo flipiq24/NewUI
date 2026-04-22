@@ -236,7 +236,9 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
 export type OutreachBucket = {
   id: string;
   label: string;
-  headerColor: string;
+  topBorder: string;
+  labelColor: string;
+  pendingColor: string;
   totalDB: number;
   pendingToday: number;
   lastCreated: string;
@@ -247,7 +249,9 @@ export const DAILY_OUTREACH_BUCKETS: OutreachBucket[] = [
   {
     id: "hot",
     label: "HOT AGENTS",
-    headerColor: "bg-red-500",
+    topBorder: "border-t-red-500",
+    labelColor: "text-red-500",
+    pendingColor: "text-red-500",
     totalDB: 7,
     pendingToday: 1,
     lastCreated: "03/14/26 (38 days ago)",
@@ -256,7 +260,9 @@ export const DAILY_OUTREACH_BUCKETS: OutreachBucket[] = [
   {
     id: "warm",
     label: "WARM AGENTS",
-    headerColor: "bg-yellow-400",
+    topBorder: "border-t-yellow-400",
+    labelColor: "text-yellow-600",
+    pendingColor: "text-yellow-600",
     totalDB: 8,
     pendingToday: 1,
     lastCreated: "02/15/26 (65 days ago)",
@@ -265,7 +271,9 @@ export const DAILY_OUTREACH_BUCKETS: OutreachBucket[] = [
   {
     id: "cold",
     label: "COLD AGENTS",
-    headerColor: "bg-blue-500",
+    topBorder: "border-t-blue-500",
+    labelColor: "text-blue-600",
+    pendingColor: "text-blue-600",
     totalDB: 2,
     pendingToday: 1,
     lastCreated: "02/02/26 (78 days ago)",
@@ -274,7 +282,9 @@ export const DAILY_OUTREACH_BUCKETS: OutreachBucket[] = [
   {
     id: "unknown",
     label: "UNKNOWN AGENTS",
-    headerColor: "bg-gray-400",
+    topBorder: "border-t-gray-400",
+    labelColor: "text-gray-500",
+    pendingColor: "text-gray-600",
     totalDB: 21,
     pendingToday: 2,
     lastCreated: "03/17/26 (35 days ago)",
