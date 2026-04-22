@@ -36,6 +36,7 @@ export default function IqPriorityAgents() {
           breadcrumb="Daily Outreach > Call Priority Agents"
           nextTask="Start New Relationship Building"
           onNext={handleTopNext}
+          nextIncomplete={calledCount < TOTAL_AGENTS}
         />
         <TaskTipBlock
           task="Josh, these are your high-priority relationships. Follow the next steps right below the agent's record information and click each of the checkboxes to get moving. If the agent doesn't respond, click Follow Up, make notes, then click Next Agent on the top for the next phone call."

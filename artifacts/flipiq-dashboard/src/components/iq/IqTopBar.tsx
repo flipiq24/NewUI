@@ -1,13 +1,33 @@
+import { useState } from "react";
+
 interface IqTopBarProps {
   breadcrumb?: string;
   nextTask?: string | null;
   onNext?: () => void;
   title?: string;
   centerContent?: React.ReactNode;
+  nextIncomplete?: boolean;
 }
 
-export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerContent }: IqTopBarProps) {
+export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerContent, nextIncomplete }: IqTopBarProps) {
+  const [showWarn, setShowWarn] = useState(false);
+
+  function handleNextClick() {
+    if (!onNext) return;
+    if (nextIncomplete) {
+      setShowWarn(true);
+    } else {
+      onNext();
+    }
+  }
+
+  function proceedAnyway() {
+    setShowWarn(false);
+    onNext?.();
+  }
+
   return (
+    <>
     <div className="min-h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0 py-3 gap-6">
       <div className="flex items-center gap-3">
         {title && (
@@ -30,7 +50,7 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerCo
       )}
       {nextTask && (
         <button
-          onClick={onNext}
+          onClick={handleNextClick}
           className={`text-xs flex items-center gap-1 ${onNext ? "cursor-pointer" : "cursor-default"}`}
         >
           <span className="font-semibold text-orange-500">Next Task:</span>
@@ -53,5 +73,37 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerCo
         </button>
       </div>
     </div>
+    {showWarn && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5 text-orange-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a1 1 0 011 1v3a1 1 0 11-2 0V7a1 1 0 011-1zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-base font-bold text-gray-900 mb-1">Hold on, Josh.</h3>
+              <p className="text-sm text-gray-600">You're not following the process. You must follow the sequence in the right order.</p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => setShowWarn(false)}
+              className="text-sm font-medium px-4 py-2 rounded border border-gray-200 text-gray-700 hover:bg-gray-50"
+            >
+              Go back
+            </button>
+            <button
+              onClick={proceedAnyway}
+              className="text-sm font-semibold px-4 py-2 rounded bg-orange-500 text-white hover:bg-orange-600"
+            >
+              Skip anyway
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

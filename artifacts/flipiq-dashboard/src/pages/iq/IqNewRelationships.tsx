@@ -50,6 +50,7 @@ export default function IqNewRelationships() {
           breadcrumb="Daily Outreach > Start New Relationships Building"
           nextTask="End of Day Stats"
           onNext={handleTopNext}
+          nextIncomplete={calledCount < total}
         />
         <TaskTipBlock
           task="Josh, great job following up with your properties and sending campaigns. Now it's time to chase high-propensity-to-sell properties with agents you already work with."
