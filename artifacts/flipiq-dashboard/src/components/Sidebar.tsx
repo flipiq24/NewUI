@@ -19,15 +19,8 @@ function IqSidebar({ location }: { location: string }) {
   const dealReviewComplete = state.dealReviewComplete ?? false;
   const outreachSent = state.outreachCampaignSent ?? false;
   const priorityComplete = state.priorityAgentsComplete ?? false;
-  const showDealReview = location === "/iq/deal-review" || dealReviewComplete || location === "/iq/daily-outreach" || location === "/iq/priority-agents" || location === "/iq/new-relationships";
-  const showDailyOutreach = location === "/iq/daily-outreach" || location === "/iq/priority-agents" || location === "/iq/new-relationships" || outreachSent || priorityComplete;
-
-  const dealBadge = dealReviewComplete ? "9/9 ✓" : "0/9";
-  const outreachBadge = priorityComplete ? "12/12" : outreachSent ? "4/12" : "0/12";
 
   const iqActive = location === "/iq" || location === "/iq/tasks" || location === "/iq/welcome-back";
-  const dealActive = location === "/iq/deal-review";
-  const outreachActive = location === "/iq/daily-outreach" || location === "/iq/priority-agents" || location === "/iq/new-relationships";
 
   return (
     <div className="w-[192px] bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
@@ -47,24 +40,22 @@ function IqSidebar({ location }: { location: string }) {
             done={iqDone && !iqActive}
           />
         </Link>
-        {showDealReview && (
+        {dealReviewComplete && (
           <Link href="/iq/deal-review">
             <IqNavItem
-              icon={<FileTextIcon />}
+              icon={<CheckIcon />}
               label="Deal Review"
-              badge={dealBadge}
-              active={dealActive}
-              done={dealReviewComplete}
+              badge="9/9"
+              done
             />
           </Link>
         )}
-        {showDailyOutreach && (
+        {(outreachSent || priorityComplete) && (
           <Link href="/iq/daily-outreach">
             <IqNavItem
-              icon={<PhoneIcon />}
+              icon={priorityComplete ? <CheckIcon /> : <PhoneIcon />}
               label="Daily Outreach"
-              badge={outreachBadge}
-              active={outreachActive}
+              badge={priorityComplete ? "12/12" : "4/12"}
               done={priorityComplete}
             />
           </Link>
