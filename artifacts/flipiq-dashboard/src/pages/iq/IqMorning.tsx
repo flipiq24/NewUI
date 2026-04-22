@@ -6,7 +6,6 @@ import {
   saveIqState,
   resetIqStateIfNewDay,
   allTasksComplete,
-  firstIncompleteRoute,
 } from "@/lib/iq/storage";
 
 export default function IqMorning() {
@@ -37,7 +36,7 @@ export default function IqMorning() {
   }
 
   if (state.morningCheckin) {
-    return <Redirect to={firstIncompleteRoute(state)} />;
+    return <Redirect to="/iq/welcome-back" />;
   }
 
   const bothAnswered = canWorkFullDay !== null && needsHelp !== null;
