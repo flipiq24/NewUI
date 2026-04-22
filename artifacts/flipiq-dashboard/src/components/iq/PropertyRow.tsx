@@ -17,15 +17,10 @@ function OfferPill({ pct, label }: { pct: number; label: string }) {
 export default function PropertyRow({ property, last }: { property: DealProperty; last?: boolean }) {
   return (
     <div className={`bg-white px-3 py-3 hover:bg-orange-50 transition-colors ${!last ? "border-b border-gray-100" : ""}`}>
-      <div className="grid grid-cols-[24px_32px_auto_140px_150px_200px] gap-0 items-start">
+      <div className="grid grid-cols-[36px_auto_160px_150px_200px] gap-0 items-start">
 
-        {/* Checkbox */}
-        <div className="flex items-center pt-1">
-          <input type="checkbox" className="w-3.5 h-3.5 accent-orange-500 cursor-pointer" />
-        </div>
-
-        {/* Action icons — email, person, phone — bigger */}
-        <div className="flex flex-col items-center gap-2 pt-0.5">
+        {/* Action icons — email, person, phone — larger and more prominent */}
+        <div className="flex flex-col items-center gap-2.5 pt-0.5">
           <EmailIcon />
           <PersonIcon />
           <PhoneCallIcon />
@@ -33,26 +28,24 @@ export default function PropertyRow({ property, last }: { property: DealProperty
 
         {/* Property identity */}
         <div className="pr-3 min-w-0">
-          <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
-            <span className="text-[11px] font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <span className="text-[11px] font-bold bg-red-100 text-red-700 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
+              <span className="text-orange-500">▲</span>
               {property.priorityBadge}
             </span>
-            <span className="text-gray-300 text-xs">•</span>
-            <span className="text-[11px] font-semibold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">
-              {property.statusBadge}
+            <input type="checkbox" className="w-3.5 h-3.5 accent-orange-500 cursor-pointer" />
+            <span className="text-[11px] font-semibold bg-orange-500 text-white px-2.5 py-0.5 rounded-full">
+              To do: {property.nextSteps.length > 8 ? property.nextSteps.slice(0, 8) + "..." : property.nextSteps}
             </span>
+            <OfferPill pct={property.offerPct} label={property.offerLabel} />
           </div>
-          <p className="text-[13px] font-bold text-gray-900 mb-0.5 flex items-center gap-1 flex-wrap">
-            <GlobeIcon />
+          <p className="text-[13px] font-bold text-gray-900 mb-1 flex items-center gap-1.5 flex-wrap">
             <span>{property.address}</span>
+            <GlobeIcon />
             <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-medium">{property.type}</span>
           </p>
-          <p className="text-[11px] text-gray-400 mt-0.5 leading-relaxed">
-            {property.propertyType} / {property.beds}Br / {property.baths}Ba / {property.garage}Gar / {property.year} / {property.sqft} / {property.lotSqft}
-            {property.pool !== "None" ? ` / Pool: ${property.pool}` : ""}
-          </p>
-          <p className="text-[11px] text-gray-400">
-            {property.days} Days • DOM: {property.dom} / CDOM: {property.cdom}
+          <p className="text-[12px] text-gray-600">
+            Source: <span className={property.sourceStatus === "Active" ? "text-green-600 font-semibold" : "text-gray-600 font-semibold"}>{property.source} - {property.sourceStatus}</span>
           </p>
         </div>
 
@@ -64,14 +57,14 @@ export default function PropertyRow({ property, last }: { property: DealProperty
               Propensity: <span className="font-semibold text-gray-700">{property.propensityScore}</span> | {property.propensityLabel}
             </p>
           )}
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-col gap-0.5">
             {property.tags.map((tag, i) => (
               <span
                 key={i}
-                className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                className={`text-[11px] font-medium ${
                   tag.startsWith("+") ? "text-orange-500 cursor-pointer" :
-                  tag.includes("Equity") || tag.includes("Owner") || tag.includes("Pain") ? "bg-green-50 text-green-700" :
-                  "bg-blue-50 text-blue-700"
+                  tag.includes("Equity") || tag.includes("Owner") || tag.includes("Pain") ? "text-green-700" :
+                  "text-blue-700"
                 }`}
               >
                 {tag}
@@ -95,20 +88,14 @@ export default function PropertyRow({ property, last }: { property: DealProperty
           </div>
         </div>
 
-        {/* Offer Status / Source */}
+        {/* Next Steps / Negotiator / Assigned */}
         <div>
-          <p className="text-[10px] text-gray-500 mb-1">
-            Source: <span className={property.sourceStatus === "Active" ? "text-green-600 font-semibold" : "text-gray-600 font-semibold"}>{property.source} - {property.sourceStatus}</span>
+          <p className="text-[12px] text-orange-600 font-semibold mb-1">
+            Next Steps: <span className="text-gray-700">{property.nextSteps}</span>
           </p>
-          <div className="mb-1.5">
-            <OfferPill pct={property.offerPct} label={property.offerLabel} />
-          </div>
-          <p className="text-[11px] text-orange-600 font-semibold mb-0.5">
-            Next Steps: {property.nextSteps}
-          </p>
-          <p className="text-[10px] text-gray-500">Offer Negotiator: {property.negotiator}</p>
-          <p className={`text-[10px] ${property.assignedUser === "Not Assigned" ? "text-gray-400" : "text-gray-600"}`}>
-            Assigned User: {property.assignedUser}
+          <p className="text-[11px] text-gray-500 mb-0.5">Offer Negotiator: <span className="text-gray-700">{property.negotiator}</span></p>
+          <p className={`text-[11px] ${property.assignedUser === "Not Assigned" ? "text-gray-400" : "text-gray-500"}`}>
+            Assigned User: <span className={property.assignedUser === "Not Assigned" ? "" : "text-gray-700"}>{property.assignedUser}</span>
           </p>
         </div>
 
@@ -119,7 +106,7 @@ export default function PropertyRow({ property, last }: { property: DealProperty
 
 function EmailIcon() {
   return (
-    <svg className="w-4 h-4 text-gray-400 hover:text-orange-500 cursor-pointer transition-colors" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg className="w-5 h-5 text-gray-600 hover:text-orange-500 cursor-pointer transition-colors" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7">
       <rect x="2" y="4" width="16" height="12" rx="2" />
       <polyline points="2,5.5 10,12 18,5.5" strokeLinecap="round" />
     </svg>
@@ -127,14 +114,14 @@ function EmailIcon() {
 }
 function PhoneCallIcon() {
   return (
-    <svg className="w-4 h-4 text-gray-400 hover:text-orange-500 cursor-pointer transition-colors" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg className="w-5 h-5 text-gray-600 hover:text-orange-500 cursor-pointer transition-colors" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7">
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h4l2 5-2.5 1.5A11 11 0 0013.5 13.5L15 11l5 2v4a2 2 0 01-2 2C7 19 1 13 1 5a2 2 0 012-2z" />
     </svg>
   );
 }
 function PersonIcon() {
   return (
-    <svg className="w-4 h-4 text-gray-400 hover:text-orange-500 cursor-pointer transition-colors" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg className="w-5 h-5 text-gray-600 hover:text-orange-500 cursor-pointer transition-colors" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7">
       <circle cx="10" cy="7" r="3.5" />
       <path strokeLinecap="round" d="M3 18c0-3.866 3.134-7 7-7s7 3.134 7 7" />
     </svg>

@@ -88,8 +88,7 @@ export default function IqDealReview() {
           </div>
 
           {/* Table header */}
-          <div className="grid grid-cols-[24px_32px_auto_140px_150px_200px] gap-0 px-3 pb-1.5 mb-1">
-            <div />
+          <div className="grid grid-cols-[36px_auto_160px_150px_200px] gap-0 px-3 pb-1.5 mb-1">
             <div />
             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
               PROPERTY
@@ -109,7 +108,7 @@ export default function IqDealReview() {
               <svg className="w-3 h-3 text-gray-300" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="1.5"><circle cx="6" cy="6" r="4.5" /><line x1="6" y1="4" x2="6" y2="6" /><circle cx="6" cy="8" r="0.5" fill="currentColor" /></svg>
             </p>
             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-              OFFER STATUS / SOURCE
+              NEXT STEPS / OWNER
               <svg className="w-3 h-3 text-gray-300" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="1.5"><circle cx="6" cy="6" r="4.5" /><line x1="6" y1="4" x2="6" y2="6" /><circle cx="6" cy="8" r="0.5" fill="currentColor" /></svg>
             </p>
           </div>
