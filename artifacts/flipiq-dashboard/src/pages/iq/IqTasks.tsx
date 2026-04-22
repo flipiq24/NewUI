@@ -6,21 +6,30 @@ import { DAILY_OUTREACH_BUCKETS } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 
 const dealCategories = [
-  { label: "Priority", count: 9, color: "text-orange-500", border: "border-orange-300" },
-  { label: "Hot", count: 6, color: "text-red-500", border: "border-red-300" },
-  { label: "Warm", count: 4, color: "text-amber-500", border: "border-amber-300" },
-  { label: "Cold", count: 3, color: "text-blue-500", border: "border-blue-300" },
+  { label: "Priority", count: 9, color: "text-orange-500", border: "border-orange-300", tip: "Highest-urgency deals — call these agents first today." },
+  { label: "Hot", count: 6, color: "text-red-500", border: "border-red-300", tip: "Active conversations with strong recent engagement." },
+  { label: "Warm", count: 4, color: "text-amber-500", border: "border-amber-300", tip: "Engaged agents in the middle of the pipeline — keep them moving." },
+  { label: "Cold", count: 3, color: "text-blue-500", border: "border-blue-300", tip: "Low-engagement deals that need a re-warm touch." },
 ];
 
-const bucketColors: Record<string, { color: string; border: string }> = {
-  hot: { color: "text-red-500", border: "border-red-300" },
-  warm: { color: "text-amber-500", border: "border-amber-300" },
-  cold: { color: "text-blue-500", border: "border-blue-300" },
-  unknown: { color: "text-gray-500", border: "border-gray-300" },
+const bucketMeta: Record<string, { color: string; border: string; tip: string }> = {
+  hot: { color: "text-red-500", border: "border-red-300", tip: "Hot agents — recent strong engagement, high reply likelihood." },
+  warm: { color: "text-amber-500", border: "border-amber-300", tip: "Warm agents — past engagement, worth re-engaging today." },
+  cold: { color: "text-blue-500", border: "border-blue-300", tip: "Cold agents — no recent activity, low engagement." },
+  unknown: { color: "text-gray-500", border: "border-gray-300", tip: "Unknown agents — no engagement history yet." },
 };
 
+const pillTips: Record<NotificationKind, string> = {
+  critical: "Critical alerts that require your immediate attention.",
+  reminder: "Reminders you set or that the system queued for today.",
+  unseen: "Unread emails from agents you've been working with.",
+  text: "Unread text messages from agents.",
+};
+
+type NotificationKind = "critical" | "reminder" | "unseen" | "text";
+
 interface NotificationPill {
-  kind: "critical" | "reminder" | "unseen" | "text";
+  kind: NotificationKind;
   count: number;
   label: string;
 }
@@ -71,7 +80,10 @@ function PillBadge({ pill }: { pill: NotificationPill }) {
   }[pill.kind];
 
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold ${styles}`}>
+    <span
+      title={`${pill.count} ${pill.label} — ${pillTips[pill.kind]}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold ${styles} cursor-help`}
+    >
       {icon}
       {pill.count} {pill.label}
     </span>
@@ -152,7 +164,8 @@ export default function IqTasks() {
                   {dealCategories.map((cat) => (
                     <div
                       key={cat.label}
-                      className={`bg-white border ${cat.border} rounded-lg p-4 text-center`}
+                      title={`${cat.label} (${cat.count}) — ${cat.tip}`}
+                      className={`bg-white border ${cat.border} rounded-lg p-4 text-center cursor-help`}
                     >
                       <p className={`text-3xl font-bold ${cat.color} leading-none mb-1`}>
                         {cat.count}
@@ -180,11 +193,12 @@ export default function IqTasks() {
               >
                 <div className="grid grid-cols-4 gap-3">
                   {DAILY_OUTREACH_BUCKETS.map((b) => {
-                    const c = bucketColors[b.id];
+                    const c = bucketMeta[b.id];
                     return (
                       <div
                         key={b.id}
-                        className={`bg-white border ${c.border} rounded-lg p-4 text-center`}
+                        title={`${b.id.toUpperCase()} — ${b.pendingToday} pending today out of ${b.totalDB} in database. ${c.tip}`}
+                        className={`bg-white border ${c.border} rounded-lg p-4 text-center cursor-help`}
                       >
                         <p className={`text-3xl font-bold ${c.color} leading-none mb-1`}>
                           {b.pendingToday}
@@ -206,7 +220,10 @@ export default function IqTasks() {
                 subtitle={`Total Priority: ${totalPriorityAgents}`}
                 onClick={() => startStep("/iq/priority-agents")}
               >
-                <div className="bg-white border border-orange-300 rounded-lg p-5 text-center">
+                <div
+                  title={`${totalPriorityAgents} priority agents to call today — your highest-value relationships flagged for a personal phone call.`}
+                  className="bg-white border border-orange-300 rounded-lg p-5 text-center cursor-help"
+                >
                   <p className="text-4xl font-bold text-orange-500 leading-none mb-1">
                     {totalPriorityAgents}
                   </p>
@@ -223,7 +240,10 @@ export default function IqTasks() {
                 subtitle={`Total Properties: ${totalProperties}`}
                 onClick={() => startStep("/iq/new-relationships")}
               >
-                <div className="bg-white border border-orange-300 rounded-lg p-5 text-center">
+                <div
+                  title={`${totalProperties} high-propensity-to-sell properties to call today — owners likely to list soon, great targets for new agent relationships.`}
+                  className="bg-white border border-orange-300 rounded-lg p-5 text-center cursor-help"
+                >
                   <p className="text-4xl font-bold text-orange-500 leading-none mb-1">
                     {totalProperties}
                   </p>
