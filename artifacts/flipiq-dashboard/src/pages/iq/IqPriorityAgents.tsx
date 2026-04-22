@@ -45,8 +45,6 @@ export default function IqPriorityAgents() {
           tip="Once you speak to the agent, based on the relationship, make sure you update the agent status."
           storageKey="priorityAgents"
           onStart={start}
-          onContinue={handleTopNext}
-          continueLabel="Start New Relationship Building"
         />
 
         {started && (

@@ -66,8 +66,6 @@ export default function IqDailyOutreach() {
           tip="You can choose from pending emails or send a custom email for each."
           storageKey="dailyOutreach"
           onStart={start}
-          onContinue={handleNext}
-          continueLabel="Call Priority Agents"
         />
 
         {started && (

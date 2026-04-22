@@ -59,8 +59,6 @@ export default function IqNewRelationships() {
           tip="Look at the Propensity to Sell score in the top middle of the page and read the iQ Property Intelligence for instructions. Click on the address to enter the property and start making calls."
           storageKey="newRelationships"
           onStart={start}
-          onContinue={handleTopNext}
-          continueLabel="End of Day Stats"
         />
 
         {started && (

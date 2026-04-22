@@ -5,8 +5,6 @@ interface TaskTipBlockProps {
   tip: string;
   storageKey?: string;
   onStart?: () => void;
-  onContinue?: () => void;
-  continueLabel?: string;
 }
 
 export default function TaskTipBlock({
@@ -14,12 +12,9 @@ export default function TaskTipBlock({
   tip,
   storageKey,
   onStart,
-  onContinue,
-  continueLabel,
 }: TaskTipBlockProps) {
   const { started, start } = useStartGate(storageKey ?? "__none__");
   const showStart = !!storageKey && !started;
-  const showContinue = !!storageKey && started && !!onContinue;
 
   function handleStart() {
     start();
@@ -36,27 +31,14 @@ export default function TaskTipBlock({
         <span className="text-base font-bold text-blue-600 flex-shrink-0">Tip:</span>
         <span className="text-base text-gray-600">{tip}</span>
       </div>
-      {(showStart || showContinue) && (
+      {showStart && (
         <div className="flex justify-end mt-3">
-          {showStart && (
-            <button
-              onClick={handleStart}
-              className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2 rounded cursor-pointer"
-            >
-              Get Started
-            </button>
-          )}
-          {showContinue && (
-            <button
-              onClick={onContinue}
-              className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2 rounded cursor-pointer inline-flex items-center gap-1.5"
-            >
-              {continueLabel ? `Continue to ${continueLabel}` : "Continue"}
-              <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <polyline points="4,2 8,6 4,10" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          )}
+          <button
+            onClick={handleStart}
+            className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2 rounded cursor-pointer"
+          >
+            Get Started
+          </button>
         </div>
       )}
     </div>
