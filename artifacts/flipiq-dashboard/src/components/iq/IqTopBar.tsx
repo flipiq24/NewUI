@@ -7,13 +7,13 @@ interface IqTopBarProps {
 
 export default function IqTopBar({ breadcrumb, nextTask, onNext, title }: IqTopBarProps) {
   return (
-    <div className="h-14 bg-white border-b border-gray-200 flex items-center px-6 flex-shrink-0">
-      <div className="flex-1 flex items-center gap-2">
+    <div className="min-h-16 bg-white border-b border-gray-200 flex items-center px-6 flex-shrink-0 py-3">
+      <div className="flex-1 flex items-center gap-3">
         {title && (
-          <span className="text-sm font-semibold text-gray-700">{title}</span>
+          <span className="text-base font-semibold text-gray-700">{title}</span>
         )}
         {breadcrumb && (
-          <span className="text-xs text-gray-500">{breadcrumb}</span>
+          <span className="text-lg font-semibold text-gray-700">{breadcrumb}</span>
         )}
       </div>
       <div className="flex items-center gap-4">
