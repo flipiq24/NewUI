@@ -50,6 +50,16 @@ export default function IqNewRelationships() {
           breadcrumb="Daily Outreach > Start New Relationships Building"
           nextTask="End of Day Stats"
           onNext={handleTopNext}
+          centerContent={
+            <div className="flex items-center gap-3 text-xs font-semibold">
+              <span className="text-gray-900">{currentIndex + 1}/{total}</span>
+              <span className="text-gray-300">|</span>
+              <span className="text-gray-700">
+                <span className="text-gray-900">{calledCount} / {total}</span>
+                <span className="text-gray-500 font-medium ml-1">new agent calls</span>
+              </span>
+            </div>
+          }
         />
         <TaskTipBlock
           task="Josh, great job following up with your properties and sending campaigns. Now it's time to chase high-propensity-to-sell properties with agents you already work with."
@@ -58,10 +68,7 @@ export default function IqNewRelationships() {
 
         <div className="flex-1 overflow-y-auto p-4">
           {/* Counter bar */}
-          <div className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-2.5 mb-4">
-            <span className="text-xs text-gray-600 font-medium">
-              <span className="font-bold text-gray-900">{calledCount} / {total}</span> new agent calls
-            </span>
+          <div className="flex items-center justify-end bg-white border border-gray-200 rounded-lg px-4 py-2.5 mb-4">
             <div className="flex items-center gap-2">
               <button
                 onClick={handlePrev}

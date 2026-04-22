@@ -3,9 +3,10 @@ interface IqTopBarProps {
   nextTask?: string | null;
   onNext?: () => void;
   title?: string;
+  centerContent?: React.ReactNode;
 }
 
-export default function IqTopBar({ breadcrumb, nextTask, onNext, title }: IqTopBarProps) {
+export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerContent }: IqTopBarProps) {
   return (
     <div className="min-h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0 py-3 gap-6">
       <div className="flex items-center gap-3">
@@ -24,6 +25,9 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title }: IqTopB
           );
         })()}
       </div>
+      {centerContent && (
+        <div className="flex-1 flex justify-center">{centerContent}</div>
+      )}
       {nextTask && (
         <button
           onClick={onNext}
