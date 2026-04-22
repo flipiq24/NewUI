@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
+import { ReactNode } from "react";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
-import TaskDashboardCard from "@/components/iq/TaskDashboardCard";
 import { DAILY_OUTREACH_BUCKETS } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 
@@ -19,6 +19,32 @@ const bucketColors: Record<string, { color: string; bg: string; border: string }
   unknown: { color: "text-gray-500", bg: "bg-gray-50", border: "border-gray-200" },
 };
 
+interface CardProps {
+  priority: number;
+  title: string;
+  subtitle: string;
+  onClick: () => void;
+  children: ReactNode;
+}
+
+function DashboardCard({ priority, title, subtitle, onClick, children }: CardProps) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full text-left bg-white border border-gray-200 rounded-xl shadow-sm p-5 hover:border-orange-300 hover:shadow-md transition-all cursor-pointer block"
+    >
+      <div className="mb-4">
+        <p className="text-[11px] font-bold text-orange-500 uppercase tracking-wider mb-1">
+          Priority #{priority}
+        </p>
+        <h3 className="text-lg font-bold text-gray-900 leading-tight">{title}</h3>
+        <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>
+      </div>
+      {children}
+    </button>
+  );
+}
+
 export default function IqTasks() {
   const [, navigate] = useLocation();
 
@@ -29,9 +55,10 @@ export default function IqTasks() {
   }
 
   const totalDeals = dealCategories.reduce((s, c) => s + c.count, 0);
-  const totalCampaigns = DAILY_OUTREACH_BUCKETS.reduce((s, b) => s + b.pendingToday, 0);
-  const priorityAgentCalls = 9;
-  const newRelationshipProperties = 30;
+  const totalCampaigns = 4;
+  const totalEmails = 5;
+  const totalPriorityAgents = 9;
+  const totalProperties = 30;
 
   return (
     <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
@@ -44,22 +71,21 @@ export default function IqTasks() {
               Here are your tasks today, Josh!
             </h1>
 
-            {/* DEAL REVIEW SECTION */}
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">
               Deal Review
             </p>
             <div className="mb-8">
-              <TaskDashboardCard
+              <DashboardCard
                 priority={1}
                 title="Deal Review"
                 subtitle={`Total Deals: ${totalDeals}`}
-                onStart={() => startStep("/iq/deal-review")}
+                onClick={() => startStep("/iq/deal-review")}
               >
                 <div className="grid grid-cols-4 gap-3">
                   {dealCategories.map((cat) => (
                     <div
                       key={cat.label}
-                      className={`${cat.bg} border ${cat.border} rounded-lg p-4 text-center cursor-default`}
+                      className={`${cat.bg} border ${cat.border} rounded-lg p-4 text-center`}
                     >
                       <p className={`text-3xl font-bold ${cat.color} leading-none mb-1`}>
                         {cat.count}
@@ -70,21 +96,19 @@ export default function IqTasks() {
                     </div>
                   ))}
                 </div>
-              </TaskDashboardCard>
+              </DashboardCard>
             </div>
 
-            {/* DAILY OUTREACH SECTION */}
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">
               Daily Outreach
             </p>
             <div className="space-y-4">
 
-              {/* Card 2 — Email Campaigns */}
-              <TaskDashboardCard
+              <DashboardCard
                 priority={2}
                 title="Email Campaigns"
-                subtitle={`${totalCampaigns} campaigns to send today`}
-                onStart={() => startStep("/iq/daily-outreach")}
+                subtitle={`${totalCampaigns} Campaigns • Total Emails: ${totalEmails}`}
+                onClick={() => startStep("/iq/daily-outreach")}
               >
                 <div className="grid grid-cols-4 gap-3">
                   {DAILY_OUTREACH_BUCKETS.map((b) => {
@@ -92,7 +116,7 @@ export default function IqTasks() {
                     return (
                       <div
                         key={b.id}
-                        className={`${c.bg} border ${c.border} rounded-lg p-4 text-center cursor-default`}
+                        className={`${c.bg} border ${c.border} rounded-lg p-4 text-center`}
                       >
                         <p className={`text-3xl font-bold ${c.color} leading-none mb-1`}>
                           {b.pendingToday}
@@ -105,69 +129,39 @@ export default function IqTasks() {
                     );
                   })}
                 </div>
-              </TaskDashboardCard>
+              </DashboardCard>
 
-              {/* Card 3 — Priority Agent Calls */}
-              <TaskDashboardCard
+              <DashboardCard
                 priority={3}
                 title="Priority Agent Calls"
-                subtitle="Call your highest-priority agents"
-                onStart={() => startStep("/iq/priority-agents")}
+                subtitle={`Total Priority: ${totalPriorityAgents}`}
+                onClick={() => startStep("/iq/priority-agents")}
               >
-                <div className="flex items-center gap-6">
-                  <div className="flex-1 bg-orange-50 border border-orange-200 rounded-lg p-5 text-center cursor-default">
-                    <p className="text-4xl font-bold text-orange-500 leading-none mb-1">
-                      {priorityAgentCalls}
-                    </p>
-                    <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide">
-                      Priority Agents to call
-                    </p>
-                  </div>
-                  <div className="flex-1 bg-red-50 border border-red-200 rounded-lg p-5 text-center cursor-default">
-                    <p className="text-4xl font-bold text-red-500 leading-none mb-1">1</p>
-                    <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide">
-                      Critical
-                    </p>
-                  </div>
-                  <div className="flex-1 bg-amber-50 border border-amber-200 rounded-lg p-5 text-center cursor-default">
-                    <p className="text-4xl font-bold text-amber-500 leading-none mb-1">0</p>
-                    <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide">
-                      Reminders
-                    </p>
-                  </div>
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-5 text-center">
+                  <p className="text-4xl font-bold text-orange-500 leading-none mb-1">
+                    {totalPriorityAgents}
+                  </p>
+                  <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide">
+                    Priority Agents to Call
+                  </p>
                 </div>
-              </TaskDashboardCard>
+              </DashboardCard>
 
-              {/* Card 4 — Build New Agent Relationships */}
-              <TaskDashboardCard
+              <DashboardCard
                 priority={4}
                 title="Build New Agent Relationships"
-                subtitle="Chase high-propensity-to-sell properties"
-                onStart={() => startStep("/iq/new-relationships")}
+                subtitle={`Total Properties: ${totalProperties}`}
+                onClick={() => startStep("/iq/new-relationships")}
               >
-                <div className="flex items-center gap-6">
-                  <div className="flex-1 bg-orange-50 border border-orange-200 rounded-lg p-5 text-center cursor-default">
-                    <p className="text-4xl font-bold text-orange-500 leading-none mb-1">
-                      {newRelationshipProperties}
-                    </p>
-                    <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide">
-                      Total Properties to call today
-                    </p>
-                  </div>
-                  <div className="flex-1 bg-green-50 border border-green-200 rounded-lg p-5 text-center cursor-default">
-                    <p className="text-4xl font-bold text-green-600 leading-none mb-1">22</p>
-                    <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide">
-                      High Propensity
-                    </p>
-                  </div>
-                  <div className="flex-1 bg-blue-50 border border-blue-200 rounded-lg p-5 text-center cursor-default">
-                    <p className="text-4xl font-bold text-blue-500 leading-none mb-1">8</p>
-                    <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide">
-                      New Agents
-                    </p>
-                  </div>
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-5 text-center">
+                  <p className="text-4xl font-bold text-orange-500 leading-none mb-1">
+                    {totalProperties}
+                  </p>
+                  <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide">
+                    Total Properties to Call Today
+                  </p>
                 </div>
-              </TaskDashboardCard>
+              </DashboardCard>
 
             </div>
           </div>
