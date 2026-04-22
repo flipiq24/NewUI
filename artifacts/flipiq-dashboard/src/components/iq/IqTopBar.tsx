@@ -7,8 +7,8 @@ interface IqTopBarProps {
 
 export default function IqTopBar({ breadcrumb, nextTask, onNext, title }: IqTopBarProps) {
   return (
-    <div className="min-h-16 bg-white border-b border-gray-200 flex items-center px-6 flex-shrink-0 py-3">
-      <div className="flex-1 flex items-center gap-3">
+    <div className="min-h-16 bg-white border-b border-gray-200 grid grid-cols-[1fr_auto_1fr] items-center px-6 flex-shrink-0 py-3 gap-4">
+      <div className="flex items-center gap-3">
         {title && (
           <span className="text-base font-semibold text-gray-700">{title}</span>
         )}
@@ -16,7 +16,7 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title }: IqTopB
           <span className="text-lg font-semibold text-gray-700">{breadcrumb}</span>
         )}
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center justify-center">
         {nextTask && (
           <button
             onClick={onNext}
@@ -31,6 +31,8 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title }: IqTopB
             )}
           </button>
         )}
+      </div>
+      <div className="flex items-center justify-end gap-4">
         <button className="flex items-center gap-1.5 group">
           <span className="text-xs font-semibold text-orange-500 group-hover:text-orange-600 transition-colors">Need Help?</span>
           <span className="w-7 h-7 bg-orange-500 group-hover:bg-orange-600 rounded flex items-center justify-center transition-colors flex-shrink-0">
