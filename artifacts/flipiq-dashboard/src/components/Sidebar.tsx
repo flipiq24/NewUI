@@ -1,6 +1,6 @@
 import { Settings, LogOut } from "lucide-react";
 import { useLocation, Link } from "wouter";
-import { loadIqState } from "@/lib/iq/storage";
+import { resetIqStateIfNewDay } from "@/lib/iq/storage";
 
 export default function Sidebar() {
   const [location] = useLocation();
@@ -14,10 +14,10 @@ export default function Sidebar() {
 }
 
 function IqSidebar({ location }: { location: string }) {
-  const state = loadIqState();
-  const dealReviewComplete = state?.dealReviewComplete ?? false;
-  const outreachSent = state?.outreachCampaignSent ?? false;
-  const priorityComplete = state?.priorityAgentsComplete ?? false;
+  const state = resetIqStateIfNewDay();
+  const dealReviewComplete = state.dealReviewComplete ?? false;
+  const outreachSent = state.outreachCampaignSent ?? false;
+  const priorityComplete = state.priorityAgentsComplete ?? false;
   const showDealReview = location === "/iq/deal-review" || dealReviewComplete || location === "/iq/daily-outreach" || location === "/iq/priority-agents" || location === "/iq/new-relationships";
   const showDailyOutreach = location === "/iq/daily-outreach" || location === "/iq/priority-agents" || location === "/iq/new-relationships" || outreachSent || priorityComplete;
 
