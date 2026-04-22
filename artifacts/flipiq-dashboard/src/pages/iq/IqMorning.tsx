@@ -113,7 +113,7 @@ function Question({
   return (
     <div>
       <p className="text-sm font-medium text-gray-800 mb-2">{label}</p>
-      <div className="flex items-center gap-3">
+      <div className="flex items-start gap-3">
         <ToggleButton
           label="Yes"
           selected={value === true}
@@ -124,12 +124,12 @@ function Question({
           selected={value === false}
           onClick={() => onChange(false)}
         />
-        <input
-          type="text"
-          placeholder="Explain"
+        <textarea
+          placeholder="Explain..."
           value={explain}
           onChange={(e) => onExplainChange(e.target.value)}
-          className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-200 w-56 bg-white"
+          rows={2}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-200 flex-1 bg-white resize-none"
         />
       </div>
     </div>

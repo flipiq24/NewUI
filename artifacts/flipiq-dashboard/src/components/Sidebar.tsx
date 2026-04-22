@@ -15,6 +15,7 @@ export default function Sidebar() {
 
 function IqSidebar({ location }: { location: string }) {
   const state = resetIqStateIfNewDay();
+  const iqDone = !!state.morningCheckin;
   const dealReviewComplete = state.dealReviewComplete ?? false;
   const outreachSent = state.outreachCampaignSent ?? false;
   const priorityComplete = state.priorityAgentsComplete ?? false;
@@ -31,16 +32,19 @@ function IqSidebar({ location }: { location: string }) {
   return (
     <div className="w-[192px] bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
       <div className="p-4 pt-5 pb-3">
-        <FlipIQLogo />
+        <Link href="/iq">
+          <FlipIQLogo />
+        </Link>
       </div>
 
       <div className="px-3 pb-2">
         <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-2 py-1">Today's Plan</p>
         <Link href="/iq">
           <IqNavItem
-            icon={<LightbulbIcon />}
+            icon={iqDone ? <CheckIcon /> : <LightbulbIcon />}
             label="iQ"
             active={iqActive}
+            done={iqDone && !iqActive}
           />
         </Link>
         {showDealReview && (
@@ -92,7 +96,9 @@ function DefaultSidebar({ location }: { location: string }) {
   return (
     <div className="w-[192px] bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
       <div className="p-4 pt-5 pb-3">
-        <FlipIQLogo />
+        <Link href="/iq">
+          <FlipIQLogo />
+        </Link>
       </div>
 
       <div className="px-3 pb-2">
@@ -194,13 +200,21 @@ function NavItem({ icon, label, badge, active, small }: {
 
 function FlipIQLogo() {
   return (
-    <div className="px-1">
+    <div className="px-1 cursor-pointer">
       <img
         src={`${import.meta.env.BASE_URL}flipiq-logo.png`}
         alt="FlipIQ"
         className="w-[110px] object-contain"
       />
     </div>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="2,8 6,12 14,4" />
+    </svg>
   );
 }
 

@@ -16,14 +16,14 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title }: IqTopB
           <span className="text-xs text-gray-500">{breadcrumb}</span>
         )}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         {nextTask && (
           <button
             onClick={onNext}
-            className={`text-xs text-gray-500 flex items-center gap-1 ${onNext ? "cursor-pointer hover:text-orange-500 transition-colors" : "cursor-default"}`}
+            className={`text-xs flex items-center gap-1 ${onNext ? "cursor-pointer" : "cursor-default"}`}
           >
-            <span className="font-medium">Next Task:</span>
-            <span className="text-gray-700 font-semibold">{nextTask}</span>
+            <span className="font-semibold text-orange-500">Next Task:</span>
+            <span className="text-gray-600">{nextTask}</span>
             {onNext && (
               <svg className="w-3.5 h-3.5 text-orange-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
                 <polyline points="6,3 11,8 6,13" />
@@ -31,8 +31,11 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title }: IqTopB
             )}
           </button>
         )}
-        <button className="text-xs font-medium text-orange-500 border border-orange-300 rounded-md px-3 py-1.5 hover:bg-orange-50 transition-colors">
+        <button className="text-xs font-semibold text-orange-500 hover:text-orange-600 flex items-center gap-1.5 transition-colors">
           Need Help?
+          <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
+          </svg>
         </button>
       </div>
     </div>
