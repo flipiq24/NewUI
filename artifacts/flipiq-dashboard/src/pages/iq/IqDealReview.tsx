@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import TaskTipBlock from "@/components/iq/TaskTipBlock";
 import PropertyRow from "@/components/iq/PropertyRow";
 import SegmentHeader from "@/components/iq/SegmentHeader";
-import { DEAL_REVIEW_PROPERTIES } from "@/lib/iq/mockData";
+import DealReviewHeader from "@/components/iq/DealReviewHeader";
+import { DEAL_REVIEW_PROPERTIES, type DealLevel, type NotificationKind } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 import { useStartGate } from "@/components/iq/useStartGate";
+import { isPropertyComplete, useChecklistVersion } from "@/lib/iq/dailyChecklist";
 
 const segments = [
   {
@@ -60,15 +62,68 @@ const segmentTaskCopy: Record<typeof segments[number]["key"], { task: string; ti
   },
 };
 
+const LEVEL_ORDER: DealLevel[] = ["high", "mid", "low", "new"];
+
 export default function IqDealReview() {
   const [, navigate] = useLocation();
   const [segIdx, setSegIdx] = useState(0);
   const segKey = `dealReview:${segments[segIdx].key}`;
   const { started, start } = useStartGate(segKey);
 
+  const [activeLevel, setActiveLevel] = useState<DealLevel | null>(null);
+  const [activeNotifications, setActiveNotifications] = useState<Set<NotificationKind>>(new Set());
+
   const currentSeg = segments[segIdx];
   const isLastSeg = segIdx === segments.length - 1;
   const nextLabel = isLastSeg ? "Daily Outreach" : segmentLabels[segments[segIdx + 1].key];
+
+  // Subscribe to checklist changes so completion checkmarks update live
+  const checklistVersion = useChecklistVersion();
+
+  // Counts and per-level completion across the entire deal-review dataset
+  const { levelCounts, levelComplete, notificationCounts } = useMemo(() => {
+    const lc: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
+    const ld: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
+    const nc: Record<NotificationKind, number> = { critical: 0, reminder: 0, unseen: 0, text: 0 };
+    for (const p of DEAL_REVIEW_PROPERTIES) {
+      lc[p.level] += 1;
+      if (isPropertyComplete(p.id)) ld[p.level] += 1;
+      for (const n of p.notifications) nc[n] += 1;
+    }
+    const complete: Record<DealLevel, boolean> = {
+      high: lc.high > 0 && ld.high === lc.high,
+      mid: lc.mid > 0 && ld.mid === lc.mid,
+      low: lc.low > 0 && ld.low === lc.low,
+      new: lc.new > 0 && ld.new === lc.new,
+    };
+    return { levelCounts: lc, levelComplete: complete, notificationCounts: nc };
+  }, [checklistVersion]);
+
+  const allLevelsDone = LEVEL_ORDER.every((l) => levelCounts[l] === 0 || levelComplete[l]);
+
+  // Properties shown in the current segment, after applying filters
+  const visibleProps = useMemo(() => {
+    return DEAL_REVIEW_PROPERTIES.filter((p) => p.segment === currentSeg.key)
+      .filter((p) => (activeLevel ? p.level === activeLevel : true))
+      .filter((p) =>
+        activeNotifications.size === 0
+          ? true
+          : p.notifications.some((n) => activeNotifications.has(n)),
+      );
+  }, [currentSeg.key, activeLevel, activeNotifications]);
+
+  function handleLevelClick(l: DealLevel) {
+    setActiveLevel((prev) => (prev === l ? null : l));
+  }
+
+  function handleNotificationClick(n: NotificationKind) {
+    setActiveNotifications((prev) => {
+      const next = new Set(prev);
+      if (next.has(n)) next.delete(n);
+      else next.add(n);
+      return next;
+    });
+  }
 
   function handleNext() {
     if (isLastSeg) {
@@ -77,8 +132,12 @@ export default function IqDealReview() {
       navigate("/iq/daily-outreach");
     } else {
       setSegIdx(segIdx + 1);
+      setActiveLevel(null);
+      setActiveNotifications(new Set());
     }
   }
+
+  const filterActive = activeLevel !== null || activeNotifications.size > 0;
 
   return (
     <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
@@ -97,68 +156,85 @@ export default function IqDealReview() {
         />
 
         {started && (
-        <div className="flex-1 overflow-y-auto p-4">
-          {/* Filter chips — all same size with icons */}
-          <div className="flex items-center gap-2 mb-4 justify-end">
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-red-100 text-red-700">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 16 16" stroke="currentColor" strokeWidth="1.8">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 2L1.5 13.5h13L8 2z" />
-                <line x1="8" y1="7" x2="8" y2="10" strokeLinecap="round" />
-                <circle cx="8" cy="12" r="0.5" fill="currentColor" />
-              </svg>
-              2 Criticals
-            </span>
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 16 16" stroke="currentColor" strokeWidth="1.8">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 2a5 5 0 014.95 4.4C13.5 9.4 14.5 10.5 14.5 11.5H1.5c0-1 1-2.1 1.55-5.1A5 5 0 018 2z" />
-                <line x1="6.5" y1="13.5" x2="9.5" y2="13.5" strokeLinecap="round" />
-              </svg>
-              3 Reminders
-            </span>
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-green-50 text-green-700">
-              <svg className="w-3.5 h-3.5 text-green-600" fill="none" viewBox="0 0 16 16" stroke="currentColor" strokeWidth="1.8">
-                <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" strokeLinecap="round" />
-                <polyline points="1.5,4.5 8,9.5 14.5,4.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              1 Unseen
-            </span>
-          </div>
+          <DealReviewHeader
+            levelCounts={levelCounts}
+            levelComplete={levelComplete}
+            notificationCounts={notificationCounts}
+            activeLevel={activeLevel}
+            activeNotifications={activeNotifications}
+            onLevelClick={handleLevelClick}
+            onNotificationClick={handleNotificationClick}
+          />
+        )}
 
-          {(() => {
-            const props = DEAL_REVIEW_PROPERTIES.filter((p) => p.segment === currentSeg.key);
-            return (
-              <div className="mb-2">
-                <SegmentHeader
-                  label={currentSeg.label}
-                  count={props.length}
-                  subtitle={currentSeg.subtitle}
-                  borderColor={currentSeg.borderColor}
-                  bgColor={currentSeg.bgColor}
-                  textColor={currentSeg.textColor}
-                />
+        {started && (
+          <div className="flex-1 overflow-y-auto p-4">
+            {filterActive && (
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-[11px] text-gray-500 uppercase tracking-wide">Filters:</span>
+                {activeLevel && (
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-orange-100 text-orange-700">
+                    {activeLevel.toUpperCase()}
+                  </span>
+                )}
+                {Array.from(activeNotifications).map((n) => (
+                  <span
+                    key={n}
+                    className="text-[11px] font-semibold px-2 py-0.5 rounded bg-orange-100 text-orange-700 capitalize"
+                  >
+                    {n}
+                  </span>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveLevel(null);
+                    setActiveNotifications(new Set());
+                  }}
+                  className="text-[11px] text-gray-500 hover:text-gray-700 underline ml-1"
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
+
+            <div className="mb-2">
+              <SegmentHeader
+                label={currentSeg.label}
+                count={visibleProps.length}
+                subtitle={currentSeg.subtitle}
+                borderColor={currentSeg.borderColor}
+                bgColor={currentSeg.bgColor}
+                textColor={currentSeg.textColor}
+              />
+              {visibleProps.length === 0 ? (
+                <div className="bg-white border border-dashed border-gray-300 rounded-lg p-8 text-center text-sm text-gray-500">
+                  No properties match the current filters in this segment.
+                </div>
+              ) : (
                 <div className="space-y-0 border border-gray-200 rounded-lg overflow-hidden">
-                  {props.map((p, i) => (
-                    <PropertyRow key={p.id} property={p} last={i === props.length - 1} />
+                  {visibleProps.map((p, i) => (
+                    <PropertyRow key={p.id} property={p} last={i === visibleProps.length - 1} />
                   ))}
                 </div>
-              </div>
-            );
-          })()}
-
-          {/* Pagination */}
-          <div className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-2.5 mt-4">
-            <span className="text-xs text-gray-500">Showing 1 to 9 of 9 entries</span>
-            <div className="flex items-center gap-2">
-              <select className="text-xs border border-gray-200 rounded px-2 py-1 text-gray-600">
-                <option>25 / page</option>
-                <option>50 / page</option>
-              </select>
-              <button className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded hover:bg-gray-50">Previous</button>
-              <button className="text-xs bg-orange-500 text-white px-2.5 py-1 rounded font-medium">1</button>
-              <button className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded hover:bg-gray-50">Next</button>
+              )}
             </div>
+
+            {allLevelsDone && (
+              <div className="mt-4 flex items-center justify-between bg-green-50 border border-green-300 rounded-lg px-4 py-3">
+                <span className="text-sm font-semibold text-green-800">
+                  All levels complete — nice work, Josh.
+                </span>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="text-xs font-semibold bg-orange-500 text-white px-3 py-1.5 rounded hover:bg-orange-600"
+                >
+                  Continue to {nextLabel}
+                </button>
+              </div>
+            )}
           </div>
-        </div>
         )}
       </div>
     </div>

@@ -6,10 +6,14 @@ export const TODAYS_TASKS = {
 };
 
 export type PropertySegment = "ACTIVE_OFF_MARKET" | "PENDING_BACKUP_HOLD" | "CLOSED_EXPIRED_CANCELED";
+export type DealLevel = "high" | "mid" | "low" | "new";
+export type NotificationKind = "critical" | "reminder" | "unseen" | "text";
 
 export type DealProperty = {
   id: number;
   segment: PropertySegment;
+  level: DealLevel;
+  notifications: NotificationKind[];
   address: string;
   type: string;
   propertyType: string;
@@ -45,6 +49,8 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
   {
     id: 1,
     segment: "ACTIVE_OFF_MARKET",
+    level: "high",
+    notifications: ["critical", "text"],
     address: "73750 Desert Vista Court, Palm Desert, CA 92260",
     type: "STD",
     propertyType: "Condominium",
@@ -66,6 +72,8 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
   {
     id: 2,
     segment: "ACTIVE_OFF_MARKET",
+    level: "high",
+    notifications: ["critical", "reminder"],
     address: "9283 Atsina Road, Phelan, CA 92371",
     type: "REO",
     propertyType: "Manufactured 433",
@@ -87,6 +95,8 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
   {
     id: 3,
     segment: "ACTIVE_OFF_MARKET",
+    level: "mid",
+    notifications: ["reminder", "text"],
     address: "338 W Magnolia Street, Compton, CA 90220",
     type: "STD",
     propertyType: "Other (L)",
@@ -108,6 +118,8 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
   {
     id: 4,
     segment: "PENDING_BACKUP_HOLD",
+    level: "low",
+    notifications: ["reminder"],
     address: "921 Warren Street, Hayward, CA 94541",
     type: "STD",
     propertyType: "Single Family",
@@ -129,6 +141,8 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
   {
     id: 5,
     segment: "PENDING_BACKUP_HOLD",
+    level: "mid",
+    notifications: ["text"],
     address: "33087 Wood St, Lake Elsinore, CA 92530",
     type: "STD",
     propertyType: "Single Family",
@@ -150,6 +164,8 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
   {
     id: 6,
     segment: "CLOSED_EXPIRED_CANCELED",
+    level: "high",
+    notifications: ["reminder"],
     address: "132 Nissen Road 3, Salinas, CA 93901",
     type: "STD",
     propertyType: "Townhouse",
@@ -171,6 +187,8 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
   {
     id: 7,
     segment: "CLOSED_EXPIRED_CANCELED",
+    level: "mid",
+    notifications: ["unseen"],
     address: "902 Ballista Avenue, La Puente, CA 91744",
     type: "STD",
     propertyType: "Single Family",
@@ -192,6 +210,8 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
   {
     id: 8,
     segment: "CLOSED_EXPIRED_CANCELED",
+    level: "high",
+    notifications: [],
     address: "18635 Keyes, Banning, CA 92220",
     type: "STD",
     propertyType: "Single Family",
@@ -213,6 +233,8 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
   {
     id: 9,
     segment: "CLOSED_EXPIRED_CANCELED",
+    level: "new",
+    notifications: [],
     address: "9461 Lotus, Westminster, CA 92683",
     type: "STD",
     propertyType: "Single Family",

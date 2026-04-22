@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import type { DealProperty } from "@/lib/iq/mockData";
+import { useDailyChecklist, type ActionKey } from "@/lib/iq/dailyChecklist";
 
 type Level = "high" | "mid" | "low" | "new";
 
@@ -58,44 +58,6 @@ function assignmentLevel(p: DealProperty): { level: Level; tip: string } {
     return { level: "low", tip: "Owner and negotiator aligned" };
   }
   return { level: "mid", tip: "Negotiator differs from assigned user" };
-}
-
-/* ─────────── Daily checkoff hook ─────────── */
-
-const ACTION_KEYS = ["call", "text", "email", "notes"] as const;
-type ActionKey = (typeof ACTION_KEYS)[number];
-
-function todayStr(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
-function useDailyChecklist(propertyId: number) {
-  const storageKey = `iqRowActions:${propertyId}:${todayStr()}`;
-  const [done, setDone] = useState<Record<ActionKey, boolean>>(() => {
-    if (typeof window === "undefined") {
-      return { call: false, text: false, email: false, notes: false };
-    }
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) return JSON.parse(raw);
-    } catch {
-      /* ignore */
-    }
-    return { call: false, text: false, email: false, notes: false };
-  });
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    localStorage.setItem(storageKey, JSON.stringify(done));
-  }, [storageKey, done]);
-
-  function toggle(k: ActionKey) {
-    setDone((prev) => ({ ...prev, [k]: !prev[k] }));
-  }
-
-  const allDone = ACTION_KEYS.every((k) => done[k]);
-  return { done, toggle, allDone };
 }
 
 /* ─────────── Action checklist ─────────── */

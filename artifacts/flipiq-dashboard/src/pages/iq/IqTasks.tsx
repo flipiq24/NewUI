@@ -41,7 +41,7 @@ interface CardProps {
   description: string;
   onClick: () => void;
   notifications?: NotificationPill[];
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 function PillBadge({ pill }: { pill: NotificationPill }) {
@@ -159,24 +159,7 @@ export default function IqTasks() {
                   { kind: "unseen", count: 1, label: "Unseen" },
                   { kind: "text", count: 3, label: "Texts" },
                 ]}
-              >
-                <div className="grid grid-cols-4 gap-3">
-                  {dealCategories.map((cat) => (
-                    <div
-                      key={cat.label}
-                      title={`${cat.label} (${cat.count}) — ${cat.tip}`}
-                      className={`bg-white border ${cat.border} rounded-lg p-4 text-center cursor-help`}
-                    >
-                      <p className={`text-3xl font-bold ${cat.color} leading-none mb-1`}>
-                        {cat.count}
-                      </p>
-                      <p className="text-[11px] font-semibold text-gray-600 uppercase tracking-wide">
-                        {cat.label}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </DashboardCard>
+              />
             </div>
 
             <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">
