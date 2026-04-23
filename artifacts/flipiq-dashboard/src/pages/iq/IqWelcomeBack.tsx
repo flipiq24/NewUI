@@ -8,12 +8,13 @@ import { resetIqStateIfNewDay, firstIncompleteRoute } from "@/lib/iq/storage";
 import { isPropertyComplete, useChecklistVersion } from "@/lib/iq/dailyChecklist";
 
 const LEVEL_LABELS: Record<DealLevel, string> = {
+  priority: "Priority",
   high: "High",
   mid: "Mid",
   low: "Low",
   new: "New",
 };
-const LEVEL_ORDER: DealLevel[] = ["high", "mid", "low", "new"];
+const LEVEL_ORDER: DealLevel[] = ["priority", "high", "mid", "low", "new"];
 
 export default function IqWelcomeBack() {
   const [, navigate] = useLocation();
@@ -21,8 +22,8 @@ export default function IqWelcomeBack() {
 
   const checklistVersion = useChecklistVersion();
   const levelProgress = useMemo(() => {
-    const total: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
-    const done: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
+    const total: Record<DealLevel, number> = { priority: 0, high: 0, mid: 0, low: 0, new: 0 };
+    const done: Record<DealLevel, number> = { priority: 0, high: 0, mid: 0, low: 0, new: 0 };
     for (const p of DEAL_REVIEW_PROPERTIES) {
       total[p.level] += 1;
       if (isPropertyComplete(p.id)) done[p.level] += 1;

@@ -6,7 +6,7 @@ export const TODAYS_TASKS = {
 };
 
 export type PropertySegment = "ACTIVE_OFF_MARKET" | "PENDING_BACKUP_HOLD" | "CLOSED_EXPIRED_CANCELED";
-export type DealLevel = "high" | "mid" | "low" | "new";
+export type DealLevel = "priority" | "high" | "mid" | "low" | "new";
 export type NotificationKind = "critical" | "reminder" | "unseen" | "text";
 
 export type ResponseStatus = "positive" | "neutral" | "negative";

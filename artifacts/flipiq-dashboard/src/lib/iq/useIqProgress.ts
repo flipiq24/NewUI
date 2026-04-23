@@ -36,7 +36,7 @@ export function useIqProgress(): IqProgressSegment[] {
     const state = loadIqState();
 
     // Active Deals
-    const levelCounts: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
+    const levelCounts: Record<DealLevel, number> = { priority: 0, high: 0, mid: 0, low: 0, new: 0 };
     let completed = 0;
     for (const p of DEAL_REVIEW_PROPERTIES) {
       levelCounts[p.level] += 1;
@@ -47,7 +47,7 @@ export function useIqProgress(): IqProgressSegment[] {
     const dealsDone =
       !!state?.dealReviewComplete ||
       (dealsTotal > 0 && completed === dealsTotal);
-    const dealsBreakdown = (["high", "mid", "low", "new"] as DealLevel[])
+    const dealsBreakdown = (["priority", "high", "mid", "low", "new"] as DealLevel[])
       .map((l) => `${levelCounts[l]} ${l === "high" ? "high priority" : l}`)
       .join(" · ");
 

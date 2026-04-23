@@ -12,8 +12,9 @@ import { resetIqStateIfNewDay, saveIqState, loadIqState, allTasksComplete } from
 import { AGENTS as RESPONSE_AGENTS } from "@/pages/iq/IqCampaignResponses";
 import { isPropertyComplete, useChecklistVersion } from "@/lib/iq/dailyChecklist";
 
-const LEVEL_ORDER: DealLevel[] = ["high", "mid", "low", "new"];
+const LEVEL_ORDER: DealLevel[] = ["priority", "high", "mid", "low", "new"];
 const LEVEL_LABEL: Record<DealLevel, string> = {
+  priority: "Priority",
   high: "High",
   mid: "Mid",
   low: "Low",
@@ -232,13 +233,14 @@ export default function IqTasks() {
   }
 
   const { levelCounts, levelComplete } = useMemo(() => {
-    const lc: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
-    const ld: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
+    const lc: Record<DealLevel, number> = { priority: 0, high: 0, mid: 0, low: 0, new: 0 };
+    const ld: Record<DealLevel, number> = { priority: 0, high: 0, mid: 0, low: 0, new: 0 };
     for (const p of DEAL_REVIEW_PROPERTIES) {
       lc[p.level] += 1;
       if (isPropertyComplete(p.id)) ld[p.level] += 1;
     }
     const complete: Record<DealLevel, boolean> = {
+      priority: lc.priority > 0 && ld.priority === lc.priority,
       high: lc.high > 0 && ld.high === lc.high,
       mid: lc.mid > 0 && ld.mid === lc.mid,
       low: lc.low > 0 && ld.low === lc.low,

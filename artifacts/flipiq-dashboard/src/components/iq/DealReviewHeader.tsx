@@ -4,6 +4,14 @@ const LEVEL_META: Record<
   DealLevel,
   { label: string; numColor: string; activeBorder: string; idleBorder: string; activeBg: string; doneTint: string }
 > = {
+  priority: {
+    label: "PRIORITY",
+    numColor: "text-red-700",
+    activeBorder: "border-red-600 ring-2 ring-red-300",
+    idleBorder: "border-red-300",
+    activeBg: "bg-red-100/60",
+    doneTint: "bg-green-50 border-green-300",
+  },
   high: {
     label: "HIGH",
     numColor: "text-red-500",
@@ -96,7 +104,7 @@ const PILL_META: Record<
   },
 };
 
-const LEVEL_ORDER: DealLevel[] = ["high", "mid", "low", "new"];
+const LEVEL_ORDER: DealLevel[] = ["priority", "high", "mid", "low", "new"];
 const PILL_ORDER: NotificationKind[] = ["critical", "reminder", "unseen", "text"];
 
 type Props = {
@@ -145,8 +153,8 @@ export default function DealReviewHeader({
         })}
       </div>
 
-      {/* 4 level filter cards */}
-      <div className="grid grid-cols-4 gap-3">
+      {/* 5 level filter cards */}
+      <div className="grid grid-cols-5 gap-3">
         {LEVEL_ORDER.map((level) => {
           const meta = LEVEL_META[level];
           const count = levelCounts[level] ?? 0;

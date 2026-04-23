@@ -70,7 +70,7 @@ const segmentTaskCopy: Record<typeof segments[number]["key"], { task: string; ti
   },
 };
 
-const LEVEL_ORDER: DealLevel[] = ["high", "mid", "low", "new"];
+const LEVEL_ORDER: DealLevel[] = ["priority", "high", "mid", "low", "new"];
 
 export default function IqDealReview() {
   const [, navigate] = useLocation();
@@ -91,8 +91,8 @@ export default function IqDealReview() {
 
   // Counts and per-level completion across the entire deal-review dataset
   const { levelCounts, levelComplete, notificationCounts, segmentCounts } = useMemo(() => {
-    const lc: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
-    const ld: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
+    const lc: Record<DealLevel, number> = { priority: 0, high: 0, mid: 0, low: 0, new: 0 };
+    const ld: Record<DealLevel, number> = { priority: 0, high: 0, mid: 0, low: 0, new: 0 };
     const nc: Record<NotificationKind, number> = { critical: 0, reminder: 0, unseen: 0, text: 0 };
     const sc: Record<string, number> = { ACTIVE_OFF_MARKET: 0, PENDING_BACKUP_HOLD: 0, CLOSED_EXPIRED_CANCELED: 0 };
     for (const p of DEAL_REVIEW_PROPERTIES) {
@@ -102,6 +102,7 @@ export default function IqDealReview() {
       sc[p.segment] = (sc[p.segment] ?? 0) + 1;
     }
     const complete: Record<DealLevel, boolean> = {
+      priority: lc.priority > 0 && ld.priority === lc.priority,
       high: lc.high > 0 && ld.high === lc.high,
       mid: lc.mid > 0 && ld.mid === lc.mid,
       low: lc.low > 0 && ld.low === lc.low,
