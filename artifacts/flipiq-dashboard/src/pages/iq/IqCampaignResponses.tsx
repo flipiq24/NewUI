@@ -1,5 +1,6 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useLocation } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import IqChatPage from "@/components/iq/IqChatPage";
@@ -153,10 +154,55 @@ const SORTED = [...AGENTS].sort((a, b) => {
   return BASKET_RANK[a.basket] - BASKET_RANK[b.basket];
 });
 
-const SECTIONS: { sentiment: Sentiment; tail: string; dot: string; text: string }[] = [
-  { sentiment: "positive", tail: "Positive Response", dot: "#5C9A2A", text: "#27500A" },
-  { sentiment: "neutral",  tail: "Neutral Response",  dot: "#9CA3AF", text: "#4B5563" },
-  { sentiment: "negative", tail: "Negative Response", dot: "#B83A3A", text: "#791F1F" },
+type SectionDef = {
+  sentiment: Sentiment;
+  tail: string;
+  dot: string;
+  text: string;
+  blurb: string;
+  actions: { key: string; label: string }[];
+};
+
+const SECTIONS: SectionDef[] = [
+  {
+    sentiment: "positive",
+    tail: "Positive Response",
+    dot: "#5C9A2A",
+    text: "#27500A",
+    blurb: "These agents are warm and asked for next steps. Move them into the deal pipeline today.",
+    actions: [
+      { key: "send-terms", label: "Send Terms & Address" },
+      { key: "schedule-call", label: "Schedule Call" },
+      { key: "add-priority", label: "Add to Priority Calls" },
+      { key: "tag-hot", label: "Tag as Hot" },
+    ],
+  },
+  {
+    sentiment: "neutral",
+    tail: "Neutral Response",
+    dot: "#9CA3AF",
+    text: "#4B5563",
+    blurb: "These need a qualifier or context before they can move forward. Send a follow-up question.",
+    actions: [
+      { key: "qualifier", label: "Send Qualifying Question" },
+      { key: "intro", label: "Send Intro / Context Reply" },
+      { key: "remind-7", label: "Remind Me in 7 Days" },
+      { key: "tag-warm", label: "Tag as Warm" },
+    ],
+  },
+  {
+    sentiment: "negative",
+    tail: "Negative Response",
+    dot: "#B83A3A",
+    text: "#791F1F",
+    blurb: "These declined or asked to stop. Suppress and reschedule the relationship for later.",
+    actions: [
+      { key: "unsubscribe", label: "Unsubscribe / Suppress" },
+      { key: "tag-cold", label: "Tag as Cold" },
+      { key: "remind-90", label: "Remind Me in 90 Days" },
+      { key: "mark-not-interested", label: "Mark Not Interested" },
+    ],
+  },
 ];
 
 // Same color language as Deal Review (high / mid / low) so the eye reads
@@ -227,8 +273,43 @@ function Tip({ children, rows, title }: {
 
 export default function IqCampaignResponses() {
   const [, navigate] = useLocation();
+  const { toast } = useToast();
   const [handled, setHandled] = useState<Set<string>>(new Set());
+  const [selectedBySection, setSelectedBySection] = useState<Record<Sentiment, Set<string>>>({
+    positive: new Set(),
+    neutral: new Set(),
+    negative: new Set(),
+  });
   const { started, start } = useStartGate("campaignResponses");
+
+  function toggleSelect(sentiment: Sentiment, name: string) {
+    setSelectedBySection((prev) => {
+      const next = new Set(prev[sentiment]);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return { ...prev, [sentiment]: next };
+    });
+  }
+  function setSectionSelectAll(sentiment: Sentiment, names: string[], checked: boolean) {
+    setSelectedBySection((prev) => ({
+      ...prev,
+      [sentiment]: checked ? new Set(names) : new Set(),
+    }));
+  }
+  function applyBulkAction(sentiment: Sentiment, label: string) {
+    const sel = selectedBySection[sentiment];
+    if (sel.size === 0) {
+      toast({ title: "Select agents first." });
+      return;
+    }
+    setHandled((prev) => {
+      const next = new Set(prev);
+      sel.forEach((n) => next.add(n));
+      return next;
+    });
+    setSelectedBySection((prev) => ({ ...prev, [sentiment]: new Set() }));
+    toast({ title: `${label} applied to ${sel.size} agent${sel.size === 1 ? "" : "s"}.` });
+  }
 
   useEffect(() => {
     const state = resetIqStateIfNewDay();
@@ -280,12 +361,17 @@ export default function IqCampaignResponses() {
             </>
           }
         >
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-10">
             {SECTIONS.map((sec) => {
               const rows = SORTED.filter((a) => a.sentiment === sec.sentiment);
+              const names = rows.map((r) => r.name);
+              const sectionSel = selectedBySection[sec.sentiment];
+              const allSelected = rows.length > 0 && rows.every((r) => sectionSel.has(r.name));
+              const sectionHandledCount = rows.filter((r) => handled.has(r.name)).length;
               return (
                 <section key={sec.sentiment}>
-                  <div className="flex items-baseline gap-2 mb-3 pb-2 border-b border-gray-200">
+                  {/* Breadcrumb-style heading */}
+                  <div className="flex items-baseline gap-2 mb-2 pb-2 border-b border-gray-200">
                     <span className="text-[12px] text-gray-400">Agents › Text and Email Campaigns ›</span>
                     <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold" style={{ color: sec.text }}>
                       <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sec.dot }} />
@@ -293,12 +379,43 @@ export default function IqCampaignResponses() {
                     </span>
                     <span className="text-[11px] text-gray-400 ml-1">· {rows.length}</span>
                   </div>
+                  <p className="text-[12px] text-gray-500 mb-3">{sec.blurb}</p>
+
+                  {/* Per-section action bar */}
+                  {rows.length > 0 && (
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <label className="inline-flex items-center gap-2 cursor-pointer select-none group">
+                          <input
+                            type="checkbox"
+                            checked={allSelected}
+                            onChange={(e) => setSectionSelectAll(sec.sentiment, names, e.target.checked)}
+                            className="w-3.5 h-3.5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer"
+                          />
+                          <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider group-hover:text-gray-700">
+                            Select All
+                          </span>
+                        </label>
+                        <SectionBulkActions
+                          enabled={sectionSel.size > 0}
+                          count={sectionSel.size}
+                          actions={sec.actions}
+                          onPick={(label) => applyBulkAction(sec.sentiment, label)}
+                        />
+                      </div>
+                      <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">
+                        {sectionHandledCount} / {rows.length} handled
+                      </span>
+                    </div>
+                  )}
+
                   {rows.length === 0 ? (
                     <p className="text-[12px] text-gray-400 italic py-2">No responses in this bucket today.</p>
                   ) : (
                     <div className="flex flex-col">
                       {rows.map((a, i) => {
                         const done = handled.has(a.name);
+                        const isSelected = sectionSel.has(a.name);
                         const basket = BASKET_COLOR[a.basket];
                         const status = STATUS_COLOR[a.status];
                         const iscDisplay = a.isc === null ? "N/A" : a.isc.toString();
@@ -309,8 +426,8 @@ export default function IqCampaignResponses() {
                 >
                   <input
                     type="checkbox"
-                    checked={done}
-                    onChange={() => toggle(a.name)}
+                    checked={isSelected || done}
+                    onChange={() => (done ? toggle(a.name) : toggleSelect(sec.sentiment, a.name))}
                     className="mt-1.5 w-3.5 h-3.5 accent-orange-500 cursor-pointer flex-shrink-0"
                   />
                   <span className="text-[11px] text-gray-300 mt-1.5 w-5 flex-shrink-0 text-right">{i + 1}.</span>
@@ -434,6 +551,63 @@ export default function IqCampaignResponses() {
           </div>
         </IqChatPage>
       </div>
+    </div>
+  );
+}
+
+function SectionBulkActions({
+  enabled,
+  count,
+  actions,
+  onPick,
+}: {
+  enabled: boolean;
+  count: number;
+  actions: { key: string; label: string }[];
+  onPick: (label: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onDoc(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        disabled={!enabled}
+        onClick={() => setOpen((v) => !v)}
+        className={`text-[11px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-md transition-colors ${
+          enabled
+            ? "bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
+            : "bg-gray-100 text-gray-400 cursor-not-allowed"
+        }`}
+      >
+        Bulk Actions{enabled ? ` · ${count}` : ""}
+      </button>
+      {open && enabled && (
+        <div className="absolute left-0 top-full mt-1.5 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1.5 min-w-[220px]">
+          {actions.map((a) => (
+            <button
+              key={a.key}
+              type="button"
+              onClick={() => {
+                onPick(a.label);
+                setOpen(false);
+              }}
+              className="w-full text-left px-3.5 py-2 text-[13px] text-gray-700 hover:bg-orange-50 hover:text-orange-600 cursor-pointer"
+            >
+              {a.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
