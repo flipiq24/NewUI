@@ -59,6 +59,8 @@ export default function IqMorning() {
         campaignsExplain,
         newDealsExplain,
       },
+      // Sending campaigns upfront marks Daily Outreach done so we skip it.
+      ...(sendCampaignsNow === "yes" ? { outreachCampaignSent: true } : {}),
     });
     navigate("/iq/tasks");
   }
