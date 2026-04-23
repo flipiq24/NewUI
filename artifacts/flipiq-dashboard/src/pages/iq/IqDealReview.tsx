@@ -218,11 +218,8 @@ export default function IqDealReview() {
                 </div>
                 <div className="flex-1">
                   <p className="text-[11px] font-semibold text-gray-400 mb-3 uppercase tracking-wider">FlipIQ</p>
-                  <p className="text-[14px] text-gray-800 leading-7 mb-4">
-                    {segmentTaskCopy[currentSeg.key].task}
-                  </p>
-                  <p className="text-[13px] text-gray-400 leading-6 mb-5">
-                    {segmentTaskCopy[currentSeg.key].tip}
+                  <p className="text-[14px] text-gray-800 leading-7 mb-5">
+                    9 High Priority deals — call the 3 Active &amp; Off Market first, then text and email.
                   </p>
                   <div className="space-y-1.5 mb-6">
                     {[
