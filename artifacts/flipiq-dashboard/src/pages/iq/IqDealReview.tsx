@@ -99,14 +99,16 @@ export default function IqDealReview() {
   const checklistVersion = useChecklistVersion();
 
   // Counts and per-level completion across the entire deal-review dataset
-  const { levelCounts, levelComplete, notificationCounts } = useMemo(() => {
+  const { levelCounts, levelComplete, notificationCounts, segmentCounts } = useMemo(() => {
     const lc: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
     const ld: Record<DealLevel, number> = { high: 0, mid: 0, low: 0, new: 0 };
     const nc: Record<NotificationKind, number> = { critical: 0, reminder: 0, unseen: 0, text: 0 };
+    const sc: Record<string, number> = { ACTIVE_OFF_MARKET: 0, PENDING_BACKUP_HOLD: 0, CLOSED_EXPIRED_CANCELED: 0 };
     for (const p of DEAL_REVIEW_PROPERTIES) {
       lc[p.level] += 1;
       if (isPropertyComplete(p.id)) ld[p.level] += 1;
       for (const n of p.notifications) nc[n] += 1;
+      sc[p.segment] = (sc[p.segment] ?? 0) + 1;
     }
     const complete: Record<DealLevel, boolean> = {
       high: lc.high > 0 && ld.high === lc.high,
@@ -114,7 +116,7 @@ export default function IqDealReview() {
       low: lc.low > 0 && ld.low === lc.low,
       new: lc.new > 0 && ld.new === lc.new,
     };
-    return { levelCounts: lc, levelComplete: complete, notificationCounts: nc };
+    return { levelCounts: lc, levelComplete: complete, notificationCounts: nc, segmentCounts: sc };
   }, [checklistVersion]);
 
   const allLevelsDone = LEVEL_ORDER.every((l) => levelCounts[l] === 0 || levelComplete[l]);
@@ -223,14 +225,13 @@ export default function IqDealReview() {
                   </p>
                   <div className="space-y-1.5 mb-6">
                     {[
-                      { label: "High priority", count: levelCounts.high },
-                      { label: "Mid priority", count: levelCounts.mid },
-                      { label: "Low priority", count: levelCounts.low },
-                      { label: "New", count: levelCounts.new },
-                    ].map(({ label, count }) => (
+                      { label: "Active & Off Market", count: segmentCounts.ACTIVE_OFF_MARKET },
+                      { label: "Pending / Backup / Hold", count: segmentCounts.PENDING_BACKUP_HOLD },
+                      { label: "Closed / Expired / Canceled", count: segmentCounts.CLOSED_EXPIRED_CANCELED },
+                    ].map(({ label, count }, i) => (
                       <div key={label} className="flex items-center gap-2.5 text-[13px] text-gray-500">
-                        <span className="w-1 h-1 rounded-full bg-gray-300 flex-shrink-0" />
-                        {count} {label}
+                        <span className="text-[11px] text-gray-300 w-3 flex-shrink-0">{i + 1}.</span>
+                        <span>{count} {label}</span>
                       </div>
                     ))}
                   </div>
