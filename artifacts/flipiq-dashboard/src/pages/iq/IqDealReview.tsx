@@ -204,88 +204,60 @@ export default function IqDealReview() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <IqTopBar />
 
-        {/* Minimalist chat-style briefing — shown until Get Started is clicked */}
+        {/* AI-style briefing gate */}
         {!started && (
-          <div className="flex-1 overflow-y-auto flex flex-col">
-            <div className="max-w-2xl mx-auto w-full px-6 py-8 flex flex-col gap-6">
+          <div className="flex-1 flex flex-col overflow-hidden relative">
+            <div className="flex-1 overflow-y-auto px-8 pt-10 pb-28">
 
-              {/* Breadcrumb + Next Task row */}
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">
-                  Deal Review &gt; 9 High Priority Deals &gt;{" "}
-                  <span className="font-semibold text-gray-800 underline decoration-orange-500 decoration-2 underline-offset-2">
-                    {segmentLabels[currentSeg.key]}
-                  </span>
-                </span>
-                <button onClick={handleNext} className="flex items-center gap-1 text-xs text-gray-400 hover:text-orange-500 transition-colors cursor-pointer">
-                  <span className="font-medium text-orange-500">Next Task:</span>
-                  <span>{nextLabel}</span>
-                  <svg className="w-3 h-3 text-orange-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6,3 11,8 6,13" /></svg>
-                </button>
-              </div>
+              {/* Breadcrumb — very subtle */}
+              <p className="text-[11px] text-gray-400 mb-8 tracking-wide">
+                Deal Review &nbsp;/&nbsp; 9 High Priority Deals &nbsp;/&nbsp;
+                <span className="text-gray-600">{segmentLabels[currentSeg.key]}</span>
+              </p>
 
-              {/* Chat bubble */}
-              <div className="flex gap-3">
-                {/* Avatar */}
-                <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg className="w-4 h-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7z" clipRule="evenodd" />
-                  </svg>
-                </div>
+              {/* Main message */}
+              <p className="text-[15px] text-gray-900 leading-7 max-w-xl mb-5">
+                {segmentTaskCopy[currentSeg.key].task}
+              </p>
 
-                {/* Message body */}
-                <div className="flex-1 flex flex-col gap-4">
-                  {/* Task text */}
-                  <p className="text-sm text-gray-800 leading-relaxed">
-                    {segmentTaskCopy[currentSeg.key].task}
-                  </p>
+              {/* Tip — lighter, smaller */}
+              <p className="text-[13px] text-gray-400 leading-6 max-w-xl mb-8">
+                {segmentTaskCopy[currentSeg.key].tip}
+              </p>
 
-                  {/* Tip */}
-                  <p className="text-sm text-gray-500 leading-relaxed border-l-2 border-orange-300 pl-3">
-                    {segmentTaskCopy[currentSeg.key].tip}
-                  </p>
+              {/* Divider */}
+              <div className="w-8 border-t border-gray-200 mb-6" />
 
-                  {/* Notifications inline */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs text-gray-400">Notifications:</span>
-                    {notificationCounts.critical > 0 && (
-                      <span className="text-xs text-red-600 font-medium">⚠ {notificationCounts.critical} Criticals</span>
-                    )}
-                    {notificationCounts.reminder > 0 && (
-                      <span className="text-xs text-amber-600 font-medium">🔔 {notificationCounts.reminder} Reminders</span>
-                    )}
-                    {notificationCounts.unseen > 0 && (
-                      <span className="text-xs text-green-700 font-medium">✉ {notificationCounts.unseen} Unseen</span>
-                    )}
-                    {notificationCounts.text > 0 && (
-                      <span className="text-xs text-purple-600 font-medium">💬 {notificationCounts.text} Texts</span>
-                    )}
-                  </div>
+              {/* Deal counts — single line, plain */}
+              <p className="text-[12px] text-gray-400 mb-3">
+                <span className="text-gray-700 font-semibold">{levelCounts.high}</span> High &nbsp;·&nbsp;
+                <span className="text-gray-700 font-semibold">{levelCounts.mid}</span> Mid &nbsp;·&nbsp;
+                <span className="text-gray-700 font-semibold">{levelCounts.low}</span> Low &nbsp;·&nbsp;
+                <span className="text-gray-700 font-semibold">{levelCounts.new}</span> New
+              </p>
 
-                  {/* Deal counts inline */}
-                  <div className="flex items-center gap-3 text-sm">
-                    <span className="font-bold text-red-500">{levelCounts.high}</span><span className="text-xs text-gray-400 uppercase tracking-wide">High</span>
-                    <span className="text-gray-200">·</span>
-                    <span className="font-bold text-amber-500">{levelCounts.mid}</span><span className="text-xs text-gray-400 uppercase tracking-wide">Mid</span>
-                    <span className="text-gray-200">·</span>
-                    <span className="font-bold text-blue-500">{levelCounts.low}</span><span className="text-xs text-gray-400 uppercase tracking-wide">Low</span>
-                    <span className="text-gray-200">·</span>
-                    <span className="font-bold text-gray-500">{levelCounts.new}</span><span className="text-xs text-gray-400 uppercase tracking-wide">New</span>
-                  </div>
+              {/* Notifications — single line, plain */}
+              <p className="text-[12px] text-gray-400">
+                {notificationCounts.critical > 0 && <><span className="text-gray-600">{notificationCounts.critical} criticals</span> &nbsp;·&nbsp; </>}
+                {notificationCounts.reminder > 0 && <><span className="text-gray-600">{notificationCounts.reminder} reminders</span> &nbsp;·&nbsp; </>}
+                {notificationCounts.unseen > 0 && <><span className="text-gray-600">{notificationCounts.unseen} unseen</span> &nbsp;·&nbsp; </>}
+                {notificationCounts.text > 0 && <span className="text-gray-600">{notificationCounts.text} texts</span>}
+              </p>
 
-                  {/* Get Started */}
-                  <div className="pt-1">
-                    <button
-                      onClick={start}
-                      className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2 rounded-lg cursor-pointer transition-colors flex items-center gap-2"
-                    >
-                      Get Started
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
+            </div>
 
+            {/* Floating bottom bar */}
+            <div className="absolute bottom-0 left-0 right-0 px-8 py-4 bg-gradient-to-t from-[#f5f6f8] via-[#f5f6f8]/95 to-transparent flex items-center justify-between">
+              <span className="text-[11px] text-gray-400">
+                Next: <span className="text-gray-600">{nextLabel}</span>
+              </span>
+              <button
+                onClick={start}
+                className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white text-xs font-medium px-4 py-2 rounded-full cursor-pointer transition-colors"
+              >
+                Get Started
+                <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
+              </button>
             </div>
           </div>
         )}
