@@ -237,7 +237,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
   };
 
   return (
-    <div ref={rowRef} className="grid grid-cols-[16px_1fr_auto] gap-4 px-2 py-3 border-b border-gray-100 last:border-b-0 hover:bg-[#FAFAF9] transition-colors relative">
+    <div ref={rowRef} className={`grid grid-cols-[16px_1fr_auto] gap-4 px-2 py-3 border-b border-gray-100 last:border-b-0 hover:bg-[#FAFAF9] transition-colors relative ${done.call ? "opacity-60" : ""}`}>
       {/* Left rail */}
       <div className="flex flex-col items-center gap-2 pt-1">
         <input
@@ -277,14 +277,22 @@ export default function DealCard({ property }: { property: DealProperty }) {
             type="button"
             onClick={triggerCall}
             title={done.call ? "Call logged" : "Call this agent first"}
-            className={`w-[22px] h-[22px] rounded-full bg-orange-50 border border-orange-300 text-orange-600 flex items-center justify-center flex-shrink-0 hover:bg-orange-500 hover:text-white cursor-pointer ${
-              !done.call ? "ring-2 ring-orange-300 shadow-[0_0_0_3px_rgba(251,146,60,0.35)] animate-pulse" : ""
+            className={`w-[22px] h-[22px] rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer ${
+              done.call
+                ? "bg-white border-[1.5px] border-green-500 text-green-600"
+                : "bg-orange-50 border border-orange-300 text-orange-600 hover:bg-orange-500 hover:text-white ring-2 ring-orange-300 shadow-[0_0_0_3px_rgba(251,146,60,0.35)] animate-pulse"
             }`}
           >
-            {ICON.phone}
+            {done.call ? (
+              <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3,8 7,12 13,4" />
+              </svg>
+            ) : (
+              ICON.phone
+            )}
           </button>
           <span className="relative group cursor-help">
-            <span className="text-[15px] font-medium text-gray-900 leading-snug group-hover:text-orange-600">
+            <span className={`text-[15px] font-semibold leading-snug ${done.call ? "text-gray-400 line-through" : "text-orange-600 group-hover:text-orange-700"}`}>
               {property.nextSteps}
             </span>
             <TipPanel
