@@ -4,8 +4,6 @@ import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import TaskTipBlock from "@/components/iq/TaskTipBlock";
 import MinimalPropertyRow from "@/components/iq/MinimalPropertyRow";
-import SegmentHeader from "@/components/iq/SegmentHeader";
-import DealReviewHeader from "@/components/iq/DealReviewHeader";
 import { DEAL_REVIEW_PROPERTIES, type DealLevel, type NotificationKind } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 import { useStartGate } from "@/components/iq/useStartGate";
@@ -272,73 +270,159 @@ export default function IqDealReview() {
                 <svg className="w-3 h-3 text-orange-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6,3 11,8 6,13" /></svg>
               </button>
             </div>
-            <DealReviewHeader
-              levelCounts={levelCounts}
-              levelComplete={levelComplete}
-              notificationCounts={notificationCounts}
-              activeLevel={activeLevel}
-              activeNotifications={activeNotifications}
-              onLevelClick={handleLevelClick}
-              onNotificationClick={handleNotificationClick}
-            />
           </>
         )}
 
         {started && (
-          <div className="flex-1 overflow-y-auto p-4">
-            <div className="mb-2">
-              <SegmentHeader
-                label={currentSeg.label}
-                count={visibleProps.length}
-                subtitle={currentSeg.subtitle}
-                borderColor={currentSeg.borderColor}
-                bgColor={currentSeg.bgColor}
-                textColor={currentSeg.textColor}
-              />
+          <div className="flex-1 overflow-y-auto bg-white px-6 py-8">
+            <div className="max-w-3xl flex flex-col gap-6">
+              {/* AI message header */}
+              <div className="flex items-center gap-2">
+                <img
+                  src={`${import.meta.env.BASE_URL}flipiq-icon.png`}
+                  alt="FlipiQ"
+                  className="w-6 h-6 object-contain"
+                />
+                <span className="text-[13px] font-semibold text-gray-700 leading-none">FlipiQ</span>
+              </div>
+
+              {/* Section heading + instruction */}
+              <div>
+                <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                  {currentSeg.label} — {visibleProps.length}{" "}
+                  {visibleProps.length === 1 ? "property" : "properties"}
+                </p>
+                <p className="text-[14px] text-gray-800 leading-7">
+                  {currentSeg.subtitle}
+                </p>
+              </div>
+
+              {/* Priority filter line — plain text, no cards */}
+              <div className="flex items-center gap-4 text-[12px] text-gray-500">
+                <span className="font-semibold uppercase tracking-wider text-gray-400 text-[11px]">
+                  Priority
+                </span>
+                {LEVEL_ORDER.map((l) => {
+                  const count = levelCounts[l];
+                  if (count === 0) return null;
+                  const isActive = activeLevel === l;
+                  const done = levelComplete[l];
+                  const labelMap = { high: "High", mid: "Mid", low: "Low", new: "New" } as const;
+                  const colorMap = {
+                    high: "text-red-500",
+                    mid: "text-yellow-600",
+                    low: "text-blue-500",
+                    new: "text-gray-500",
+                  } as const;
+                  return (
+                    <button
+                      key={l}
+                      type="button"
+                      onClick={() => handleLevelClick(l)}
+                      className={`inline-flex items-center gap-1 transition-colors cursor-pointer ${
+                        isActive ? "text-gray-900 font-semibold" : "hover:text-gray-700"
+                      }`}
+                    >
+                      <span className={`font-semibold ${colorMap[l]}`}>{count}</span>
+                      <span>{labelMap[l]}</span>
+                      {done && (
+                        <svg className="w-3 h-3 text-green-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3,8 7,12 13,4" />
+                        </svg>
+                      )}
+                    </button>
+                  );
+                })}
+                {activeLevel && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveLevel(null)}
+                    className="text-[11px] text-gray-400 hover:text-gray-600 underline cursor-pointer"
+                  >
+                    clear
+                  </button>
+                )}
+              </div>
+
+              {/* Notifications — plain text line, no cards */}
+              {(notificationCounts.critical + notificationCounts.reminder + notificationCounts.unseen + notificationCounts.text) > 0 && (
+                <div className="flex items-center gap-4 text-[12px] text-gray-500">
+                  <span className="font-semibold uppercase tracking-wider text-gray-400 text-[11px]">
+                    Notifications
+                  </span>
+                  {(["critical", "reminder", "unseen", "text"] as const).map((n) => {
+                    const count = notificationCounts[n];
+                    if (count === 0) return null;
+                    const isActive = activeNotifications.has(n);
+                    const labelMap = { critical: "Criticals", reminder: "Reminders", unseen: "Unseen", text: "Texts" } as const;
+                    const colorMap = {
+                      critical: "text-red-500",
+                      reminder: "text-amber-500",
+                      unseen: "text-emerald-500",
+                      text: "text-violet-500",
+                    } as const;
+                    return (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() => handleNotificationClick(n)}
+                        className={`inline-flex items-center gap-1 transition-colors cursor-pointer ${
+                          isActive ? "text-gray-900 font-semibold" : "hover:text-gray-700"
+                        }`}
+                      >
+                        <span className={`font-semibold ${colorMap[n]}`}>{count}</span>
+                        <span>{labelMap[n]}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Property list */}
               {visibleProps.length === 0 ? (
-                <div className="text-sm text-gray-500 py-8 text-center">
+                <div className="text-sm text-gray-500 py-8">
                   No properties match the current filters in this segment.
                 </div>
               ) : (
-                <div className="mt-4 mb-2 flex items-center gap-3 text-[11px] text-gray-400">
-                  <span className="font-semibold uppercase tracking-wider">Response</span>
-                  <span className="inline-flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-green-500" /> Positive
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-yellow-400" /> Neutral
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-red-500" /> Negative
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-gray-300" /> No reply yet
-                  </span>
-                </div>
+                <>
+                  <div className="flex items-center gap-3 text-[11px] text-gray-400">
+                    <span className="font-semibold uppercase tracking-wider">Response</span>
+                    <span className="inline-flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-green-500" /> Positive
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-yellow-400" /> Neutral
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-red-500" /> Negative
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-gray-300" /> No reply yet
+                    </span>
+                  </div>
+                  <div>
+                    {visibleProps.map((p, i) => (
+                      <MinimalPropertyRow key={p.id} property={p} index={i + 1} />
+                    ))}
+                  </div>
+                </>
               )}
-              {visibleProps.length > 0 && (
-                <div className="bg-white">
-                  {visibleProps.map((p, i) => (
-                    <MinimalPropertyRow key={p.id} property={p} index={i + 1} />
-                  ))}
+
+              {allLevelsDone && (
+                <div className="flex items-center justify-between">
+                  <span className="text-[14px] font-medium text-green-700">
+                    All levels complete — nice work, Josh.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="text-xs font-semibold bg-orange-500 text-white px-3 py-1.5 rounded-full hover:bg-orange-600 cursor-pointer"
+                  >
+                    Continue to {nextLabel}
+                  </button>
                 </div>
               )}
             </div>
-
-            {allLevelsDone && (
-              <div className="mt-4 flex items-center justify-between bg-green-50 border border-green-300 rounded-lg px-4 py-3">
-                <span className="text-sm font-semibold text-green-800">
-                  All levels complete — nice work, Josh.
-                </span>
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="text-xs font-semibold bg-orange-500 text-white px-3 py-1.5 rounded hover:bg-orange-600"
-                >
-                  Continue to {nextLabel}
-                </button>
-              </div>
-            )}
           </div>
         )}
       </div>
