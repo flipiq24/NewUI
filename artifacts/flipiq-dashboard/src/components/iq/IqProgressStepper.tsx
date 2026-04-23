@@ -96,8 +96,14 @@ export default function IqProgressStepper() {
 
 function Tooltip({ text }: { text: string }) {
   return (
-    <div className="bg-white text-gray-700 text-[11px] leading-snug rounded-md px-2.5 py-1.5 shadow-md border border-gray-200 w-56 text-center">
-      {text}
+    <div className="relative">
+      <div className="bg-white text-gray-700 text-[12px] leading-snug rounded-lg px-3 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-gray-200 max-w-[240px] whitespace-normal text-center">
+        {text}
+      </div>
+      {/* Downward tail */}
+      <div className="absolute left-1/2 top-full -translate-x-1/2 -mt-px">
+        <div className="w-2 h-2 bg-white border-r border-b border-gray-200 rotate-45 -translate-y-1/2" />
+      </div>
     </div>
   );
 }
