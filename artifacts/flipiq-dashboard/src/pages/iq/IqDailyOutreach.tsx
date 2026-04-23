@@ -4,7 +4,6 @@ import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import IqChatPage from "@/components/iq/IqChatPage";
-import AudienceCard from "@/components/iq/AudienceCard";
 import { DAILY_OUTREACH_BUCKETS } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 import { useStartGate } from "@/components/iq/useStartGate";
@@ -81,133 +80,134 @@ export default function IqDailyOutreach() {
           onNextTask={handleNext}
           instructions={
             <>
-              Start by clicking the box of each group — Hot, Warm, Cold, Unknown — on the top right of each card. Then choose a template, or configure a custom SMS or email message.
+              I recommend you send <span className="font-semibold">SMS + Email</span> to every group below — Hot, Warm, Cold, and Unknown — since none of them have been touched in over a month. Check off the audiences you want included today, pick a template for each channel, then hit Send Campaign.
             </>
           }
         >
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <div className="flex flex-col gap-8">
 
-            {/* 1. Select Audience */}
-            <div className="px-6 pt-5 pb-5 border-b border-gray-100">
+            {/* 1. Select Audience — flat list, no cards */}
+            <section>
               <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">
-                1. SELECT AUDIENCE
+                1. Select Audience
               </p>
-              <div className="flex gap-3">
-                {DAILY_OUTREACH_BUCKETS.map((bucket) => (
-                  <AudienceCard
-                    key={bucket.id}
-                    bucket={bucket}
-                    selected={selected.has(bucket.id)}
-                    onToggle={() => toggleBucket(bucket.id)}
-                  />
-                ))}
+              <div className="flex flex-col">
+                {DAILY_OUTREACH_BUCKETS.map((bucket, i) => {
+                  const checked = selected.has(bucket.id);
+                  return (
+                    <label
+                      key={bucket.id}
+                      className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0 cursor-pointer group"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleBucket(bucket.id)}
+                        className="mt-1 w-3.5 h-3.5 accent-orange-500 cursor-pointer flex-shrink-0"
+                      />
+                      <span className="text-[11px] text-gray-300 mt-1 w-3 flex-shrink-0">{i + 1}.</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-baseline gap-2 flex-wrap">
+                          <span className="text-[13px] font-semibold text-gray-800">{bucket.label.replace(" AGENTS", " Agents")}</span>
+                          <span className="text-[12px] text-gray-500">
+                            <span className="text-orange-500 font-semibold">{bucket.pendingToday}</span> pending today
+                            <span className="text-gray-300 mx-1.5">·</span>
+                            {bucket.totalDB} in database
+                          </span>
+                        </div>
+                        <p className="text-[12px] text-gray-400 mt-0.5">
+                          Last touched {bucket.lastCreated} · {bucket.lastTemplate}
+                        </p>
+                      </div>
+                    </label>
+                  );
+                })}
               </div>
-            </div>
+            </section>
 
-            {/* 2. Configure Message */}
-            <div className="px-6 py-5">
+            {/* 2. Configure Message — flat checkbox rows, no cards */}
+            <section>
               <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">
-                2. CONFIGURE MESSAGE
+                2. Configure Message
                 {selectedCount > 0 && (
-                  <span className="text-gray-400 normal-case font-normal ml-1">
-                    (SENDS TO {selectedCount} AGENTS)
+                  <span className="text-gray-400 normal-case font-normal ml-1.5 tracking-normal">
+                    — sending to {selectedCount} agents
                   </span>
                 )}
               </p>
-
-              <div className="grid grid-cols-3 divide-x divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
-
-                {/* SMS Text */}
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="sms-check"
-                        checked={smsChecked}
-                        onChange={(e) => setSmsChecked(e.target.checked)}
-                        className="w-3.5 h-3.5 accent-orange-500 cursor-pointer"
-                      />
-                      <label htmlFor="sms-check" className="flex items-center gap-1.5 cursor-pointer">
-                        <SmsIcon />
-                        <span className="text-sm font-bold text-gray-800">SMS Text</span>
-                      </label>
-                    </div>
-                    <button className="text-gray-300 hover:text-gray-500 transition-colors">
-                      <EyeIcon />
-                    </button>
-                  </div>
+              <div className="flex flex-col">
+                {/* SMS row */}
+                <div className="flex items-center gap-3 py-3 border-b border-gray-100">
+                  <input
+                    type="checkbox"
+                    id="sms-check"
+                    checked={smsChecked}
+                    onChange={(e) => setSmsChecked(e.target.checked)}
+                    className="w-3.5 h-3.5 accent-orange-500 cursor-pointer flex-shrink-0"
+                  />
+                  <label htmlFor="sms-check" className="text-[13px] font-semibold text-gray-800 w-24 cursor-pointer flex-shrink-0">
+                    SMS Text
+                  </label>
                   <select
                     value={smsTemplate}
                     onChange={(e) => setSmsTemplate(e.target.value)}
-                    className="w-full text-xs border border-gray-200 rounded px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-orange-400"
+                    disabled={!smsChecked}
+                    className={`flex-1 text-[13px] border-0 bg-transparent text-gray-700 focus:outline-none cursor-pointer ${!smsChecked ? "opacity-40 cursor-not-allowed" : ""}`}
                   >
                     {SMS_TEMPLATES.map((t) => <option key={t}>{t}</option>)}
                   </select>
                 </div>
 
-                {/* Email */}
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="email-check"
-                        checked={emailChecked}
-                        onChange={(e) => setEmailChecked(e.target.checked)}
-                        className="w-3.5 h-3.5 accent-orange-500 cursor-pointer"
-                      />
-                      <label htmlFor="email-check" className="flex items-center gap-1.5 cursor-pointer">
-                        <MailIcon />
-                        <span className="text-sm font-bold text-gray-800">Email</span>
-                      </label>
-                    </div>
-                    <button className="text-gray-300 hover:text-gray-500 transition-colors">
-                      <EyeIcon />
-                    </button>
-                  </div>
+                {/* Email row */}
+                <div className="flex items-center gap-3 py-3 border-b border-gray-100">
+                  <input
+                    type="checkbox"
+                    id="email-check"
+                    checked={emailChecked}
+                    onChange={(e) => setEmailChecked(e.target.checked)}
+                    className="w-3.5 h-3.5 accent-orange-500 cursor-pointer flex-shrink-0"
+                  />
+                  <label htmlFor="email-check" className="text-[13px] font-semibold text-gray-800 w-24 cursor-pointer flex-shrink-0">
+                    Email
+                  </label>
                   <select
                     value={emailTemplate}
                     onChange={(e) => setEmailTemplate(e.target.value)}
                     disabled={!emailChecked}
-                    className={`w-full text-xs border border-gray-200 rounded px-2 py-1.5 bg-white text-gray-700 focus:outline-none focus:border-orange-400 ${!emailChecked ? "opacity-40 cursor-not-allowed" : ""}`}
+                    className={`flex-1 text-[13px] border-0 bg-transparent text-gray-700 focus:outline-none cursor-pointer ${!emailChecked ? "opacity-40 cursor-not-allowed" : ""}`}
                   >
                     {EMAIL_TEMPLATES.map((t) => <option key={t}>{t}</option>)}
                   </select>
                 </div>
 
-                {/* Voicemail */}
-                <div className="p-4 opacity-50">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <input type="checkbox" disabled className="w-3.5 h-3.5 cursor-not-allowed" />
-                      <div className="flex items-center gap-1.5">
-                        <VoicemailIcon />
-                        <span className="text-sm font-bold text-gray-800">Voicemail</span>
-                        <span className="text-[9px] font-bold bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-sm uppercase tracking-wide">Soon</span>
-                      </div>
-                    </div>
-                  </div>
-                  <select disabled className="w-full text-xs border border-gray-200 rounded px-2 py-1.5 bg-white text-gray-400 cursor-not-allowed">
-                    <option>General Check-in.mp3</option>
-                  </select>
+                {/* Voicemail row — disabled */}
+                <div className="flex items-center gap-3 py-3 opacity-50">
+                  <input type="checkbox" disabled className="w-3.5 h-3.5 cursor-not-allowed flex-shrink-0" />
+                  <span className="text-[13px] font-semibold text-gray-800 w-24 flex-shrink-0 flex items-center gap-1.5">
+                    Voicemail
+                    <span className="text-[9px] font-bold bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-sm uppercase tracking-wide">Soon</span>
+                  </span>
+                  <span className="flex-1 text-[13px] text-gray-400">General Check-in.mp3</span>
                 </div>
-
               </div>
-            </div>
+            </section>
 
-            {/* Footer */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-              <p className="text-sm text-gray-500 flex items-center gap-1.5">
-                <InfoIcon />
-                You are sending to <strong className="text-gray-800 ml-1">{selectedCount} Agents</strong>
+            {/* Send button — bottom right */}
+            <div className="flex items-center justify-between">
+              <p className="text-[13px] text-gray-500">
+                {selectedCount > 0 ? (
+                  <>You're sending to <span className="font-semibold text-gray-800">{selectedCount} agents</span></>
+                ) : (
+                  <>Select at least one audience to enable sending.</>
+                )}
               </p>
               <button
                 onClick={handleSend}
-                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm px-6 py-2.5 rounded-lg transition-colors flex items-center gap-2"
+                disabled={selectedCount === 0 || (!smsChecked && !emailChecked)}
+                className="flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-xs font-medium px-4 py-2 rounded-full cursor-pointer transition-colors"
               >
                 Send Campaign
-                <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="6,3 11,8 6,13" />
                 </svg>
               </button>
@@ -220,45 +220,3 @@ export default function IqDailyOutreach() {
   );
 }
 
-function SmsIcon() {
-  return (
-    <svg className="w-3.5 h-3.5 text-gray-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <rect x="1" y="1.5" width="14" height="10" rx="2" />
-      <path d="M4 14l3-2.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-function MailIcon() {
-  return (
-    <svg className="w-3.5 h-3.5 text-gray-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <rect x="1" y="3" width="14" height="10" rx="1.5" />
-      <polyline points="1,4 8,9.5 15,4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-function VoicemailIcon() {
-  return (
-    <svg className="w-3.5 h-3.5 text-gray-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="4.5" cy="9" r="3" />
-      <circle cx="11.5" cy="9" r="3" />
-      <line x1="4.5" y1="12" x2="11.5" y2="12" />
-    </svg>
-  );
-}
-function EyeIcon() {
-  return (
-    <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path strokeLinecap="round" d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" />
-      <circle cx="8" cy="8" r="2" />
-    </svg>
-  );
-}
-function InfoIcon() {
-  return (
-    <svg className="w-3.5 h-3.5 text-gray-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="8" cy="8" r="6.5" />
-      <line x1="8" y1="7" x2="8" y2="11" strokeLinecap="round" />
-      <circle cx="8" cy="5" r="0.5" fill="currentColor" />
-    </svg>
-  );
-}
