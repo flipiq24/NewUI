@@ -932,10 +932,9 @@ function CommIcon({ type }: { type: string }) {
 }
 
 function RowMenu({
-  actions,
   onPick,
 }: {
-  actions: { key: string; label: string }[];
+  actions?: { key: string; label: string }[];
   onPick: (label: string) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -947,6 +946,103 @@ function RowMenu({
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
+
+  const COMMUNICATION = [
+    { label: "Call", icon: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M3 2h3l1.5 3.5-2 1.2C6.3 9 7 9.7 8.3 10.5l1.2-2L13 10v3c0 .6-.5 1-1 1C5.4 14 2 6.6 2 3c0-.5.4-1 1-1z" />
+      </svg>
+    ) },
+    { label: "Text", icon: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M2 4a1 1 0 011-1h10a1 1 0 011 1v6a1 1 0 01-1 1H6l-3 3v-3H3a1 1 0 01-1-1V4z" />
+      </svg>
+    ) },
+    { label: "Email", icon: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="2" y="3.5" width="12" height="9" rx="1" />
+        <polyline points="2.5,4.5 8,9 13.5,4.5" />
+      </svg>
+    ) },
+    { label: "Text VM", icon: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="6" y="2" width="4" height="8" rx="2" />
+        <path d="M3.5 8a4.5 4.5 0 009 0M8 12.5V14" />
+      </svg>
+    ) },
+  ];
+  const FOLLOW_UP = [
+    { label: "Set Status", icon: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M2 12c2-3 4-3 6 0s4 3 6 0" />
+      </svg>
+    ) },
+    { label: "Set Reminder", icon: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <circle cx="8" cy="8" r="6" />
+        <polyline points="8,4.5 8,8 10.5,9.5" />
+      </svg>
+    ) },
+    { label: "Set Critical", icon: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M8 2L14 13H2L8 2z" />
+        <path d="M8 7v3M8 11.5v.5" strokeLinecap="round" />
+      </svg>
+    ) },
+  ];
+  const ORGANIZE = [
+    { label: "Favorites", icon: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M8 2.5l1.7 3.5 3.8.5-2.8 2.7.7 3.8L8 11.2l-3.4 1.8.7-3.8L2.5 6.5l3.8-.5L8 2.5z" />
+      </svg>
+    ) },
+    { label: "Agent Deals", icon: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <polygon points="2,3 14,3 10,9 10,13 6,13 6,9" />
+      </svg>
+    ) },
+  ];
+  const NOTES = [
+    { label: "View / Add", icon: (
+      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="3" y="2" width="10" height="12" rx="1" />
+        <path d="M5 5h6M5 8h6M5 11h4" />
+      </svg>
+    ) },
+  ];
+
+  function pick(label: string) {
+    onPick(label);
+    setOpen(false);
+  }
+
+  function Group({
+    title,
+    items,
+  }: {
+    title: string;
+    items: { label: string; icon: JSX.Element }[];
+  }) {
+    return (
+      <div className="flex flex-col min-w-[120px]">
+        <p className="text-[10px] font-semibold tracking-wider uppercase text-gray-400 mb-2">{title}</p>
+        <div className="flex flex-col gap-1.5">
+          {items.map((it) => (
+            <button
+              key={it.label}
+              type="button"
+              onClick={() => pick(it.label)}
+              className="flex items-center gap-2 text-left text-[12px] text-gray-700 hover:text-orange-600 cursor-pointer"
+            >
+              <span className="text-gray-400 group-hover:text-orange-500">{it.icon}</span>
+              <span>{it.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div ref={ref} className="relative">
       <button
@@ -962,20 +1058,11 @@ function RowMenu({
         </svg>
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1.5 min-w-[200px]">
-          {actions.map((a) => (
-            <button
-              key={a.key}
-              type="button"
-              onClick={() => {
-                onPick(a.label);
-                setOpen(false);
-              }}
-              className="w-full text-left px-3.5 py-2 text-[13px] text-gray-700 hover:bg-orange-50 hover:text-orange-600 cursor-pointer"
-            >
-              {a.label}
-            </button>
-          ))}
+        <div className="absolute right-0 top-full mt-1.5 z-30 bg-white border border-gray-200 rounded-lg shadow-[0_4px_14px_rgba(0,0,0,0.08)] px-4 py-3 flex gap-6">
+          <Group title="Communication" items={COMMUNICATION} />
+          <Group title="Follow Up" items={FOLLOW_UP} />
+          <Group title="Organize" items={ORGANIZE} />
+          <Group title="Notes" items={NOTES} />
         </div>
       )}
     </div>
