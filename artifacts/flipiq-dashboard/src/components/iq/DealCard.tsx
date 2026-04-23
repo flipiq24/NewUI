@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type ReactNode, type CSSProperties } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import type { DealProperty } from "@/lib/iq/mockData";
 import { useDailyChecklist } from "@/lib/iq/dailyChecklist";
 import { DEAL_DETAILS, type DealDetail } from "@/lib/iq/dealDetails";
@@ -35,13 +35,9 @@ function sourceKey(source: string, status: string) {
   const s = (status || source.replace(/^MLS\s*—\s*/i, "")).trim().toLowerCase();
   return s in SOURCE_COLORS ? s : source.trim().toLowerCase();
 }
-function sourcePillStyle(source: string, status: string): CSSProperties {
+function sourceTextColor(source: string, status: string): string {
   const c = SOURCE_COLORS[sourceKey(source, status)] ?? SOURCE_COLORS["off market"];
-  return { backgroundColor: c.bg, color: c.text };
-}
-function sourceDotColor(source: string, status: string): string {
-  const c = SOURCE_COLORS[sourceKey(source, status)] ?? SOURCE_COLORS["off market"];
-  return c.dot;
+  return c.text;
 }
 
 const STATUS_PILL: Record<DealDetail["statusType"], string> = {
@@ -298,16 +294,12 @@ export default function DealCard({ property }: { property: DealProperty }) {
             {ICON.globe}
           </button>
           <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help inline-flex items-center gap-1.5 text-gray-500">
-            <span>Source:</span>
+          <span className="relative group cursor-help text-gray-500 hover:text-gray-900">
+            Source:{" "}
             <span
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11.5px] font-medium"
-              style={sourcePillStyle(property.source, property.sourceStatus)}
+              className="font-medium"
+              style={{ color: sourceTextColor(property.source, property.sourceStatus) }}
             >
-              <span
-                className="w-1.5 h-1.5 rounded-full"
-                style={{ backgroundColor: sourceDotColor(property.source, property.sourceStatus) }}
-              />
               {property.source}
               {property.sourceStatus ? ` — ${property.sourceStatus}` : ""}
             </span>
