@@ -17,8 +17,11 @@ const segments = [
     borderColor: "border-green-500",
     bgColor: "bg-green-50",
     textColor: "text-green-800",
-    subtitle:
-      "These are your highest-priority active and off-market properties. MUST call first. Follow up with text and email after the phone call is made.",
+    subtitle: (
+      <>
+        These are <span className="text-red-600 font-semibold">High Priority</span> Active &amp; Off Market deals at the top of your FlipIQ priority list. MUST call first. Follow up with text and email after the phone call is made.
+      </>
+    ),
   },
   {
     key: "PENDING_BACKUP_HOLD" as const,
@@ -26,8 +29,11 @@ const segments = [
     borderColor: "border-amber-500",
     bgColor: "bg-amber-50",
     textColor: "text-amber-800",
-    subtitle:
-      "These properties are in contract. Call the agent. Find out if the buyer is performing. Stay close until it's confirmed.",
+    subtitle: (
+      <>
+        These are <span className="text-red-600 font-semibold">High Priority</span> Pending / Backup / Hold deals — they're in contract. Call the agent, find out if the buyer is performing, and stay close until it's confirmed.
+      </>
+    ),
   },
   {
     key: "CLOSED_EXPIRED_CANCELED" as const,
@@ -35,8 +41,11 @@ const segments = [
     borderColor: "border-red-400",
     bgColor: "bg-red-50",
     textColor: "text-red-800",
-    subtitle:
-      "This property is no longer available — that's your opening. Find out who the buyer was, did it sell for more or less than your offer, and update the relationship. Then ask if they have any other properties coming up.",
+    subtitle: (
+      <>
+        These are <span className="text-red-600 font-semibold">High Priority</span> Closed / Expired / Canceled deals — the property is no longer available, and that's your opening. Find out who the buyer was, whether it sold for more or less than your offer, update the relationship, and ask if they have any other properties coming up.
+      </>
+    ),
   },
 ];
 
@@ -223,7 +232,7 @@ export default function IqDealReview() {
                 </div>
                 <div>
                   <p className="text-[14px] text-gray-800 leading-7 mb-5">
-                    You have 9 High Priority deals that need your attention today. Work through each group in order and take action on every deal. Hit <span className="text-orange-500 font-medium">Get Started</span> when you're ready.
+                    You have <span className="text-orange-500 font-semibold">9</span> <span className="text-red-600 font-semibold">High Priority</span> deals at the top of your FlipIQ priority list — Active &amp; Off Market, Pending / Backup / Hold, and Closed / Expired / Canceled. Call the agent on each one. Work through each group in order and take action on every deal. Hit <span className="text-orange-500 font-medium">Get Started</span> when you're ready.
                   </p>
                   <div className="space-y-1.5 mb-6">
                     {[
@@ -279,7 +288,7 @@ export default function IqDealReview() {
           <>
             <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
               <span className="text-sm text-gray-500">
-                Active Deals › 9 High Priority Deals ›{" "}
+                Active Deals › <span className="text-red-600 font-semibold">9 High Priority</span> Deals ›{" "}
                 <span className="font-semibold text-gray-800 underline decoration-orange-500 decoration-2 underline-offset-2">
                   {segmentLabels[currentSeg.key]}
                 </span>

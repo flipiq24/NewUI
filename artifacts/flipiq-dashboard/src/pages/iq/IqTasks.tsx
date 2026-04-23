@@ -155,12 +155,16 @@ interface PriorityProps {
 }
 
 function highlightNumbers(text: string) {
-  const parts = text.split(/(\d[\d,]*)/g);
-  return parts.map((p, i) =>
-    /^\d[\d,]*$/.test(p)
-      ? <span key={i} className="text-orange-500 font-semibold">{p}</span>
-      : <span key={i}>{p}</span>
-  );
+  const parts = text.split(/(High Priority|\d[\d,]*)/gi);
+  return parts.map((p, i) => {
+    if (/^high priority$/i.test(p)) {
+      return <span key={i} className="text-red-600 font-semibold">{p}</span>;
+    }
+    if (/^\d[\d,]*$/.test(p)) {
+      return <span key={i} className="text-orange-500 font-semibold">{p}</span>;
+    }
+    return <span key={i}>{p}</span>;
+  });
 }
 
 function Priority({ priority, title, body, done, items }: PriorityProps) {
@@ -287,7 +291,7 @@ export default function IqTasks() {
                 <Priority
                   priority={1}
                   title="Active Deals"
-                  body={`Follow up on your ${totalDeals} properties — work High first, then Mid, Low, and New. Update offer status as you go.`}
+                  body={`These ${totalDeals} properties are your High Priority deals — Active & Off Market, Pending / Backup / Hold, and Closed / Expired / Canceled. Call the agent on each one. Work High first, then Mid, Low, and New, and update offer status as you go.`}
                   done={dealDone}
                   items={[
                     `${totalDeals} deals`,
