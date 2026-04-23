@@ -202,17 +202,45 @@ export default function IqDealReview() {
     <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <IqTopBar
-          breadcrumb={`Deal Review > 9 High Priority Deals > ${segmentLabels[currentSeg.key]}`}
-          nextTask={nextLabel}
-          onNext={handleNext}
-        />
-        <TaskTipBlock
-          task={segmentTaskCopy[currentSeg.key].task}
-          tip={segmentTaskCopy[currentSeg.key].tip}
-          storageKey={segKey}
-          onStart={start}
-        />
+        <IqTopBar />
+        <div className="bg-white border-b border-gray-200 px-6 pt-4 pb-0 flex-shrink-0">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-lg font-semibold text-gray-700">
+              <span>Deal Review &gt; 9 High Priority Deals &gt; </span>
+              <span className="underline decoration-orange-500 decoration-2 underline-offset-4">
+                {segmentLabels[currentSeg.key]}
+              </span>
+            </span>
+            <button
+              onClick={handleNext}
+              className="text-xs flex items-center gap-1 cursor-pointer"
+            >
+              <span className="font-semibold text-orange-500">Next Task:</span>
+              <span className="text-gray-600">{nextLabel}</span>
+              <svg className="w-3.5 h-3.5 text-orange-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="6,3 11,8 6,13" />
+              </svg>
+            </button>
+          </div>
+          <div className="flex gap-2 mb-2">
+            <span className="text-base font-bold text-orange-500 flex-shrink-0">Task:</span>
+            <span className="text-base text-gray-800">{segmentTaskCopy[currentSeg.key].task}</span>
+          </div>
+          <div className="flex gap-2 pb-4">
+            <span className="text-base font-bold text-blue-600 flex-shrink-0">Tip:</span>
+            <span className="text-base text-gray-600">{segmentTaskCopy[currentSeg.key].tip}</span>
+          </div>
+          {!started && (
+            <div className="flex justify-end pb-4">
+              <button
+                onClick={start}
+                className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2 rounded cursor-pointer"
+              >
+                Get Started
+              </button>
+            </div>
+          )}
+        </div>
 
         {!started && (
           <DealReviewHeader
