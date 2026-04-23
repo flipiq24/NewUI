@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import {
@@ -153,9 +153,96 @@ function DashboardCard({ priority, title, subtitle, description, onClick, notifi
   );
 }
 
+function MorningCheckinPopup({ onDismiss }: { onDismiss: () => void }) {
+  const [answer, setAnswer] = useState<boolean | null>(null);
+  const [helpText, setHelpText] = useState("");
+
+  function handleAnswer(val: boolean) {
+    setAnswer(val);
+  }
+
+  function handleConfirm() {
+    if (answer === null) return;
+    const state = resetIqStateIfNewDay();
+    saveIqState({
+      ...state,
+      morningCheckin: {
+        canWorkFullDay: answer,
+        needsHelp: false,
+        canSendOffers: true,
+        canSendCampaigns: true,
+        canReviewNewDeals: true,
+        workExplain: helpText,
+        helpExplain: helpText,
+        offersExplain: "",
+        campaignsExplain: "",
+        newDealsExplain: "",
+      },
+    });
+    onDismiss();
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8 flex flex-col gap-6">
+        <div>
+          <p className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-2">Morning Check-in</p>
+          <h2 className="text-xl font-bold text-gray-900 leading-snug">
+            Are you able to commit a full day and complete all your tasks?
+          </h2>
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={() => handleAnswer(true)}
+            className={`flex-1 py-2.5 rounded-full text-sm font-semibold border transition-colors ${
+              answer === true
+                ? "bg-orange-500 text-white border-orange-500"
+                : "bg-white text-orange-500 border-orange-300 hover:bg-orange-50"
+            }`}
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => handleAnswer(false)}
+            className={`flex-1 py-2.5 rounded-full text-sm font-semibold border transition-colors ${
+              answer === false
+                ? "bg-orange-500 text-white border-orange-500"
+                : "bg-white text-orange-500 border-orange-300 hover:bg-orange-50"
+            }`}
+          >
+            No
+          </button>
+        </div>
+
+        <textarea
+          value={helpText}
+          onChange={(e) => setHelpText(e.target.value)}
+          placeholder="Explain or request any help…"
+          rows={3}
+          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-200 resize-none bg-white"
+        />
+
+        {answer !== null && (
+          <button
+            onClick={handleConfirm}
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm py-2.5 rounded-lg transition-colors"
+          >
+            Continue
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function IqTasks() {
   const [, navigate] = useLocation();
   const checklistVersion = useChecklistVersion();
+  const [showCheckin, setShowCheckin] = useState(() => {
+    const s = loadIqState();
+    return !s?.morningCheckin;
+  });
 
   // Re-read persisted progress so badges reflect what's done today.
   // Tracked via checklistVersion so toggles inside Deal Review propagate here.
@@ -205,6 +292,7 @@ export default function IqTasks() {
 
   return (
     <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
+      {showCheckin && <MorningCheckinPopup onDismiss={() => setShowCheckin(false)} />}
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <IqTopBar title="FlipIQ Assistant" />

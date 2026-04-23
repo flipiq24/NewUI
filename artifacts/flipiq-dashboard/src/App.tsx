@@ -5,7 +5,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import MyStats from "@/pages/MyStats";
 import AdaptationReports from "@/pages/AdaptationReports";
-import IqMorning from "@/pages/iq/IqMorning";
 import IqTasks from "@/pages/iq/IqTasks";
 import IqDealReview from "@/pages/iq/IqDealReview";
 import IqDailyOutreach from "@/pages/iq/IqDailyOutreach";
@@ -20,7 +19,7 @@ function Router() {
     <Switch>
       <Route path="/" component={MyStats} />
       <Route path="/adaptation-reports" component={AdaptationReports} />
-      <Route path="/iq" component={IqMorning} />
+      <Route path="/iq" component={IqTasks} />
       <Route path="/iq/tasks" component={IqTasks} />
       <Route path="/iq/deal-review" component={IqDealReview} />
       <Route path="/iq/deal-review/:address" component={() => (
