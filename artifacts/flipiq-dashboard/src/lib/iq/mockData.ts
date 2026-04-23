@@ -9,11 +9,15 @@ export type PropertySegment = "ACTIVE_OFF_MARKET" | "PENDING_BACKUP_HOLD" | "CLO
 export type DealLevel = "high" | "mid" | "low" | "new";
 export type NotificationKind = "critical" | "reminder" | "unseen" | "text";
 
+export type ResponseStatus = "positive" | "neutral" | "negative";
+
 export type DealProperty = {
   id: number;
   segment: PropertySegment;
   level: DealLevel;
   notifications: NotificationKind[];
+  textResponse?: ResponseStatus;
+  emailResponse?: ResponseStatus;
   address: string;
   type: string;
   propertyType: string;
@@ -51,6 +55,8 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
     segment: "ACTIVE_OFF_MARKET",
     level: "high",
     notifications: ["critical", "text"],
+    textResponse: "positive",
+    emailResponse: "positive",
     address: "73750 Desert Vista Court, Palm Desert, CA 92260",
     type: "STD",
     propertyType: "Condominium",
@@ -74,6 +80,7 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
     segment: "ACTIVE_OFF_MARKET",
     level: "high",
     notifications: ["critical", "reminder"],
+    textResponse: "neutral",
     address: "9283 Atsina Road, Phelan, CA 92371",
     type: "REO",
     propertyType: "Manufactured 433",
@@ -97,6 +104,7 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
     segment: "ACTIVE_OFF_MARKET",
     level: "mid",
     notifications: ["reminder", "text"],
+    emailResponse: "negative",
     address: "338 W Magnolia Street, Compton, CA 90220",
     type: "STD",
     propertyType: "Other (L)",

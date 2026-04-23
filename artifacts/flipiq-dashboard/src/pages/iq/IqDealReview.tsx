@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import TaskTipBlock from "@/components/iq/TaskTipBlock";
-import PropertyRow from "@/components/iq/PropertyRow";
+import MinimalPropertyRow from "@/components/iq/MinimalPropertyRow";
 import SegmentHeader from "@/components/iq/SegmentHeader";
 import DealReviewHeader from "@/components/iq/DealReviewHeader";
 import { DEAL_REVIEW_PROPERTIES, type DealLevel, type NotificationKind } from "@/lib/iq/mockData";
@@ -63,24 +63,6 @@ const segmentTaskCopy: Record<typeof segments[number]["key"], { task: string; ti
 };
 
 const LEVEL_ORDER: DealLevel[] = ["high", "mid", "low", "new"];
-
-function InfoDot() {
-  return (
-    <svg className="w-3 h-3 text-gray-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="8" cy="8" r="6.5" />
-      <line x1="8" y1="7" x2="8" y2="11.5" strokeLinecap="round" />
-      <circle cx="8" cy="5" r="0.6" fill="currentColor" />
-    </svg>
-  );
-}
-
-function FilterIcon() {
-  return (
-    <svg className="w-3 h-3 text-gray-500" viewBox="0 0 16 16" fill="currentColor">
-      <path d="M2 3 h12 l-4.5 6 v4 l-3 1.5 v-5.5 z" />
-    </svg>
-  );
-}
 
 export default function IqDealReview() {
   const [, navigate] = useLocation();
@@ -314,40 +296,30 @@ export default function IqDealReview() {
                 textColor={currentSeg.textColor}
               />
               {visibleProps.length === 0 ? (
-                <div className="bg-white border border-dashed border-gray-300 rounded-lg p-8 text-center text-sm text-gray-500">
+                <div className="text-sm text-gray-500 py-8 text-center">
                   No properties match the current filters in this segment.
                 </div>
               ) : (
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
-                  {/* Column header row */}
-                  <div
-                    className="hidden md:grid items-center gap-4 px-3 py-2 bg-gray-50 border-b border-gray-200 text-[10px] font-bold text-gray-500 uppercase tracking-wider"
-                    style={{
-                      gridTemplateColumns:
-                        "32px minmax(0,2.4fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1.2fr)",
-                    }}
-                  >
-                    <span />
-                    <span className="flex items-center gap-3">
-                      <span className="inline-flex items-center gap-1">
-                        Property <InfoDot />
-                      </span>
-                      <span className="inline-flex items-center gap-1 text-gray-400 normal-case font-semibold">
-                        <FilterIcon /> Segments
-                      </span>
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      Price / Propensity <InfoDot />
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      Last Open / Called <InfoDot />
-                    </span>
-                    <span className="inline-flex items-center gap-1 justify-end">
-                      Offer Status / Source <InfoDot />
-                    </span>
-                  </div>
+                <div className="mt-4 mb-2 flex items-center gap-3 text-[11px] text-gray-400">
+                  <span className="font-semibold uppercase tracking-wider">Response</span>
+                  <span className="inline-flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-green-500" /> Positive
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-yellow-400" /> Neutral
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-red-500" /> Negative
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-gray-300" /> No reply yet
+                  </span>
+                </div>
+              )}
+              {visibleProps.length > 0 && (
+                <div className="bg-white">
                   {visibleProps.map((p, i) => (
-                    <PropertyRow key={p.id} property={p} last={i === visibleProps.length - 1} />
+                    <MinimalPropertyRow key={p.id} property={p} index={i + 1} />
                   ))}
                 </div>
               )}
