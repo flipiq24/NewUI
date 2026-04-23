@@ -372,33 +372,6 @@ export default function IqCampaignResponses() {
             </>
           }
         >
-          {/* Step pills */}
-          <div className="flex items-center gap-2 mb-1">
-            {SECTIONS.map((s, i) => {
-              const active = i === stepIdx;
-              const done = i < stepIdx;
-              return (
-                <button
-                  key={s.sentiment}
-                  type="button"
-                  onClick={() => setStepIdx(i)}
-                  disabled={i > stepIdx}
-                  className={`inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full border transition-colors ${
-                    active
-                      ? "border-transparent text-white"
-                      : done
-                      ? "border-gray-200 text-gray-500 hover:bg-gray-50 cursor-pointer"
-                      : "border-gray-200 text-gray-300 cursor-not-allowed"
-                  }`}
-                  style={active ? { backgroundColor: s.dot } : undefined}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: active ? "#fff" : s.dot }} />
-                  {i + 1}. {s.tail}
-                </button>
-              );
-            })}
-          </div>
-
           <div className="flex flex-col gap-10">
             {SECTIONS.filter((_, i) => i === stepIdx).map((sec) => {
               const rows = SORTED.filter((a) => a.sentiment === sec.sentiment);
