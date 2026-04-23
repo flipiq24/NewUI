@@ -101,7 +101,7 @@ function Tooltip({ text }: { text: string }) {
       <div className="absolute left-1/2 bottom-full -translate-x-1/2 mb-px">
         <div className="w-2 h-2 bg-white border-l border-t border-gray-200 rotate-45 translate-y-1/2" />
       </div>
-      <div className="bg-white text-gray-700 text-[12px] leading-snug rounded-lg px-3 py-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-gray-200 max-w-[240px] whitespace-normal text-center">
+      <div className="bg-white text-gray-700 text-[12px] leading-snug rounded-lg px-4 py-2 shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-gray-200 w-[420px] max-w-[420px] whitespace-normal text-center">
         {text}
       </div>
     </div>
