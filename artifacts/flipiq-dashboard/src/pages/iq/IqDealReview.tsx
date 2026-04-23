@@ -203,67 +203,118 @@ export default function IqDealReview() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <IqTopBar />
-        <div className="bg-white border-b border-gray-200 px-6 pt-4 pb-0 flex-shrink-0">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-lg font-semibold text-gray-700">
-              <span>Deal Review &gt; 9 High Priority Deals &gt; </span>
-              <span className="underline decoration-orange-500 decoration-2 underline-offset-4">
-                {segmentLabels[currentSeg.key]}
-              </span>
-            </span>
-            <button
-              onClick={handleNext}
-              className="text-xs flex items-center gap-1 cursor-pointer"
-            >
-              <span className="font-semibold text-orange-500">Next Task:</span>
-              <span className="text-gray-600">{nextLabel}</span>
-              <svg className="w-3.5 h-3.5 text-orange-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="6,3 11,8 6,13" />
-              </svg>
-            </button>
-          </div>
-          <div className="flex gap-2 mb-2">
-            <span className="text-base font-bold text-orange-500 flex-shrink-0">Task:</span>
-            <span className="text-base text-gray-800">{segmentTaskCopy[currentSeg.key].task}</span>
-          </div>
-          <div className="flex gap-2 pb-4">
-            <span className="text-base font-bold text-blue-600 flex-shrink-0">Tip:</span>
-            <span className="text-base text-gray-600">{segmentTaskCopy[currentSeg.key].tip}</span>
-          </div>
-          {!started && (
-            <div className="flex justify-end pb-4">
-              <button
-                onClick={start}
-                className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2 rounded cursor-pointer"
-              >
-                Get Started
-              </button>
-            </div>
-          )}
-        </div>
 
+        {/* Minimalist chat-style briefing — shown until Get Started is clicked */}
         {!started && (
-          <DealReviewHeader
-            levelCounts={levelCounts}
-            levelComplete={levelComplete}
-            notificationCounts={notificationCounts}
-            activeLevel={null}
-            activeNotifications={new Set()}
-            onLevelClick={() => {}}
-            onNotificationClick={() => {}}
-          />
+          <div className="flex-1 overflow-y-auto flex flex-col">
+            <div className="max-w-2xl mx-auto w-full px-6 py-8 flex flex-col gap-6">
+
+              {/* Breadcrumb + Next Task row */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">
+                  Deal Review &gt; 9 High Priority Deals &gt;{" "}
+                  <span className="font-semibold text-gray-800 underline decoration-orange-500 decoration-2 underline-offset-2">
+                    {segmentLabels[currentSeg.key]}
+                  </span>
+                </span>
+                <button onClick={handleNext} className="flex items-center gap-1 text-xs text-gray-400 hover:text-orange-500 transition-colors cursor-pointer">
+                  <span className="font-medium text-orange-500">Next Task:</span>
+                  <span>{nextLabel}</span>
+                  <svg className="w-3 h-3 text-orange-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6,3 11,8 6,13" /></svg>
+                </button>
+              </div>
+
+              {/* Chat bubble */}
+              <div className="flex gap-3">
+                {/* Avatar */}
+                <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-4 h-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7z" clipRule="evenodd" />
+                  </svg>
+                </div>
+
+                {/* Message body */}
+                <div className="flex-1 flex flex-col gap-4">
+                  {/* Task text */}
+                  <p className="text-sm text-gray-800 leading-relaxed">
+                    {segmentTaskCopy[currentSeg.key].task}
+                  </p>
+
+                  {/* Tip */}
+                  <p className="text-sm text-gray-500 leading-relaxed border-l-2 border-orange-300 pl-3">
+                    {segmentTaskCopy[currentSeg.key].tip}
+                  </p>
+
+                  {/* Notifications inline */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs text-gray-400">Notifications:</span>
+                    {notificationCounts.critical > 0 && (
+                      <span className="text-xs text-red-600 font-medium">⚠ {notificationCounts.critical} Criticals</span>
+                    )}
+                    {notificationCounts.reminder > 0 && (
+                      <span className="text-xs text-amber-600 font-medium">🔔 {notificationCounts.reminder} Reminders</span>
+                    )}
+                    {notificationCounts.unseen > 0 && (
+                      <span className="text-xs text-green-700 font-medium">✉ {notificationCounts.unseen} Unseen</span>
+                    )}
+                    {notificationCounts.text > 0 && (
+                      <span className="text-xs text-purple-600 font-medium">💬 {notificationCounts.text} Texts</span>
+                    )}
+                  </div>
+
+                  {/* Deal counts inline */}
+                  <div className="flex items-center gap-3 text-sm">
+                    <span className="font-bold text-red-500">{levelCounts.high}</span><span className="text-xs text-gray-400 uppercase tracking-wide">High</span>
+                    <span className="text-gray-200">·</span>
+                    <span className="font-bold text-amber-500">{levelCounts.mid}</span><span className="text-xs text-gray-400 uppercase tracking-wide">Mid</span>
+                    <span className="text-gray-200">·</span>
+                    <span className="font-bold text-blue-500">{levelCounts.low}</span><span className="text-xs text-gray-400 uppercase tracking-wide">Low</span>
+                    <span className="text-gray-200">·</span>
+                    <span className="font-bold text-gray-500">{levelCounts.new}</span><span className="text-xs text-gray-400 uppercase tracking-wide">New</span>
+                  </div>
+
+                  {/* Get Started */}
+                  <div className="pt-1">
+                    <button
+                      onClick={start}
+                      className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2 rounded-lg cursor-pointer transition-colors flex items-center gap-2"
+                    >
+                      Get Started
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
         )}
 
         {started && (
-          <DealReviewHeader
-            levelCounts={levelCounts}
-            levelComplete={levelComplete}
-            notificationCounts={notificationCounts}
-            activeLevel={activeLevel}
-            activeNotifications={activeNotifications}
-            onLevelClick={handleLevelClick}
-            onNotificationClick={handleNotificationClick}
-          />
+          <>
+            <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
+              <span className="text-sm text-gray-500">
+                Deal Review &gt; 9 High Priority Deals &gt;{" "}
+                <span className="font-semibold text-gray-800 underline decoration-orange-500 decoration-2 underline-offset-2">
+                  {segmentLabels[currentSeg.key]}
+                </span>
+              </span>
+              <button onClick={handleNext} className="flex items-center gap-1 text-xs text-gray-400 hover:text-orange-500 transition-colors cursor-pointer">
+                <span className="font-medium text-orange-500">Next Task:</span>
+                <span>{nextLabel}</span>
+                <svg className="w-3 h-3 text-orange-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6,3 11,8 6,13" /></svg>
+              </button>
+            </div>
+            <DealReviewHeader
+              levelCounts={levelCounts}
+              levelComplete={levelComplete}
+              notificationCounts={notificationCounts}
+              activeLevel={activeLevel}
+              activeNotifications={activeNotifications}
+              onLevelClick={handleLevelClick}
+              onNotificationClick={handleNotificationClick}
+            />
+          </>
         )}
 
         {started && (
