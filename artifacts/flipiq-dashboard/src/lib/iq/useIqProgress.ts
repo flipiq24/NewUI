@@ -4,7 +4,7 @@ import { loadIqState } from "./storage";
 import { isPropertyComplete, useChecklistVersion } from "./dailyChecklist";
 
 export type IqProgressSegment = {
-  key: "deals" | "agents" | "new";
+  key: "plan" | "deals" | "agents" | "new";
   label: string;
   count: number;
   done: boolean;
@@ -53,7 +53,20 @@ export function useIqProgress(): IqProgressSegment[] {
     const newTotal = NEW_RELATIONSHIPS_DEALS.length;
     const newDone = !!state?.newRelationshipsComplete;
 
+    const planDone = !!state?.flowStarted;
+
     return [
+      {
+        key: "plan",
+        label: "Today's Plan",
+        count: 1,
+        done: planDone,
+        labelTooltip: "Your morning check-in and daily plan.",
+        numberTooltip: planDone
+          ? "Morning check-in complete."
+          : "Complete your morning check-in to set today's plan.",
+        route: "/iq",
+      },
       {
         key: "deals",
         label: "Active Deals",

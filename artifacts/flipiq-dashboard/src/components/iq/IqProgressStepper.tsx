@@ -5,7 +5,8 @@ import { useIqProgress, type IqProgressSegment } from "@/lib/iq/useIqProgress";
 function currentSegmentKey(pathname: string): IqProgressSegment["key"] {
   if (pathname.startsWith("/iq/daily-outreach") || pathname.startsWith("/iq/priority-agents")) return "agents";
   if (pathname.startsWith("/iq/new-relationships")) return "new";
-  return "deals";
+  if (pathname.startsWith("/iq/deal-review") || pathname.startsWith("/iq/tasks")) return "deals";
+  return "plan";
 }
 
 export default function IqProgressStepper() {
