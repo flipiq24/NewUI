@@ -47,6 +47,7 @@ function MorningCheckinPopup({ onDismiss }: { onDismiss: () => void }) {
     const state = resetIqStateIfNewDay();
     saveIqState({
       ...state,
+      outreachCampaignSent: sendCampaigns === "yes" ? true : state.outreachCampaignSent,
       morningCheckin: {
         canWorkFullDay: answer,
         sendCampaignsNow: sendCampaigns,
