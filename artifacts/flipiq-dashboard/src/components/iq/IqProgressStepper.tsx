@@ -87,10 +87,10 @@ export default function IqProgressStepper() {
                 </button>
               </div>
             </div>
-            {/* Connector — sits in the same flex row, vertically centered with circles, butted up against them */}
+            {/* Connector — separated from circles by a gap on each side */}
             {i < segments.length - 1 && (
               <div
-                className={`h-[2px] flex-1 min-w-[40px] max-w-[128px] -mx-px ${lineActive ? "bg-orange-500" : "bg-gray-200"}`}
+                className={`h-[2px] flex-1 min-w-[40px] max-w-[128px] mx-3 ${lineActive ? "bg-orange-500" : "bg-gray-200"}`}
               />
             )}
           </Fragment>
