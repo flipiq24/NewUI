@@ -2,13 +2,13 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
-import IqAskBar from "@/components/iq/IqAskBar";
-import TaskTipBlock from "@/components/iq/TaskTipBlock";
+import IqChatPage from "@/components/iq/IqChatPage";
 import AgentRecordCard from "@/components/iq/AgentRecordCard";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 import { useStartGate } from "@/components/iq/useStartGate";
 
 const TOTAL_AGENTS = 1;
+const SHOWN_QUEUE = 9;
 
 export default function IqPriorityAgents() {
   const [, navigate] = useLocation();
@@ -35,27 +35,35 @@ export default function IqPriorityAgents() {
     <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <IqTopBar
-          breadcrumb="Agents › Priority Calls"
-          nextTask="New Deals › New High Propensity to Sell Deals"
-          onNext={handleTopNext}
-          nextIncomplete={calledCount < TOTAL_AGENTS}
-        />
-        <TaskTipBlock
-          task="Josh, these are your high-priority relationships. Follow the next steps right below the agent's record information and click each of the checkboxes to get moving. If the agent doesn't respond, click Follow Up, make notes, then click Next Agent on the top for the next phone call."
-          tip="Once you speak to the agent, based on the relationship, make sure you update the agent status."
-          storageKey="priorityAgents"
+        <IqTopBar />
+        <IqChatPage
+          breadcrumbHead="Agents ›"
+          breadcrumbTail="Priority Calls"
+          started={started}
           onStart={start}
-        />
-
-        {started && (
-        <div className="flex-1 overflow-y-auto p-4">
+          briefingMessage={
+            <>
+              Josh, these are your <span className="text-orange-500 font-semibold">{SHOWN_QUEUE}</span> highest-priority agent relationships today. Call each one, follow the prompts under their record, and update their status as you go.
+            </>
+          }
+          briefingItems={[
+            { label: "priority agents to call", count: SHOWN_QUEUE },
+            { label: "total priority agents in your pipeline", count: 90 },
+          ]}
+          nextTaskLabel="New Deals › New High Propensity to Sell Deals"
+          onNextTask={handleTopNext}
+          instructions={
+            <>
+              Follow the next steps right below the agent's record information and click each of the checkboxes to get moving. If the agent doesn't respond, click Follow Up, make notes, then click Next Agent for the next phone call.
+            </>
+          }
+        >
           {/* Pagination bar */}
-          <div className="grid grid-cols-3 items-center bg-white border border-gray-200 rounded-lg px-4 py-2.5 mb-4">
+          <div className="grid grid-cols-3 items-center bg-white border border-gray-200 rounded-lg px-4 py-2.5">
             <span className="text-xs text-gray-600 font-medium">90 Total Priority Agents</span>
             <div className="flex justify-center">
               <span className="text-xs text-gray-600 font-medium">
-                <span className="font-bold text-gray-900">{calledCount + 1}/9</span> Priority Agents calls
+                <span className="font-bold text-gray-900">{calledCount + 1}/{SHOWN_QUEUE}</span> Priority Agents calls
               </span>
             </div>
             <div className="flex items-center gap-2 justify-end">
@@ -79,9 +87,7 @@ export default function IqPriorityAgents() {
           </div>
 
           <AgentRecordCard />
-        </div>
-        )}
-        <IqAskBar />
+        </IqChatPage>
       </div>
     </div>
   );

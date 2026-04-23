@@ -3,8 +3,7 @@ import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
-import IqAskBar from "@/components/iq/IqAskBar";
-import TaskTipBlock from "@/components/iq/TaskTipBlock";
+import IqChatPage from "@/components/iq/IqChatPage";
 import IqPropertyIntelligence from "@/components/iq/IqPropertyIntelligence";
 import { NEW_RELATIONSHIPS_DEALS } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
@@ -49,27 +48,34 @@ export default function IqNewRelationships() {
     <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <IqTopBar
-          breadcrumb="New Deals › New High Propensity to Sell Deals"
-          nextTask="End of Day Stats"
-          onNext={handleTopNext}
-          nextIncomplete={calledCount < total}
-        />
-        <TaskTipBlock
-          task="Josh, great job following up with your properties and sending campaigns. Now it's time to chase high-propensity-to-sell properties with agents you already work with."
-          tip="Look at the Propensity to Sell score in the top middle of the page and read the iQ Property Intelligence for instructions. Click on the address to enter the property and start making calls."
-          storageKey="newRelationships"
+        <IqTopBar />
+        <IqChatPage
+          breadcrumbHead="New Deals ›"
+          breadcrumbTail="New High Propensity to Sell Deals"
+          started={started}
           onStart={start}
-        />
-
-        {started && (
-        <div className="flex-1 overflow-y-auto p-4">
+          briefingMessage={
+            <>
+              Josh, great job following up with your properties and sending campaigns. Now it's time to chase <span className="text-orange-500 font-semibold">{total}</span> high-propensity-to-sell properties with agents you already work with.
+            </>
+          }
+          briefingItems={[
+            { label: "preselected properties to call today", count: total },
+          ]}
+          nextTaskLabel="End of Day Stats"
+          onNextTask={handleTopNext}
+          instructions={
+            <>
+              Look at the Propensity to Sell score in the top middle of the page and read the iQ Property Intelligence for instructions. Click on the address to enter the property and start making calls.
+            </>
+          }
+        >
           {/* Counter bar */}
-          <div className="grid grid-cols-3 items-center bg-white border border-gray-200 rounded-lg px-4 py-2.5 mb-4">
+          <div className="grid grid-cols-3 items-center bg-white border border-gray-200 rounded-lg px-4 py-2.5">
             <div />
             <div className="flex justify-center">
               <span className="text-xs text-gray-600 font-medium">
-                <span className="font-bold text-gray-900">{calledCount} / 30</span> new agent calls
+                <span className="font-bold text-gray-900">{calledCount} / {total}</span> new agent calls
               </span>
             </div>
             <div className="flex items-center gap-2 justify-end">
@@ -156,9 +162,7 @@ export default function IqNewRelationships() {
               <IqPropertyIntelligence data={deal.iqIntelligence} />
             )}
           </div>
-        </div>
-        )}
-        <IqAskBar />
+        </IqChatPage>
       </div>
     </div>
   );
