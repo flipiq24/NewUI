@@ -426,6 +426,18 @@ export default function IqCampaignResponses() {
   const [stepIdx, setStepIdx] = useState(0);
   const { started, start } = useStartGate("campaignResponses");
 
+  // Auto-select all positive responses when entering the Positive step.
+  useEffect(() => {
+    if (!started) return;
+    if (SECTIONS[stepIdx].sentiment !== "positive") return;
+    const positives = AGENTS.filter((a) => a.section === "positive").map((a) => a.name);
+    setSelectedBySection((prev) => {
+      const cur = prev.positive;
+      if (positives.every((n) => cur.has(n)) && cur.size === positives.length) return prev;
+      return { ...prev, positive: new Set(positives) };
+    });
+  }, [started, stepIdx]);
+
   function toggleSelect(sentiment: Sentiment, name: string) {
     setSelectedBySection((prev) => {
       const next = new Set(prev[sentiment]);
@@ -543,6 +555,7 @@ export default function IqCampaignResponses() {
                           enabled={sectionSel.size > 0}
                           count={sectionSel.size}
                           actions={sec.actions}
+                          glow={sec.sentiment === "positive" && sectionSel.size > 0 && sectionHandledCount < rows.length}
                           onPick={(label) => applyBulkAction(sec.sentiment, label)}
                         />
                       </div>
@@ -928,11 +941,13 @@ function SectionBulkActions({
   count,
   actions,
   onPick,
+  glow = false,
 }: {
   enabled: boolean;
   count: number;
   actions: { key: string; label: string }[];
   onPick: (label: string) => void;
+  glow?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -955,7 +970,7 @@ function SectionBulkActions({
           enabled
             ? "bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
             : "bg-gray-100 text-gray-400 cursor-not-allowed"
-        }`}
+        } ${glow ? "ring-2 ring-orange-300 shadow-[0_0_0_4px_rgba(251,146,60,0.35)] animate-pulse" : ""}`}
       >
         Bulk Actions{enabled ? ` · ${count}` : ""}
       </button>
