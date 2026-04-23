@@ -214,6 +214,10 @@ export default function IqTasks() {
                 <span className="text-orange-500 font-medium">Get Started</span> when you're ready.
               </p>
 
+              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Today's Tasks:
+              </p>
+
               <div className="flex flex-col gap-5">
 
                 <Priority
