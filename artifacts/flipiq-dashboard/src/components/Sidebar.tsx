@@ -113,7 +113,10 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
           <span className="text-orange-500 font-bold">+</span>
         </button>
         <Link href="/">
-          <IqNavItem icon={<BackIcon />} label="← Back to COMMAND 1.5" />
+          <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-md cursor-pointer text-gray-600 hover:bg-gray-100">
+            <span className="flex-shrink-0 w-3 h-3 text-gray-500"><BackIcon /></span>
+            <span className="text-[10px] font-medium whitespace-nowrap">← Back to COMMAND 1.5</span>
+          </div>
         </Link>
       </div>
 
