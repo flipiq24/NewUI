@@ -27,7 +27,7 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
   const welcomeBackActive = location === "/iq/welcome-back";
   const todaysPlanActive = location === "/iq" || location === "/iq/tasks";
   const activeDealsActive = location === "/iq/deal-review";
-  const agentsLocations = ["/iq/daily-outreach", "/iq/priority-agents"];
+  const agentsLocations = ["/iq/daily-outreach", "/iq/campaign-responses", "/iq/priority-agents"];
   const agentsActive = agentsLocations.includes(location);
   const newDealsActive = location === "/iq/new-relationships";
 

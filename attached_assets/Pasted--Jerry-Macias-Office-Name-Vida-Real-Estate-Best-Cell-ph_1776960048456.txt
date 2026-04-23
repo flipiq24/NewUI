@@ -1,0 +1,180 @@
+	
+Jerry Macias
+Office Name: Vida Real Estate
+Best Cell phone:
+5625442413
+Best Email:
+jerry@meetvida.com
+Assigned User: Josh Santos
+Relationship Status: Unknown
+Basket: Low Value
+Required Action: 0
+Follow-Up Status: N/A
+Follow-Up Date: N/A
+Investor Source Count: 4
+Active in Last 2 Years: TRUE
+Pending, Backup, Sold: (2) 0P, 0B, 2S
+
+Hadaly Khoum
+Office Name: REALTY MASTERS & ASSOCIATES
+Best Cell phone:
+909-767-9474
+Best Email:
+hadalykhoum5268@gmail.com
+Assigned User: Josh Santos
+Relationship Status: Hot
+Basket: Mid Value
+Required Action: 
+1 Reminders
+•
+1 Critical
+Follow-Up Status: Attempt 2
+Follow-Up Date: 04/07/2026
+Investor Source Count: 11
+Active in Last 2 Years: TRUE
+Pending, Backup, Sold: (9) 1P, 0B, 8S
+
+Christy Davenport
+Office Name: COLDWELL BANKER REALTY
+Best Cell phone:
+951-312-5017
+Best Email:
+christydavenport1@yahoo.com
+Assigned User: Josh Santos
+Relationship Status: Warm
+Basket: Low Value
+Required Action: 0
+Follow-Up Status: Relationship Built
+Follow-Up Date: 04/02/2026
+Investor Source Count: N/A
+Active in Last 2 Years: TRUE
+Pending, Backup, Sold: (4) 1P, 0B, 3S
+
+Jose Ponce
+Office Name: PONCE & PONCE REALTY, INC
+Best Cell phone:
+909-266-0934
+Best Email:
+joseponce909@yahoo.com
+Assigned User: Josh Santos
+Relationship Status: Priority
+Basket: High Value
+Required Action: 
+1 Critical
+Follow-Up Status: Relationship Built
+Follow-Up Date: 03/18/2026
+Investor Source Count: 19
+Active in Last 2 Years: TRUE
+Pending, Backup, Sold: (57) 3P, 0B, 54S
+
+Salvador Armijo
+Office Name: CARNAVAL REALTY
+Best Cell phone:
+626-290-0373
+Best Email:
+salvadorarmijo007@gmail.com
+Assigned User: Josh Santos
+Relationship Status: Hot
+Basket: High Value
+Required Action: 0
+Follow-Up Status: Attempt 1
+Follow-Up Date: 01/23/2026
+Investor Source Count: N/A
+Active in Last 2 Years: TRUE
+Pending, Backup, Sold: (3) 1P, 0B, 2S
+
+Belinda Sadberry
+Office Name: Nelson Shelton & Associates
+Best Cell phone:
+4243559140
+Best Email:
+sadberryelite@gmail.com
+Assigned User: Josh Santos
+Relationship Status: Hot
+Basket: Low Value
+Required Action: 0
+Follow-Up Status: N/A
+Follow-Up Date: N/A
+Investor Source Count: 4
+Active in Last 2 Years: TRUE
+Pending, Backup, Sold: (1) 0P, 0B, 1S
+
+Susan Lubinbrownlie
+Office Name: Coldwell Banker/Gay Dales
+Best Cell phone:
+831-320-3001
+Best Email:
+sbrownliecb@outlook.com
+Assigned User: Josh Santos
+Relationship Status: Unknown
+Basket: Unknown
+Required Action: 0
+Follow-Up Status: N/A
+Follow-Up Date: N/A
+Investor Source Count: N/A
+Active in Last 2 Years: TRUE
+Pending, Backup, Sold: (20) 2P, 2B, 16S
+
+Beberly Morales
+Office Name: eXp Realty of California Inc
+Best Cell phone:
+323-842-4154
+Best Email:
+beberly.realestate@gmail.com
+Assigned User: Josh Santos
+Relationship Status: Warm
+Basket: Low Value
+Required Action: 0
+Follow-Up Status: N/A
+Follow-Up Date: N/A
+Investor Source Count: 4
+Active in Last 2 Years: TRUE
+Pending, Backup, Sold: (1) 1P, 0B, 0S
+
+Peter Gillin
+Office Name: N/A
+Best Cell phone:
+N/A
+Best Email:
+pdg@morganskenderian.com
+Assigned User: Josh Santos
+Relationship Status: Unknown
+Basket: Unknown
+Required Action: 0
+Follow-Up Status: N/A
+Follow-Up Date: N/A
+Investor Source Count: 4
+Active in Last 2 Years: TRUE
+Pending, Backup, Sold: (4) 3P, 0B, 1S
+
+Adam Rodell
+Office Name: RE/MAX Select One
+Best Cell phone:
+714-747-2117
+Best Email:
+adamrodell@aol.com
+Assigned User: Josh Santos
+Relationship Status: Warm
+Basket: High Value
+Required Action: 0
+Follow-Up Status: Not Interested
+Follow-Up Date: 01/04/2026
+Investor Source Count: 4
+Active in Last 2 Years: TRUE
+Pending, Backup, Sold: (18) 1P, 0B, 17S
+
+Tony Diaz
+Office Name: Flipiq
+Best Cell phone:
+7145817805
+Best Email:
+tony@flipiq.com
+Assigned User: Josh Santos
+Relationship Status: Priority
+Basket: Clients
+Required Action: 0
+Follow-Up Status: Attempt 5
+Follow-Up Date: 11/27/2025
+Investor Source Count: 2
+Active in Last 2 Years: False
+Pending, Backup, Sold: (0) 0P, 0B, 0S

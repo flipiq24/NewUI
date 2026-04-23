@@ -55,13 +55,13 @@ export default function IqDailyOutreach() {
     const state = resetIqStateIfNewDay();
     saveIqState({ ...state, outreachCampaignSent: true });
     toast({ title: "Campaign sent successfully!" });
-    setTimeout(() => navigate("/iq/priority-agents"), 800);
+    setTimeout(() => navigate("/iq/campaign-responses"), 800);
   }
 
   function handleNext() {
     const state = resetIqStateIfNewDay();
     saveIqState({ ...state, outreachCampaignSent: true });
-    navigate("/iq/priority-agents");
+    navigate("/iq/campaign-responses");
   }
 
   return (
@@ -83,7 +83,7 @@ export default function IqDailyOutreach() {
             label: `${BUCKET_LABEL[b.id] ?? b.id} agents pending today`,
             count: b.pendingToday,
           }))}
-          nextTaskLabel="Agents › Priority Calls"
+          nextTaskLabel="Agents › Campaign Responses"
           onNextTask={handleNext}
           instructions={
             <>
