@@ -135,16 +135,6 @@ function MorningCheckinPopup({ onDismiss }: { onDismiss: () => void }) {
                 Yes
               </button>
               <button
-                onClick={() => setSendCampaigns("no")}
-                className={`flex-1 min-w-[100px] py-2.5 rounded-full text-sm font-semibold border transition-colors ${
-                  sendCampaigns === "no"
-                    ? "bg-orange-500 text-white border-orange-500"
-                    : "bg-white text-orange-500 border-orange-300 hover:bg-orange-50"
-                }`}
-              >
-                Not Today
-              </button>
-              <button
                 onClick={() => setSendCampaigns("later")}
                 className={`flex-1 min-w-[140px] py-2.5 rounded-full text-sm font-semibold border transition-colors ${
                   sendCampaigns === "later"
