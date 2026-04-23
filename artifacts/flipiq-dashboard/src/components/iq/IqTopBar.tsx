@@ -1,4 +1,5 @@
 import { useState } from "react";
+import IqProgressStepper from "./IqProgressStepper";
 
 interface IqTopBarProps {
   breadcrumb?: string;
@@ -48,9 +49,9 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerCo
           );
         })()}
       </div>
-      {centerContent && (
-        <div className="flex-1 flex justify-center">{centerContent}</div>
-      )}
+      <div className="flex-1 flex justify-center">
+        {centerContent ?? <IqProgressStepper />}
+      </div>
       {filterContent && (
         <div className="flex items-center">{filterContent}</div>
       )}
