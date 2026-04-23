@@ -298,115 +298,17 @@ export default function IqDealReview() {
                 </p>
               </div>
 
-              {/* Priority filter line — plain text, no cards */}
-              <div className="flex items-center gap-4 text-[12px] text-gray-500">
-                <span className="font-semibold uppercase tracking-wider text-gray-400 text-[11px]">
-                  Priority
-                </span>
-                {LEVEL_ORDER.map((l) => {
-                  const count = levelCounts[l];
-                  if (count === 0) return null;
-                  const isActive = activeLevel === l;
-                  const done = levelComplete[l];
-                  const labelMap = { high: "High", mid: "Mid", low: "Low", new: "New" } as const;
-                  const colorMap = {
-                    high: "text-red-500",
-                    mid: "text-yellow-600",
-                    low: "text-blue-500",
-                    new: "text-gray-500",
-                  } as const;
-                  return (
-                    <button
-                      key={l}
-                      type="button"
-                      onClick={() => handleLevelClick(l)}
-                      className={`inline-flex items-center gap-1 transition-colors cursor-pointer ${
-                        isActive ? "text-gray-900 font-semibold" : "hover:text-gray-700"
-                      }`}
-                    >
-                      <span className={`font-semibold ${colorMap[l]}`}>{count}</span>
-                      <span>{labelMap[l]}</span>
-                      {done && (
-                        <svg className="w-3 h-3 text-green-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="3,8 7,12 13,4" />
-                        </svg>
-                      )}
-                    </button>
-                  );
-                })}
-                {activeLevel && (
-                  <button
-                    type="button"
-                    onClick={() => setActiveLevel(null)}
-                    className="text-[11px] text-gray-400 hover:text-gray-600 underline cursor-pointer"
-                  >
-                    clear
-                  </button>
-                )}
-              </div>
-
-              {/* Notifications — plain text line, no cards */}
-              {(notificationCounts.critical + notificationCounts.reminder + notificationCounts.unseen + notificationCounts.text) > 0 && (
-                <div className="flex items-center gap-4 text-[12px] text-gray-500">
-                  <span className="font-semibold uppercase tracking-wider text-gray-400 text-[11px]">
-                    Notifications
-                  </span>
-                  {(["critical", "reminder", "unseen", "text"] as const).map((n) => {
-                    const count = notificationCounts[n];
-                    if (count === 0) return null;
-                    const isActive = activeNotifications.has(n);
-                    const labelMap = { critical: "Criticals", reminder: "Reminders", unseen: "Unseen", text: "Texts" } as const;
-                    const colorMap = {
-                      critical: "text-red-500",
-                      reminder: "text-amber-500",
-                      unseen: "text-emerald-500",
-                      text: "text-violet-500",
-                    } as const;
-                    return (
-                      <button
-                        key={n}
-                        type="button"
-                        onClick={() => handleNotificationClick(n)}
-                        className={`inline-flex items-center gap-1 transition-colors cursor-pointer ${
-                          isActive ? "text-gray-900 font-semibold" : "hover:text-gray-700"
-                        }`}
-                      >
-                        <span className={`font-semibold ${colorMap[n]}`}>{count}</span>
-                        <span>{labelMap[n]}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-
               {/* Property list */}
               {visibleProps.length === 0 ? (
                 <div className="text-sm text-gray-500 py-8">
                   No properties match the current filters in this segment.
                 </div>
               ) : (
-                <>
-                  <div className="flex items-center gap-3 text-[11px] text-gray-400">
-                    <span className="font-semibold uppercase tracking-wider">Response</span>
-                    <span className="inline-flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-green-500" /> Positive
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-yellow-400" /> Neutral
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-red-500" /> Negative
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-gray-300" /> No reply yet
-                    </span>
-                  </div>
-                  <div>
-                    {visibleProps.map((p, i) => (
-                      <MinimalPropertyRow key={p.id} property={p} index={i + 1} />
-                    ))}
-                  </div>
-                </>
+                <div>
+                  {visibleProps.map((p, i) => (
+                    <MinimalPropertyRow key={p.id} property={p} index={i + 1} />
+                  ))}
+                </div>
               )}
 
               {allLevelsDone && (
