@@ -212,16 +212,16 @@ export default function IqDealReview() {
             <div className="max-w-3xl flex flex-col gap-6">
 
               {/* AI message */}
-              <div className="flex gap-3">
-                <div className="w-7 h-7 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div>
+                <div className="flex items-center gap-2 mb-3">
                   <img
                     src={`${import.meta.env.BASE_URL}flipiq-icon.png`}
                     alt="FlipiQ"
-                    className="w-7 h-7 object-contain"
+                    className="w-6 h-6 object-contain"
                   />
+                  <span className="text-[13px] font-semibold text-gray-700 leading-none">FlipiQ</span>
                 </div>
-                <div className="flex-1">
-                  <p className="text-[11px] font-semibold text-gray-400 mb-3 tracking-wider">FlipiQ</p>
+                <div>
                   <p className="text-[14px] text-gray-800 leading-7 mb-5">
                     You have 9 High Priority deals that need your attention today. Work through each group in order and take action on every deal. Hit <span className="text-orange-500 font-medium">Get Started</span> when you're ready.
                   </p>
