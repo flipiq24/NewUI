@@ -249,7 +249,17 @@ export default function DealCard({ property }: { property: DealProperty }) {
             <span className="text-[15px] font-medium text-gray-900 leading-snug group-hover:text-orange-600">
               {property.nextSteps}
             </span>
-            <TipPanel title="Next Step" rows={[["Task", property.nextSteps], ["Context", detail.taskNote]]} />
+            <TipPanel
+              title="Next Step"
+              wide
+              rows={[
+                ["Task", property.nextSteps],
+                ...(detail.taskWho ? ([["Who", detail.taskWho]] as [string, string][]) : []),
+                ...(detail.taskWhat ? ([["What", detail.taskWhat]] as [string, string][]) : []),
+                ...(detail.taskHow ? ([["How", detail.taskHow]] as [string, string][]) : []),
+                ["Context", detail.taskNote],
+              ]}
+            />
           </span>
         </div>
 

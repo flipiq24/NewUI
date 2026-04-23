@@ -31,6 +31,9 @@ export type DealDetail = {
   source: string;
   negotiator: string;
   assigned: string;
+  taskWho?: string;
+  taskWhat?: string;
+  taskHow?: string;
 };
 
 export const DEAL_DETAILS: Record<number, DealDetail> = {
@@ -53,6 +56,9 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     firstCalled: "12/15/25", totalCommsCount: 9, totalCalls: 3, totalTexts: 3, totalEmails: 3,
     pct: "60%", status: "In Negotiations", statusType: "neg",
     source: "MLS — Active", negotiator: "Josh Santos", assigned: "Josh Santos",
+    taskWho: "Listing agent — Maria Reyes (Coldwell Banker)",
+    taskWhat: "Counter their $425k ask and lock in revised terms.",
+    taskHow: "Call the agent, anchor at $399k, offer 7-day close + cash-equivalent EMD, then send updated PSA by EOD.",
   },
   2: {
     taskNote: "Primary buyer in escrow with 3% EMD. Submit backup at same number.",
@@ -73,6 +79,9 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     firstCalled: "12/01/25", totalCommsCount: 5, totalCalls: 2, totalTexts: 2, totalEmails: 1,
     pct: "50%", status: "Contract Submitted", statusType: "neg",
     source: "MLS — Pending", negotiator: "Josh Santos", assigned: "Not Assigned",
+    taskWho: "Listing agent — Tom Bauer (REO desk)",
+    taskWhat: "Get into backup position behind the primary buyer.",
+    taskHow: "Call the agent, confirm primary's EMD + contingency dates, then submit a backup offer at $335,800 cash, AS-IS, 7-day close.",
   },
   3: {
     taskNote: "Strong comps support $960k. Submit backup ready to move.",
@@ -93,6 +102,9 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     firstCalled: "12/10/25", totalCommsCount: 7, totalCalls: 2, totalTexts: 3, totalEmails: 2,
     pct: "20%", status: "Continue to Follow", statusType: "init",
     source: "Off Market", negotiator: "Josh Santos", assigned: "Josh Santos",
+    taskWho: "Listing agent — Carla Nguyen",
+    taskWhat: "Get a backup offer in front of the seller while primary is shaky.",
+    taskHow: "Call the agent, ask about tenant access + interior condition, then send a $895k cash offer subject to interior inspection.",
   },
   4: {
     taskNote: "Buyer performance check. Confirm EMD and contingency removal dates.",
@@ -113,6 +125,9 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     firstCalled: "—", totalCommsCount: 0, totalCalls: 0, totalTexts: 0, totalEmails: 0,
     pct: "30%", status: "Back Up", statusType: "bu",
     source: "MLS — Back Up Offer", negotiator: "Josh Santos", assigned: "Not Assigned",
+    taskWho: "Listing agent — David Kim",
+    taskWhat: "Reminder follow-up — confirm primary buyer's contingency removal.",
+    taskHow: "Call the agent today, ask if EMD and inspection contingencies have been released, log the answer, and reset reminder for 5 days out.",
   },
   5: {
     taskNote: "No activity logged yet. Make first call today.",
@@ -133,6 +148,9 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     firstCalled: "—", totalCommsCount: 0, totalCalls: 0, totalTexts: 0, totalEmails: 0,
     pct: "0%", status: "None", statusType: "none",
     source: "MLS — Hold", negotiator: "Josh Santos", assigned: "Not Assigned",
+    taskWho: "Listing agent — Priya Patel",
+    taskWhat: "First contact — find out why the listing is on Hold.",
+    taskHow: "Call the agent, ask reason for the hold and seller motivation, log notes, and set status to Initial Contact.",
   },
   6: {
     taskNote: "Sold. Find out who bought, at what price, and what's next from this agent.",
@@ -153,6 +171,9 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     firstCalled: "03/02/26", totalCommsCount: 5, totalCalls: 2, totalTexts: 2, totalEmails: 1,
     pct: "10%", status: "Initial Contact", statusType: "init",
     source: "Notification Opened", negotiator: "Josh Santos", assigned: "Josh Santos",
+    taskWho: "Listing agent — Susan Brewer (probate specialist)",
+    taskWhat: "Probate sale closed — find out who bought, at what price, and what's coming next from this agent.",
+    taskHow: "Call the agent, congratulate on the close, ask buyer/price, then ask about other estate or probate listings she's working.",
   },
   7: {
     taskNote: "Cancelled listing. Call and find out why.",
@@ -173,6 +194,9 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     firstCalled: "—", totalCommsCount: 0, totalCalls: 0, totalTexts: 0, totalEmails: 0,
     pct: "30%", status: "Offer Terms Sent", statusType: "bu",
     source: "MLS — Cancelled", negotiator: "Josh Santos", assigned: "Not Assigned",
+    taskWho: "Listing agent — Marcus Hill",
+    taskWhat: "Cancelled listing — find out why and reopen the seller conversation.",
+    taskHow: "Call the agent, ask why it was cancelled and current seller intent, then offer to bring a cash buyer if the seller is still motivated.",
   },
   8: {
     taskNote: "Closed but agent may still have seller relationship. Open the door.",
@@ -193,6 +217,9 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     firstCalled: "12/15/25", totalCommsCount: 5, totalCalls: 2, totalTexts: 2, totalEmails: 1,
     pct: "80%", status: "Offer Accepted", statusType: "neg",
     source: "MLS — Closed", negotiator: "Josh Santos", assigned: "Not Assigned",
+    taskWho: "Listing agent — Janet Cole",
+    taskWhat: "Tax-distressed close — open the door to keep this agent feeding us deals.",
+    taskHow: "Call the agent, learn buyer + final terms, congratulate, then ask if she has more tax-delinquency or distressed listings coming.",
   },
   9: {
     taskNote: "Sold. Call, ask who bought, learn price and terms.",
@@ -213,5 +240,8 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     firstCalled: "04/01/26", totalCommsCount: 8, totalCalls: 3, totalTexts: 3, totalEmails: 2,
     pct: "100%", status: "Acquired", statusType: "neg",
     source: "MLS — Expired", negotiator: "Josh Santos", assigned: "Not Assigned",
+    taskWho: "Listing agent — Brian O'Connor",
+    taskWhat: "Expired listing — call the agent and learn buyer + price.",
+    taskHow: "Call the agent, ask who bought and at what price/terms, log the comp, and ask what other Westminster listings she's working.",
   },
 };
