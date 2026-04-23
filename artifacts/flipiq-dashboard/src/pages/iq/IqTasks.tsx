@@ -112,6 +112,15 @@ interface PriorityProps {
   items?: string[];
 }
 
+function highlightNumbers(text: string) {
+  const parts = text.split(/(\d[\d,]*)/g);
+  return parts.map((p, i) =>
+    /^\d[\d,]*$/.test(p)
+      ? <span key={i} className="text-orange-500 font-semibold">{p}</span>
+      : <span key={i}>{p}</span>
+  );
+}
+
 function Priority({ priority, title, body, done, items }: PriorityProps) {
   return (
     <div className="flex gap-3">
@@ -134,7 +143,7 @@ function Priority({ priority, title, body, done, items }: PriorityProps) {
             {items.map((line, i) => (
               <div key={i} className="flex items-center gap-2.5 text-[13px] text-gray-500">
                 <span className="text-[11px] text-gray-300 w-3 flex-shrink-0">{i + 1}.</span>
-                <span>{line}</span>
+                <span>{highlightNumbers(line)}</span>
               </div>
             ))}
           </div>
