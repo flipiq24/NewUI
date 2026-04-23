@@ -221,7 +221,7 @@ export default function IqDealReview() {
                 <div className="flex-1">
                   <p className="text-[11px] font-semibold text-gray-400 mb-3 uppercase tracking-wider">FlipIQ</p>
                   <p className="text-[14px] text-gray-800 leading-7 mb-5">
-                    9 High Priority deals — call the 3 Active &amp; Off Market first, then text and email.
+                    You have 9 High Priority deals that need your attention today. Work through each group in order and take action on every deal. Hit <span className="text-orange-500 font-medium">Get Started</span> when you're ready.
                   </p>
                   <div className="space-y-1.5 mb-6">
                     {[
