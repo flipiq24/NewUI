@@ -53,30 +53,36 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
             done={!!state.morningCheckin && !todaysPlanActive}
           />
         </Link>
-        <Link href="/iq/deal-review">
-          <IqNavItem
-            icon={<FileTextIcon />}
-            label="Active Deals"
-            active={activeDealsActive}
-            done={!!state.dealReviewComplete && !activeDealsActive}
-          />
-        </Link>
-        <Link href="/iq/daily-outreach">
-          <IqNavItem
-            icon={<PhoneIcon />}
-            label="Agents"
-            active={agentsActive}
-            done={!!(state.outreachCampaignSent && state.priorityAgentsComplete) && !agentsActive}
-          />
-        </Link>
-        <Link href="/iq/new-relationships">
-          <IqNavItem
-            icon={<FolderIcon />}
-            label="New Deals"
-            active={newDealsActive}
-            done={!!state.newRelationshipsComplete && !newDealsActive}
-          />
-        </Link>
+        {(activeDealsActive || !!state.dealReviewComplete) && (
+          <Link href="/iq/deal-review">
+            <IqNavItem
+              icon={<FileTextIcon />}
+              label="Active Deals"
+              active={activeDealsActive}
+              done={!!state.dealReviewComplete && !activeDealsActive}
+            />
+          </Link>
+        )}
+        {(agentsActive || !!(state.outreachCampaignSent && state.priorityAgentsComplete)) && (
+          <Link href="/iq/daily-outreach">
+            <IqNavItem
+              icon={<PhoneIcon />}
+              label="Agents"
+              active={agentsActive}
+              done={!!(state.outreachCampaignSent && state.priorityAgentsComplete) && !agentsActive}
+            />
+          </Link>
+        )}
+        {(newDealsActive || !!state.newRelationshipsComplete) && (
+          <Link href="/iq/new-relationships">
+            <IqNavItem
+              icon={<FolderIcon />}
+              label="New Deals"
+              active={newDealsActive}
+              done={!!state.newRelationshipsComplete && !newDealsActive}
+            />
+          </Link>
+        )}
         {welcomeBackActive && (
           <Link href="/iq/welcome-back">
             <IqNavItem
