@@ -48,7 +48,7 @@ type Agent = {
   thread: ThreadMsg[];
 };
 
-const AGENTS: Agent[] = [
+export const AGENTS: Agent[] = [
   { id:1, section:"positive", name:"Jose Ponce", office:"PONCE & PONCE REALTY, INC", phone:"909-266-0934", email:"joseponce909@yahoo.com", city:"Fontana", licenseYear:"2011",
     rel:"Priority", basket:"High Value", investor:"Yes", sourceCount:19, activeYr:"TRUE",
     pending:3, backup:0, sold:54, totalDeals:57, otherListings:7,

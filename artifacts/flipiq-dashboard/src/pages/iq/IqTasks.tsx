@@ -9,6 +9,7 @@ import {
   type DealLevel,
 } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState, loadIqState, allTasksComplete } from "@/lib/iq/storage";
+import { AGENTS as RESPONSE_AGENTS } from "@/pages/iq/IqCampaignResponses";
 import { isPropertyComplete, useChecklistVersion } from "@/lib/iq/dailyChecklist";
 
 const LEVEL_ORDER: DealLevel[] = ["high", "mid", "low", "new"];
@@ -227,6 +228,11 @@ export default function IqTasks() {
   const iqState = useMemo(() => loadIqState(), [checklistVersion, showCheckin]);
   const outreachFlag = !!iqState?.outreachCampaignSent;
   const responsesFlag = !!iqState?.campaignResponsesComplete;
+  const responseCounts = useMemo(() => {
+    const counts = { positive: 0, neutral: 0, negative: 0 };
+    for (const a of RESPONSE_AGENTS) counts[a.section] += 1;
+    return counts;
+  }, []);
   const priorityFlag = !!iqState?.priorityAgentsComplete;
   const newRelFlag = !!iqState?.newRelationshipsComplete;
   const dayDone = !!iqState && allTasksComplete(iqState);
@@ -318,7 +324,11 @@ export default function IqTasks() {
                   title="Agents › Campaign Responses"
                   body="Work the agents who replied to today's campaigns — Positive first, then Neutral, then Negative — and apply the right follow-up to each."
                   done={responsesFlag}
-                  items={["Positive Response", "Neutral Response", "Negative Response"]}
+                  items={[
+                    `${responseCounts.positive} Positive Response`,
+                    `${responseCounts.neutral} Neutral Response`,
+                    `${responseCounts.negative} Negative Response`,
+                  ]}
                 />
 
                 <Priority
