@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/Sidebar";
@@ -18,6 +18,15 @@ export default function IqNewRelationships() {
 
   const total = NEW_RELATIONSHIPS_DEALS.length;
   const deal = NEW_RELATIONSHIPS_DEALS[currentIndex];
+
+  useEffect(() => {
+    const state = resetIqStateIfNewDay();
+    const patch: Record<string, boolean> = {};
+    if (!state?.dealReviewComplete) patch.dealReviewComplete = true;
+    if (!state?.outreachCampaignSent) patch.outreachCampaignSent = true;
+    if (!state?.priorityAgentsComplete) patch.priorityAgentsComplete = true;
+    if (Object.keys(patch).length > 0) saveIqState({ ...state, ...patch });
+  }, []);
 
   function finishDay() {
     const state = resetIqStateIfNewDay();

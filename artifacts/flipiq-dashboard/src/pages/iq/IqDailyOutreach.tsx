@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/Sidebar";
@@ -43,6 +43,13 @@ export default function IqDailyOutreach() {
 
   const totalAgents = DAILY_OUTREACH_BUCKETS.reduce((acc, b) => acc + b.pendingToday, 0);
   const totalCampaigns = 4;
+
+  useEffect(() => {
+    const state = resetIqStateIfNewDay();
+    if (!state?.dealReviewComplete) {
+      saveIqState({ ...state, dealReviewComplete: true });
+    }
+  }, []);
 
   function handleSend() {
     const state = resetIqStateIfNewDay();

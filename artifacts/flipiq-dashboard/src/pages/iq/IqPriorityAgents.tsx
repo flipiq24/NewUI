@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
@@ -14,6 +14,14 @@ export default function IqPriorityAgents() {
   const [, navigate] = useLocation();
   const [calledCount, setCalledCount] = useState(0);
   const { started, start } = useStartGate("priorityAgents");
+
+  useEffect(() => {
+    const state = resetIqStateIfNewDay();
+    const patch: Record<string, boolean> = {};
+    if (!state?.dealReviewComplete) patch.dealReviewComplete = true;
+    if (!state?.outreachCampaignSent) patch.outreachCampaignSent = true;
+    if (Object.keys(patch).length > 0) saveIqState({ ...state, ...patch });
+  }, []);
 
   function handleNext() {
     const next = calledCount + 1;

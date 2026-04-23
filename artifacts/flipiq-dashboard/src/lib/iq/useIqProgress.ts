@@ -44,7 +44,9 @@ export function useIqProgress(): IqProgressSegment[] {
     }
     const dealsTotal = DEAL_REVIEW_PROPERTIES.length;
     const dealsRemaining = Math.max(0, dealsTotal - completed);
-    const dealsDone = dealsTotal > 0 && completed === dealsTotal;
+    const dealsDone =
+      !!state?.dealReviewComplete ||
+      (dealsTotal > 0 && completed === dealsTotal);
     const dealsBreakdown = (["high", "mid", "low", "new"] as DealLevel[])
       .map((l) => `${levelCounts[l]} ${l === "high" ? "high priority" : l}`)
       .join(" · ");
