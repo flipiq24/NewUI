@@ -9,6 +9,7 @@ import { useStartGate } from "@/components/iq/useStartGate";
 type Channel = "text" | "email" | "call";
 type Basket = "High Value" | "Mid Value" | "Low Value" | "Clients" | "Unknown";
 type Status = "Priority" | "Hot" | "Warm" | "Cold" | "Unknown";
+type Sentiment = "positive" | "neutral" | "negative";
 
 type AgentResponse = {
   name: string;
@@ -26,6 +27,7 @@ type AgentResponse = {
   channel: Channel;
   respondedAt: string;
   snippet: string;
+  sentiment: Sentiment;
 };
 
 const AGENTS: AgentResponse[] = [
@@ -37,6 +39,7 @@ const AGENTS: AgentResponse[] = [
     isc: 19, active: true, pbs: { total: 57, p: 3, b: 0, s: 54 },
     channel: "call", respondedAt: "Today, 9:42a",
     snippet: "Got your text — call me back, I have one in Fontana you'll like.",
+    sentiment: "positive",
   },
   {
     name: "Hadaly Khoum", office: "REALTY MASTERS & ASSOCIATES",
@@ -46,6 +49,7 @@ const AGENTS: AgentResponse[] = [
     isc: 11, active: true, pbs: { total: 9, p: 1, b: 0, s: 8 },
     channel: "email", respondedAt: "Today, 8:15a",
     snippet: "Yes, send terms — buyer needs to close in 14 days.",
+    sentiment: "positive",
   },
   {
     name: "Adam Rodell", office: "RE/MAX Select One",
@@ -55,6 +59,7 @@ const AGENTS: AgentResponse[] = [
     isc: 4, active: true, pbs: { total: 18, p: 1, b: 0, s: 17 },
     channel: "text", respondedAt: "Yesterday, 6:11p",
     snippet: "Not now — try me again next quarter.",
+    sentiment: "negative",
   },
   {
     name: "Jerry Macias", office: "Vida Real Estate",
@@ -64,6 +69,7 @@ const AGENTS: AgentResponse[] = [
     isc: 4, active: true, pbs: { total: 2, p: 0, b: 0, s: 2 },
     channel: "text", respondedAt: "Today, 7:48a",
     snippet: "What price range are you looking at?",
+    sentiment: "neutral",
   },
   {
     name: "Belinda Sadberry", office: "Nelson Shelton & Associates",
@@ -73,6 +79,7 @@ const AGENTS: AgentResponse[] = [
     isc: 4, active: true, pbs: { total: 1, p: 0, b: 0, s: 1 },
     channel: "email", respondedAt: "Yesterday, 4:02p",
     snippet: "Add me to your buy list — I'm in West LA.",
+    sentiment: "positive",
   },
   {
     name: "Beberly Morales", office: "eXp Realty of California Inc",
@@ -82,6 +89,7 @@ const AGENTS: AgentResponse[] = [
     isc: 4, active: true, pbs: { total: 1, p: 1, b: 0, s: 0 },
     channel: "text", respondedAt: "Today, 10:21a",
     snippet: "Stop. Unsubscribe.",
+    sentiment: "negative",
   },
   {
     name: "Peter Gillin", office: "—",
@@ -91,6 +99,7 @@ const AGENTS: AgentResponse[] = [
     isc: 4, active: true, pbs: { total: 4, p: 3, b: 0, s: 1 },
     channel: "email", respondedAt: "Yesterday, 11:55a",
     snippet: "Who is this?",
+    sentiment: "neutral",
   },
   {
     name: "Tony Diaz", office: "Flipiq",
@@ -100,6 +109,7 @@ const AGENTS: AgentResponse[] = [
     isc: 2, active: false, pbs: { total: 0, p: 0, b: 0, s: 0 },
     channel: "call", respondedAt: "Yesterday, 5:30p",
     snippet: "Voicemail — call back about the Inland portfolio.",
+    sentiment: "neutral",
   },
   {
     name: "Salvador Armijo", office: "CARNAVAL REALTY",
@@ -109,6 +119,7 @@ const AGENTS: AgentResponse[] = [
     isc: null, active: true, pbs: { total: 3, p: 1, b: 0, s: 2 },
     channel: "text", respondedAt: "Today, 6:55a",
     snippet: "Send the address — let me run comps.",
+    sentiment: "positive",
   },
   {
     name: "Christy Davenport", office: "COLDWELL BANKER REALTY",
@@ -118,6 +129,7 @@ const AGENTS: AgentResponse[] = [
     isc: null, active: true, pbs: { total: 4, p: 1, b: 0, s: 3 },
     channel: "email", respondedAt: "Yesterday, 2:14p",
     snippet: "Thanks Josh — keeping you in mind for my Riverside listings.",
+    sentiment: "positive",
   },
   {
     name: "Susan Lubinbrownlie", office: "Coldwell Banker / Gay Dales",
@@ -127,6 +139,7 @@ const AGENTS: AgentResponse[] = [
     isc: null, active: true, pbs: { total: 20, p: 2, b: 2, s: 16 },
     channel: "email", respondedAt: "Yesterday, 9:08a",
     snippet: "Auto-reply: Out of office through Monday.",
+    sentiment: "neutral",
   },
 ];
 
@@ -139,6 +152,12 @@ const SORTED = [...AGENTS].sort((a, b) => {
   if (bi !== ai) return bi - ai;
   return BASKET_RANK[a.basket] - BASKET_RANK[b.basket];
 });
+
+const SECTIONS: { sentiment: Sentiment; tail: string; dot: string; text: string }[] = [
+  { sentiment: "positive", tail: "Positive Response", dot: "#5C9A2A", text: "#27500A" },
+  { sentiment: "neutral",  tail: "Neutral Response",  dot: "#9CA3AF", text: "#4B5563" },
+  { sentiment: "negative", tail: "Negative Response", dot: "#B83A3A", text: "#791F1F" },
+];
 
 // Same color language as Deal Review (high / mid / low) so the eye reads
 // "value tier" the same way it does on properties.
@@ -261,13 +280,29 @@ export default function IqCampaignResponses() {
             </>
           }
         >
-          <div className="flex flex-col">
-            {SORTED.map((a, i) => {
-              const done = handled.has(a.name);
-              const basket = BASKET_COLOR[a.basket];
-              const status = STATUS_COLOR[a.status];
-              const iscDisplay = a.isc === null ? "N/A" : a.isc.toString();
+          <div className="flex flex-col gap-8">
+            {SECTIONS.map((sec) => {
+              const rows = SORTED.filter((a) => a.sentiment === sec.sentiment);
               return (
+                <section key={sec.sentiment}>
+                  <div className="flex items-baseline gap-2 mb-3 pb-2 border-b border-gray-200">
+                    <span className="text-[12px] text-gray-400">Agents › Text and Email Campaigns ›</span>
+                    <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold" style={{ color: sec.text }}>
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sec.dot }} />
+                      {sec.tail}
+                    </span>
+                    <span className="text-[11px] text-gray-400 ml-1">· {rows.length}</span>
+                  </div>
+                  {rows.length === 0 ? (
+                    <p className="text-[12px] text-gray-400 italic py-2">No responses in this bucket today.</p>
+                  ) : (
+                    <div className="flex flex-col">
+                      {rows.map((a, i) => {
+                        const done = handled.has(a.name);
+                        const basket = BASKET_COLOR[a.basket];
+                        const status = STATUS_COLOR[a.status];
+                        const iscDisplay = a.isc === null ? "N/A" : a.isc.toString();
+                        return (
                 <div
                   key={a.name}
                   className={`flex items-start gap-3 py-3 border-b border-gray-100 last:border-0 ${done ? "opacity-60" : ""}`}
@@ -374,6 +409,11 @@ export default function IqCampaignResponses() {
                     </p>
                   </div>
                 </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </section>
               );
             })}
           </div>
