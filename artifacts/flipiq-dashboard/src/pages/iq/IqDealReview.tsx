@@ -242,7 +242,7 @@ export default function IqDealReview() {
                     ].map(({ label, count }, i) => (
                       <div key={label} className="flex items-center gap-2.5 text-[13px] text-gray-500">
                         <span className="text-[11px] text-gray-300 w-3 flex-shrink-0">{i + 1}.</span>
-                        <span>{count} {label}</span>
+                        <span><span className="text-orange-500 font-semibold">{count}</span> {label}</span>
                       </div>
                     ))}
                   </div>
