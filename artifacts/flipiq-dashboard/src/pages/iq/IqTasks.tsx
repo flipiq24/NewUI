@@ -234,7 +234,7 @@ export default function IqTasks() {
     return !s?.morningCheckin;
   });
 
-  const iqState = useMemo(() => loadIqState(), [checklistVersion]);
+  const iqState = useMemo(() => loadIqState(), [checklistVersion, showCheckin]);
   const outreachFlag = !!iqState?.outreachCampaignSent;
   const priorityFlag = !!iqState?.priorityAgentsComplete;
   const newRelFlag = !!iqState?.newRelationshipsComplete;
