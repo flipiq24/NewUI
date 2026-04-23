@@ -329,7 +329,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
               className="font-medium"
               style={{ color: sourceTextColor(property.source, property.sourceStatus) }}
             >
-              {property.sourceStatus || (property.source.match(/\s*—\s*(.*)$/)?.[1] ?? (property.source.toLowerCase() in SOURCE_COLORS ? property.source : ""))}
+              {property.sourceStatus || (property.source.match(/\s*—\s*(.*)$/)?.[1] ?? "")}
             </span>
             <TipPanel
               title="Source"
