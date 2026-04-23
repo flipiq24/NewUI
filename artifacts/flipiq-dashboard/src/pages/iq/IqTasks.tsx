@@ -107,51 +107,37 @@ interface PriorityProps {
   priority: number;
   title: string;
   body: string;
-  meta?: string;
   done?: boolean;
-  children?: React.ReactNode;
+  stats?: string[];
 }
 
-function Priority({ priority, title, body, meta, done, children }: PriorityProps) {
+function Priority({ priority, title, body, done, stats }: PriorityProps) {
   return (
-    <div>
-      <div className="flex items-center gap-2 mb-1.5">
-        <span className="text-[11px] font-medium text-orange-500">Priority #{priority}</span>
-        {done && (
-          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-green-600">
-            <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="3,8 7,12 13,4" />
-            </svg>
-            Done
-          </span>
+    <div className="flex gap-3">
+      <span className="text-[12px] text-gray-300 mt-[2px] flex-shrink-0 w-4">{priority}.</span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline gap-2 mb-1">
+          <span className="text-[13px] font-semibold text-gray-800">{title}</span>
+          {done && (
+            <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-green-600">
+              <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3,8 7,12 13,4" />
+              </svg>
+              done
+            </span>
+          )}
+        </div>
+        <p className="text-[13px] text-gray-500 leading-6 mb-1.5">{body}</p>
+        {stats && stats.length > 0 && (
+          <div className="space-y-0.5">
+            {stats.map((line, i) => (
+              <p key={i} className="text-[12px] text-gray-400 leading-5">
+                {line}
+              </p>
+            ))}
+          </div>
         )}
       </div>
-      <p className="text-[14px] font-semibold text-gray-800 leading-snug mb-1">{title}</p>
-      <p className="text-[13px] text-gray-600 leading-6 mb-2">{body}</p>
-      {meta && (
-        <p className="text-[12px] text-gray-400 mb-2">{meta}</p>
-      )}
-      {children}
-    </div>
-  );
-}
-
-function Chips({ items }: { items: { label: string; value: string | number; tone?: "default" | "muted" }[] }) {
-  return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      {items.map((it, i) => (
-        <span
-          key={i}
-          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[11px] ${
-            it.tone === "muted"
-              ? "border-gray-200 text-gray-500 bg-gray-50"
-              : "border-gray-200 text-gray-700 bg-white"
-          }`}
-        >
-          <span className="font-semibold text-gray-800">{it.value}</span>
-          <span className="text-gray-500">{it.label}</span>
-        </span>
-      ))}
     </div>
   );
 }
@@ -227,71 +213,45 @@ export default function IqTasks() {
                 <span className="text-orange-500 font-medium">Get Started</span> when you're ready.
               </p>
 
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-5">
 
-                {/* Priority 1 — Deal Review */}
                 <Priority
                   priority={1}
-                  title="Deal Review"
+                  title="Active Deals"
                   body="Follow up on your properties — High first, then Mid, Low, and finally New. Update offer status as you go and check notifications for each property."
-                  meta={`Total Deals: ${totalDeals}`}
                   done={dealDone}
-                >
-                  <div className="space-y-2">
-                    <Chips
-                      items={LEVEL_ORDER.map((l) => ({
-                        label: LEVEL_LABEL[l],
-                        value: levelCounts[l],
-                      }))}
-                    />
-                    <Chips
-                      items={[
-                        { label: "Criticals", value: 2, tone: "muted" },
-                        { label: "Reminders", value: 4, tone: "muted" },
-                        { label: "Unseen", value: 1, tone: "muted" },
-                        { label: "Texts", value: 3, tone: "muted" },
-                      ]}
-                    />
-                  </div>
-                </Priority>
+                  stats={[
+                    `${totalDeals} deals · ${LEVEL_ORDER.map((l) => `${levelCounts[l]} ${LEVEL_LABEL[l]}`).join(" · ")}`,
+                    "2 Criticals · 4 Reminders · 1 Unseen · 3 Texts",
+                  ]}
+                />
 
-                {/* Priority 2 — Email Campaigns */}
                 <Priority
                   priority={2}
-                  title="Email Campaigns"
+                  title="Agents › Text and Email Campaigns"
                   body="Send today's outreach across Hot, Warm, Cold, and Unknown agent buckets."
-                  meta={`${totalCampaigns} Campaigns • Total Emails: ${totalEmails}`}
                   done={outreachFlag}
-                >
-                  <Chips
-                    items={DAILY_OUTREACH_BUCKETS.map((b) => ({
-                      label: BUCKET_LABEL[b.id] ?? b.id,
-                      value: `${b.pendingToday} / ${b.totalDB}`,
-                    }))}
-                  />
-                </Priority>
+                  stats={[
+                    `${totalCampaigns} campaigns · ${totalEmails} emails total`,
+                    DAILY_OUTREACH_BUCKETS.map((b) => `${b.pendingToday}/${b.totalDB} ${BUCKET_LABEL[b.id] ?? b.id}`).join(" · "),
+                  ]}
+                />
 
-                {/* Priority 3 — Priority Agent Calls */}
                 <Priority
                   priority={3}
-                  title="Priority Agent Calls"
+                  title="Agents › Priority Calls"
                   body="Call your highest-value agents to keep relationships warm and deals moving."
-                  meta={`Total Priority: ${totalPriorityAgents}`}
                   done={priorityFlag}
-                >
-                  <Chips items={[{ label: "Priority Agents to Call", value: totalPriorityAgents }]} />
-                </Priority>
+                  stats={[`${totalPriorityAgents} priority agents to call`]}
+                />
 
-                {/* Priority 4 — New Relationships */}
                 <Priority
                   priority={4}
-                  title="Build New Agent Relationships"
+                  title="New Deals › New High Propensity to Sell Deals"
                   body="Reach out on high-propensity-to-sell properties to grow your agent network."
-                  meta={`Total Properties: ${totalProperties}`}
                   done={newRelFlag}
-                >
-                  <Chips items={[{ label: "Properties to Call Today", value: totalProperties }]} />
-                </Priority>
+                  stats={[`${totalProperties} properties to call today`]}
+                />
 
               </div>
 
