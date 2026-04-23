@@ -75,7 +75,7 @@ const LEVEL_ORDER: DealLevel[] = ["priority", "high", "mid", "low", "new"];
 export default function IqDealReview() {
   const [, navigate] = useLocation();
   const [segIdx, setSegIdx] = useState(0);
-  const segKey = `dealReview`;
+  const segKey = `dealReview:${segments[segIdx].key}`;
   const { started, start } = useStartGate(segKey);
 
   const [activeLevel, setActiveLevel] = useState<DealLevel | null>(null);
