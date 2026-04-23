@@ -38,6 +38,9 @@ export function loadIqState(): IqState | null {
 
 export function saveIqState(s: IqState): void {
   localStorage.setItem(KEY, JSON.stringify(s));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("iq:state-changed"));
+  }
 }
 
 export function clearIqState(): IqState {

@@ -5,7 +5,7 @@ import { useIqProgress, type IqProgressSegment } from "@/lib/iq/useIqProgress";
 function currentSegmentKey(pathname: string): IqProgressSegment["key"] {
   if (pathname.startsWith("/iq/daily-outreach") || pathname.startsWith("/iq/priority-agents")) return "agents";
   if (pathname.startsWith("/iq/new-relationships")) return "new";
-  if (pathname.startsWith("/iq/deal-review") || pathname.startsWith("/iq/tasks")) return "deals";
+  if (pathname.startsWith("/iq/deal-review")) return "deals";
   return "plan";
 }
 
@@ -53,17 +53,17 @@ export default function IqProgressStepper() {
             <div className="relative flex items-center justify-center">
               {/* Tooltip — anchored below the circle (stepper sits at the top of the page) */}
               {activeTooltip && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 z-50 pointer-events-none">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 z-50 pointer-events-none">
                   <Tooltip text={activeTooltip} />
                 </div>
               )}
               {/* Label sits absolutely above the circle */}
               <div
-                className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2"
+                className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 max-w-[120px]"
                 onMouseEnter={() => setHover({ idx: i, kind: "label" })}
                 onMouseLeave={() => setHover(null)}
               >
-                <span className={`text-[13px] tracking-tight whitespace-nowrap cursor-help ${labelClass}`}>
+                <span className={`block text-[13px] tracking-tight truncate cursor-help ${labelClass}`}>
                   {seg.label}
                 </span>
               </div>
@@ -90,7 +90,7 @@ export default function IqProgressStepper() {
             {/* Connector — sits in the same flex row, vertically centered with circles, butted up against them */}
             {i < segments.length - 1 && (
               <div
-                className={`h-[2px] w-32 -mx-px ${lineActive ? "bg-orange-500" : "bg-gray-200"}`}
+                className={`h-[2px] flex-1 min-w-[40px] max-w-[128px] -mx-px ${lineActive ? "bg-orange-500" : "bg-gray-200"}`}
               />
             )}
           </Fragment>
@@ -105,9 +105,9 @@ function Tooltip({ text }: { text: string }) {
     <div className="relative">
       {/* Upward tail */}
       <div className="absolute left-1/2 bottom-full -translate-x-1/2 mb-px">
-        <div className="w-2 h-2 bg-white border-l border-t border-gray-200 rotate-45 translate-y-1/2" />
+        <div className="w-1.5 h-1.5 bg-gray-900 rotate-45 translate-y-1/2" />
       </div>
-      <div className="bg-white text-gray-700 text-[12px] leading-snug rounded-lg px-4 py-2 shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-gray-200 w-[420px] max-w-[420px] whitespace-normal text-center">
+      <div className="bg-gray-900 text-white text-[11px] leading-snug rounded-md px-2.5 py-1.5 shadow-md max-w-[260px] whitespace-normal text-center">
         {text}
       </div>
     </div>

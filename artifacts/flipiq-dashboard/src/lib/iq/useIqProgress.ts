@@ -20,11 +20,16 @@ export function useIqProgress(): IqProgressSegment[] {
   const [stateVersion, setStateVersion] = useState(0);
 
   useEffect(() => {
+    const bump = () => setStateVersion((v) => v + 1);
     const onStorage = (e: StorageEvent) => {
-      if (!e.key || e.key === "iq:state") setStateVersion((v) => v + 1);
+      if (!e.key || e.key === "iq:state") bump();
     };
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    window.addEventListener("iq:state-changed", bump);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("iq:state-changed", bump);
+    };
   }, []);
 
   return useMemo(() => {
@@ -41,8 +46,7 @@ export function useIqProgress(): IqProgressSegment[] {
     const dealsRemaining = Math.max(0, dealsTotal - completed);
     const dealsDone = dealsTotal > 0 && completed === dealsTotal;
     const dealsBreakdown = (["high", "mid", "low", "new"] as DealLevel[])
-      .filter((l) => levelCounts[l] > 0)
-      .map((l) => `${levelCounts[l]} ${l === "new" ? "new" : `${l} priority`}`)
+      .map((l) => `${levelCounts[l]} ${l === "high" ? "high priority" : l}`)
       .join(" · ");
 
     // Agents
@@ -76,7 +80,7 @@ export function useIqProgress(): IqProgressSegment[] {
         labelTooltip: "Deals that need your attention today.",
         numberTooltip: dealsDone
           ? `All ${dealsTotal} deals completed today.`
-          : `${completed} of ${dealsTotal} complete · ${dealsBreakdown}`,
+          : dealsBreakdown,
         route: "/iq/deal-review",
       },
       {
