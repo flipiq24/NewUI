@@ -19,6 +19,20 @@ const KW_DOT: Record<DealDetail["kw"], string> = {
   mid: "bg-[#BA7517]",
   low: "bg-[#B4B2A9]",
 };
+const SALES_TYPE_LABELS: Record<string, string> = {
+  STD: "Standard",
+  SPAY: "Short Sale",
+  NOD: "Notice Of Default",
+  REO: "REO",
+  PRO: "Probate Listing",
+  AUC: "Auction",
+  TRUS: "Trust",
+  TPA: "Third Party Approval",
+  HUD: "HUD Owned",
+  BK: "Bankruptcy Property",
+  FORC: "In Foreclosure",
+  CONS: "Conservatorship",
+};
 const SOURCE_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
   active:               { bg: "#EAF3DE", text: "#27500A", dot: "#5C9A2A" },
   pending:              { bg: "#FAEEDA", text: "#854F0B", dot: "#C58323" },
@@ -299,7 +313,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
             <TipPanel
               title="Sales Type"
               rows={[
-                ["Sales Type", property.type],
+                ["Sales Type", `${property.type} — ${SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}`],
                 ["Property Type", property.propertyType],
               ]}
             />
