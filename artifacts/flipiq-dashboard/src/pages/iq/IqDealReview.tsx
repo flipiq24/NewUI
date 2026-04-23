@@ -303,22 +303,10 @@ export default function IqDealReview() {
         {started && (
           <div className="flex-1 overflow-y-auto bg-white px-6 py-8">
             <div className="w-full flex flex-col gap-6">
-              {/* Per-segment FlipiQ briefing */}
-              <div className="flex items-start gap-3">
-                <img
-                  src={`${import.meta.env.BASE_URL}flipiq-icon.png`}
-                  alt="FlipiQ"
-                  className="w-6 h-6 object-contain flex-shrink-0 mt-0.5"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="mb-1.5">
-                    <span className="text-[13px] font-semibold text-gray-700 leading-none">FlipiQ</span>
-                  </div>
-                  <p className="text-[14px] text-gray-800 leading-7">
-                    {currentSeg.subtitle(segmentCounts[currentSeg.key] ?? 0)}
-                  </p>
-                </div>
-              </div>
+              {/* Per-segment instructions (inline, no second gate) */}
+              <p className="text-[13px] text-gray-600 leading-6 -mb-2">
+                {currentSeg.subtitle(segmentCounts[currentSeg.key] ?? 0)}
+              </p>
 
               {/* Section heading row: Select All (left) · Next Task (right) */}
               <div>
