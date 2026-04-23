@@ -55,8 +55,8 @@ export default function IqPriorityAgents() {
             </>
           }
           briefingItems={[
-            { label: "priority agents to call", count: SHOWN_QUEUE },
             { label: "total priority agents in your pipeline", count: 90 },
+            { label: "priority agents to call", count: SHOWN_QUEUE },
           ]}
           nextTaskLabel="New Deals › New High Propensity to Sell Deals"
           onNextTask={handleTopNext}
