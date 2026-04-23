@@ -220,7 +220,7 @@ export default function IqDailyOutreach() {
 
                 {/* Voicemail row — disabled */}
                 <div className="flex items-center gap-3 py-3 opacity-50">
-                  <input type="checkbox" disabled className="w-3.5 h-3.5 cursor-not-allowed flex-shrink-0" />
+                  <input type="checkbox" disabled className="w-3.5 h-3.5 accent-orange-500 cursor-not-allowed flex-shrink-0" />
                   <span className="text-[13px] font-semibold text-gray-800 w-24 flex-shrink-0 flex items-center gap-1.5">
                     Voicemail
                     <span className="text-[9px] font-bold bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-sm uppercase tracking-wide">Soon</span>

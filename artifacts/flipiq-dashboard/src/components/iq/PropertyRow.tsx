@@ -124,7 +124,7 @@ export default function PropertyRow({ property, last }: { property: DealProperty
             checked={allDone}
             onChange={(e) => setPropertyComplete(property.id, e.target.checked)}
             title={allDone ? "Mark this property as not done" : "Mark this property done"}
-            className="w-3.5 h-3.5 accent-green-500 cursor-pointer flex-shrink-0"
+            className="w-3.5 h-3.5 accent-orange-500 cursor-pointer flex-shrink-0"
           />
           <ToDoPill text={property.nextSteps} />
           <OfferPill pct={property.offerPct} label={property.offerLabel} />
