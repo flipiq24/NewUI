@@ -80,6 +80,7 @@ export default function IqDealReview() {
 
   const [activeLevel, setActiveLevel] = useState<DealLevel | null>(null);
   const [activeNotifications, setActiveNotifications] = useState<Set<NotificationKind>>(new Set());
+  const [highCallsMade, setHighCallsMade] = useState(false);
 
   const currentSeg = segments[segIdx];
   const isLastSeg = segIdx === segments.length - 1;
@@ -204,6 +205,7 @@ export default function IqDealReview() {
       setSegIdx(segIdx + 1);
       setActiveLevel(null);
       setActiveNotifications(new Set());
+      setHighCallsMade(false);
     }
   }
 
@@ -335,6 +337,8 @@ export default function IqDealReview() {
                     {allSelected && (
                       <BulkActionsButton
                         highOnly={visibleProps.some((p) => p.level === "high")}
+                        callsMade={highCallsMade}
+                        onCallMade={() => setHighCallsMade(true)}
                       />
                     )}
                   </div>
@@ -400,7 +404,15 @@ export default function IqDealReview() {
   );
 }
 
-function BulkActionsButton({ highOnly }: { highOnly: boolean }) {
+function BulkActionsButton({
+  highOnly,
+  callsMade,
+  onCallMade,
+}: {
+  highOnly: boolean;
+  callsMade: boolean;
+  onCallMade: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -412,14 +424,16 @@ function BulkActionsButton({ highOnly }: { highOnly: boolean }) {
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
+  const followUps = [
+    { key: "text", label: "Text", icon: ChatIcon },
+    { key: "email", label: "Email", icon: MailIcon },
+    { key: "voicemail", label: "Text Voicemail", icon: MicIcon },
+  ];
+  const callAction = { key: "call", label: "Call", icon: PhoneIcon };
+  const gated = highOnly && !callsMade;
   const actions = highOnly
-    ? [{ key: "call", label: "Call", icon: PhoneIcon }]
-    : [
-        { key: "call", label: "Call", icon: PhoneIcon },
-        { key: "text", label: "Text", icon: ChatIcon },
-        { key: "email", label: "Email", icon: MailIcon },
-        { key: "voicemail", label: "Text Voicemail", icon: MicIcon },
-      ];
+    ? [callAction, ...followUps]
+    : [callAction, ...followUps];
 
   return (
     <div ref={ref} className="relative">
@@ -431,18 +445,43 @@ function BulkActionsButton({ highOnly }: { highOnly: boolean }) {
         Bulk Actions
       </button>
       {open && (
-        <div className="absolute left-0 top-full mt-1.5 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1.5 min-w-[180px]">
-          {actions.map((a) => (
+        <div className="absolute left-0 top-full mt-1.5 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1.5 min-w-[200px]">
+          {actions.map((a) => {
+            const isFollowUp = a.key !== "call";
+            const locked = gated && isFollowUp;
+            return (
             <button
               key={a.key}
               type="button"
-              onClick={() => setOpen(false)}
-              className="w-full flex items-center gap-2.5 px-3.5 py-2 text-left text-[13px] text-gray-700 hover:bg-orange-50 hover:text-orange-600 cursor-pointer"
+              disabled={locked}
+              onClick={() => {
+                if (locked) return;
+                if (a.key === "call" && highOnly) onCallMade();
+                setOpen(false);
+              }}
+              title={locked ? "Call first to unlock follow-up actions" : undefined}
+              className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-left text-[13px] ${
+                locked
+                  ? "text-gray-300 cursor-not-allowed"
+                  : "text-gray-700 hover:bg-orange-50 hover:text-orange-600 cursor-pointer"
+              }`}
             >
               <a.icon />
-              <span>{a.label}</span>
+              <span className="flex-1">{a.label}</span>
+              {locked && (
+                <svg className="w-3 h-3 text-gray-300" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <rect x="4" y="7" width="8" height="6" rx="1" />
+                  <path d="M5.5 7V5a2.5 2.5 0 015 0v2" />
+                </svg>
+              )}
             </button>
-          ))}
+            );
+          })}
+          {gated && (
+            <p className="px-3.5 pt-1.5 pb-0.5 text-[10px] text-gray-400 uppercase tracking-wider border-t border-gray-100 mt-1">
+              Call first to unlock follow-ups
+            </p>
+          )}
         </div>
       )}
     </div>
