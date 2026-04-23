@@ -18,7 +18,7 @@ export default function IqProgressStepper() {
   const [hover, setHover] = useState<{ idx: number; kind: "label" | "number" } | null>(null);
 
   return (
-    <div className="flex items-center pt-5">
+    <div className="flex items-center pt-12">
       {segments.map((seg, i) => {
         const isCurrent = i === currentIdx;
         const isPast = i < currentIdx;
@@ -35,26 +35,34 @@ export default function IqProgressStepper() {
         }
 
         const labelClass = seg.done || isCurrent || isPast ? "text-gray-700" : "text-gray-400";
+        const activeTooltip =
+          hover?.idx === i
+            ? hover.kind === "label"
+              ? seg.labelTooltip
+              : seg.numberTooltip
+            : null;
 
         return (
           <Fragment key={seg.key}>
             <div className="relative flex items-center justify-center">
+              {/* Tooltip — anchored above the entire step so it always appears above the labels */}
+              {activeTooltip && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 pointer-events-none">
+                  <Tooltip text={activeTooltip} />
+                </div>
+              )}
               {/* Label sits absolutely above the circle */}
               <div
                 className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2"
                 onMouseEnter={() => setHover({ idx: i, kind: "label" })}
                 onMouseLeave={() => setHover(null)}
               >
-                <span className={`text-[11px] font-medium whitespace-nowrap ${labelClass}`}>
+                <span className={`text-[11px] font-medium whitespace-nowrap cursor-help ${labelClass}`}>
                   {seg.label}
                 </span>
-                {hover?.idx === i && hover.kind === "label" && (
-                  <Tooltip text={seg.labelTooltip} />
-                )}
               </div>
               {/* Circle */}
               <div
-                className="relative"
                 onMouseEnter={() => setHover({ idx: i, kind: "number" })}
                 onMouseLeave={() => setHover(null)}
               >
@@ -71,9 +79,6 @@ export default function IqProgressStepper() {
                     seg.count
                   )}
                 </button>
-                {hover?.idx === i && hover.kind === "number" && (
-                  <Tooltip text={seg.numberTooltip} />
-                )}
               </div>
             </div>
             {/* Connector — sits in the same flex row, vertically centered with circles, butted up against them */}
@@ -91,10 +96,8 @@ export default function IqProgressStepper() {
 
 function Tooltip({ text }: { text: string }) {
   return (
-    <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 z-50 pointer-events-none">
-      <div className="bg-white text-gray-700 text-[11px] leading-snug rounded-md px-2.5 py-1.5 shadow-md border border-gray-200 w-56 text-center">
-        {text}
-      </div>
+    <div className="bg-white text-gray-700 text-[11px] leading-snug rounded-md px-2.5 py-1.5 shadow-md border border-gray-200 w-56 text-center">
+      {text}
     </div>
   );
 }
