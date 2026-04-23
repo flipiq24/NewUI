@@ -31,7 +31,7 @@ export default function IqProgressStepper() {
 
         let circleClass = "";
         if (seg.done) {
-          circleClass = "bg-white border-[1.5px] border-green-500 text-green-600";
+          circleClass = "bg-white border-[1.5px] border-orange-500 text-orange-600";
         } else if (isCurrent) {
           circleClass = "bg-orange-500 border-[1.5px] border-orange-500 text-white";
         } else if (isPast) {

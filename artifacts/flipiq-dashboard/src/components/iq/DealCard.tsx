@@ -279,7 +279,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
             title={done.call ? "Call logged" : "Call this agent first"}
             className={`w-[22px] h-[22px] rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer ${
               done.call
-                ? "bg-white border-[1.5px] border-green-500 text-green-600"
+                ? "bg-white border-[1.5px] border-orange-500 text-orange-600"
                 : "bg-orange-50 border border-orange-300 text-orange-600 hover:bg-orange-500 hover:text-white ring-2 ring-orange-300 shadow-[0_0_0_3px_rgba(251,146,60,0.35)] animate-pulse"
             }`}
           >
