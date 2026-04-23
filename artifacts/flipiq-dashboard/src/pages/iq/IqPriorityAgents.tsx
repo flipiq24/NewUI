@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
+import IqAskBar from "@/components/iq/IqAskBar";
 import TaskTipBlock from "@/components/iq/TaskTipBlock";
 import AgentRecordCard from "@/components/iq/AgentRecordCard";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
@@ -80,6 +81,7 @@ export default function IqPriorityAgents() {
           <AgentRecordCard />
         </div>
         )}
+        <IqAskBar />
       </div>
     </div>
   );

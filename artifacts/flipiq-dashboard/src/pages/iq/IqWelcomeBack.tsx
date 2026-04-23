@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
+import IqAskBar from "@/components/iq/IqAskBar";
 import { DEAL_REVIEW_PROPERTIES, TODAYS_TASKS, type DealLevel } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, firstIncompleteRoute } from "@/lib/iq/storage";
 import { isPropertyComplete, useChecklistVersion } from "@/lib/iq/dailyChecklist";
@@ -133,6 +134,7 @@ export default function IqWelcomeBack() {
             </div>
           </div>
         </div>
+        <IqAskBar />
       </div>
     </div>
   );

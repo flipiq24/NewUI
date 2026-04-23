@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
+import IqAskBar from "@/components/iq/IqAskBar";
 import {
   saveIqState,
   resetIqStateIfNewDay,
@@ -118,6 +119,7 @@ export default function IqMorning() {
             )}
           </div>
         </div>
+        <IqAskBar />
       </div>
     </div>
   );

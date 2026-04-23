@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
+import IqAskBar from "@/components/iq/IqAskBar";
 import TaskTipBlock from "@/components/iq/TaskTipBlock";
 import MinimalPropertyRow from "@/components/iq/MinimalPropertyRow";
 import { DEAL_REVIEW_PROPERTIES, type DealLevel, type NotificationKind } from "@/lib/iq/mockData";
@@ -425,6 +426,7 @@ export default function IqDealReview() {
             </div>
           </div>
         )}
+        <IqAskBar />
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
+import IqAskBar from "@/components/iq/IqAskBar";
 import TaskTipBlock from "@/components/iq/TaskTipBlock";
 import IqPropertyIntelligence from "@/components/iq/IqPropertyIntelligence";
 import { NEW_RELATIONSHIPS_DEALS } from "@/lib/iq/mockData";
@@ -157,6 +158,7 @@ export default function IqNewRelationships() {
           </div>
         </div>
         )}
+        <IqAskBar />
       </div>
     </div>
   );

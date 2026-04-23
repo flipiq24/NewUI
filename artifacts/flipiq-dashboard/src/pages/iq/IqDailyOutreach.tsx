@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
+import IqAskBar from "@/components/iq/IqAskBar";
 import TaskTipBlock from "@/components/iq/TaskTipBlock";
 import AudienceCard from "@/components/iq/AudienceCard";
 import { DAILY_OUTREACH_BUCKETS } from "@/lib/iq/mockData";
@@ -221,6 +222,7 @@ export default function IqDailyOutreach() {
           </div>
         </div>
         )}
+        <IqAskBar />
       </div>
     </div>
   );
