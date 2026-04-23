@@ -28,17 +28,31 @@ const BUCKET_LABEL: Record<string, string> = {
 function MorningCheckinPopup({ onDismiss }: { onDismiss: () => void }) {
   const [answer, setAnswer] = useState<boolean | null>(null);
   const [helpText, setHelpText] = useState("");
+  const [sendCampaigns, setSendCampaigns] = useState<"yes" | "no" | "later" | null>(null);
+
+  const bucketCounts = DAILY_OUTREACH_BUCKETS.reduce<Record<string, number>>((acc, b) => {
+    acc[b.id] = b.pendingToday;
+    return acc;
+  }, {});
+  const bucketTotal = Object.values(bucketCounts).reduce((a, b) => a + b, 0);
+  const bucketDot: Record<string, string> = {
+    hot: "#B83A3A", warm: "#C58323", cold: "#2F86D6", unknown: "#9CA3AF",
+  };
+  const bucketLabel: Record<string, string> = {
+    hot: "Hot", warm: "Warm", cold: "Cold", unknown: "Unknown",
+  };
 
   function handleConfirm() {
-    if (answer === null) return;
+    if (answer === null || sendCampaigns === null) return;
     const state = resetIqStateIfNewDay();
     saveIqState({
       ...state,
       morningCheckin: {
         canWorkFullDay: answer,
+        sendCampaignsNow: sendCampaigns,
         needsHelp: false,
         canSendOffers: true,
-        canSendCampaigns: true,
+        canSendCampaigns: sendCampaigns !== "no",
         canReviewNewDeals: true,
         workExplain: helpText,
         helpExplain: helpText,
@@ -92,6 +106,58 @@ function MorningCheckinPopup({ onDismiss }: { onDismiss: () => void }) {
         />
 
         {answer !== null && (
+          <div className="border-t border-gray-100 pt-5 flex flex-col gap-4">
+            <h2 className="text-xl font-bold text-gray-900 leading-snug">
+              Do you want me to send out your email campaigns now?
+            </h2>
+            <div className="flex items-center gap-3 flex-wrap">
+              {(["hot", "warm", "cold", "unknown"] as const).map((k) => (
+                <span key={k} className="inline-flex items-center gap-1.5 text-[12px] text-gray-600">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: bucketDot[k] }} />
+                  <span className="font-medium">{bucketLabel[k]}</span>
+                  <span className="text-orange-500 font-semibold">{bucketCounts[k] ?? 0}</span>
+                </span>
+              ))}
+              <span className="text-[12px] text-gray-400">
+                · <span className="text-gray-700 font-medium">{bucketTotal}</span> agents
+              </span>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setSendCampaigns("yes")}
+                className={`flex-1 min-w-[80px] py-2.5 rounded-full text-sm font-semibold border transition-colors ${
+                  sendCampaigns === "yes"
+                    ? "bg-orange-500 text-white border-orange-500"
+                    : "bg-white text-orange-500 border-orange-300 hover:bg-orange-50"
+                }`}
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setSendCampaigns("no")}
+                className={`flex-1 min-w-[80px] py-2.5 rounded-full text-sm font-semibold border transition-colors ${
+                  sendCampaigns === "no"
+                    ? "bg-orange-500 text-white border-orange-500"
+                    : "bg-white text-orange-500 border-orange-300 hover:bg-orange-50"
+                }`}
+              >
+                No
+              </button>
+              <button
+                onClick={() => setSendCampaigns("later")}
+                className={`flex-1 min-w-[140px] py-2.5 rounded-full text-sm font-semibold border transition-colors ${
+                  sendCampaigns === "later"
+                    ? "bg-orange-500 text-white border-orange-500"
+                    : "bg-white text-orange-500 border-orange-300 hover:bg-orange-50"
+                }`}
+              >
+                I will send later
+              </button>
+            </div>
+          </div>
+        )}
+
+        {answer !== null && sendCampaigns !== null && (
           <button
             onClick={handleConfirm}
             className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm py-2.5 rounded-lg transition-colors"

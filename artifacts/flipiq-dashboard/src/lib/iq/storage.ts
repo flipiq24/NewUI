@@ -6,6 +6,7 @@ export type IqState = {
     canSendOffers: boolean;
     canSendCampaigns: boolean;
     canReviewNewDeals: boolean;
+    sendCampaignsNow?: "yes" | "no" | "later" | null;
     workExplain: string;
     helpExplain: string;
     offersExplain: string;

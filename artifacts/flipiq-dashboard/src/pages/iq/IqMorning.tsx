@@ -7,10 +7,12 @@ import {
   saveIqState,
   resetIqStateIfNewDay,
 } from "@/lib/iq/storage";
+import { DAILY_OUTREACH_BUCKETS } from "@/lib/iq/mockData";
 
 export default function IqMorning() {
   const [, navigate] = useLocation();
   const [canWorkFullDay, setCanWorkFullDay] = useState<boolean | null>(null);
+  const [sendCampaignsNow, setSendCampaignsNow] = useState<"yes" | "no" | "later" | null>(null);
   const [needsHelp, setNeedsHelp] = useState<boolean | null>(null);
   const [canSendOffers, setCanSendOffers] = useState<boolean | null>(null);
   const [canSendCampaigns, setCanSendCampaigns] = useState<boolean | null>(null);
@@ -35,6 +37,7 @@ export default function IqMorning() {
 
   const allAnswered =
     canWorkFullDay !== null &&
+    sendCampaignsNow !== null &&
     needsHelp !== null &&
     canSendOffers !== null &&
     canSendCampaigns !== null &&
@@ -45,6 +48,7 @@ export default function IqMorning() {
       ...state,
       morningCheckin: {
         canWorkFullDay: canWorkFullDay!,
+        sendCampaignsNow,
         needsHelp: needsHelp!,
         canSendOffers: canSendOffers!,
         canSendCampaigns: canSendCampaigns!,
@@ -75,6 +79,10 @@ export default function IqMorning() {
                 onChange={setCanWorkFullDay}
                 explain={workExplain}
                 onExplainChange={setWorkExplain}
+              />
+              <CampaignQuestion
+                value={sendCampaignsNow}
+                onChange={setSendCampaignsNow}
               />
               <Question
                 label="Do you need any help today?"
@@ -164,6 +172,51 @@ function Question({
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-200 flex-1 bg-white resize-none"
           />
         )}
+      </div>
+    </div>
+  );
+}
+
+function CampaignQuestion({
+  value,
+  onChange,
+}: {
+  value: "yes" | "no" | "later" | null;
+  onChange: (v: "yes" | "no" | "later") => void;
+}) {
+  const counts = DAILY_OUTREACH_BUCKETS.reduce<Record<string, number>>((acc, b) => {
+    acc[b.id] = b.pendingToday;
+    return acc;
+  }, {});
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  const dotColor: Record<string, string> = {
+    hot: "#B83A3A", warm: "#C58323", cold: "#2F86D6", unknown: "#9CA3AF",
+  };
+  const labels: Record<string, string> = {
+    hot: "Hot", warm: "Warm", cold: "Cold", unknown: "Unknown",
+  };
+
+  return (
+    <div>
+      <p className="text-sm font-medium text-gray-800 mb-2">
+        Do you want me to send out your email campaigns now?
+      </p>
+      <div className="flex items-center gap-4 mb-3 flex-wrap">
+        {(["hot", "warm", "cold", "unknown"] as const).map((k) => (
+          <span key={k} className="inline-flex items-center gap-1.5 text-[12px] text-gray-600">
+            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: dotColor[k] }} />
+            <span className="font-medium">{labels[k]}</span>
+            <span className="text-orange-500 font-semibold">{counts[k] ?? 0}</span>
+          </span>
+        ))}
+        <span className="text-[12px] text-gray-400">
+          · <span className="text-gray-700 font-medium">{total}</span> agents pending today
+        </span>
+      </div>
+      <div className="flex items-center gap-3 flex-wrap">
+        <ToggleButton label="Yes" selected={value === "yes"} onClick={() => onChange("yes")} />
+        <ToggleButton label="No" selected={value === "no"} onClick={() => onChange("no")} />
+        <ToggleButton label="I will send later" selected={value === "later"} onClick={() => onChange("later")} />
       </div>
     </div>
   );
