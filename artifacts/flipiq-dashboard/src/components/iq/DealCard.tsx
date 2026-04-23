@@ -134,7 +134,7 @@ function DrillMenu({
   if (!open) return null;
   return (
     <div
-      className="absolute top-0 left-[calc(100%+8px)] bg-white border border-gray-300 rounded-lg shadow-lg p-2.5 z-50 min-w-[450px] grid grid-cols-3 gap-x-4"
+      className="absolute top-0 left-[calc(100%+8px)] bg-white border border-gray-300 rounded-lg shadow-lg p-2.5 z-50 min-w-[600px] grid grid-cols-3 gap-x-6"
       onClick={(e) => e.stopPropagation()}
     >
       <div>
@@ -149,7 +149,7 @@ function DrillMenu({
                 onClose();
               }
             }}
-            className="w-full text-left px-2 py-1.5 text-[13px] text-gray-900 hover:bg-gray-100 rounded cursor-pointer"
+            className="w-full text-left px-2 py-1.5 text-[13px] text-gray-900 hover:bg-gray-100 rounded cursor-pointer whitespace-nowrap"
           >
             {label}
           </button>
@@ -158,7 +158,7 @@ function DrillMenu({
       <div>
         <h5 className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold px-1.5 mb-1">Quick Links</h5>
         {MENU_ITEMS.quick.map((label) => (
-          <button key={label} type="button" className="w-full text-left px-2 py-1.5 text-[13px] text-gray-900 hover:bg-gray-100 rounded cursor-pointer">
+          <button key={label} type="button" className="w-full text-left px-2 py-1.5 text-[13px] text-gray-900 hover:bg-gray-100 rounded cursor-pointer whitespace-nowrap">
             {label}
           </button>
         ))}
@@ -166,7 +166,7 @@ function DrillMenu({
       <div>
         <h5 className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold px-1.5 mb-1">Detailed Analysis</h5>
         {MENU_ITEMS.detail.map((label) => (
-          <button key={label} type="button" className="w-full text-left px-2 py-1.5 text-[13px] text-gray-900 hover:bg-gray-100 rounded cursor-pointer">
+          <button key={label} type="button" className="w-full text-left px-2 py-1.5 text-[13px] text-gray-900 hover:bg-gray-100 rounded cursor-pointer whitespace-nowrap">
             {label}
           </button>
         ))}
