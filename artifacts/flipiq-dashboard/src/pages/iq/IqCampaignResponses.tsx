@@ -842,8 +842,9 @@ function AgentRow({
               {a.fuStatus}
             </span>
           </Tip>
-          <div className="flex flex-col items-center gap-0.5 -mt-0.5">
+          <div className="flex flex-col items-center gap-1 -mt-0.5">
             <RowMenu actions={rowActions} onPick={(label) => onRowAction?.(label)} />
+            <ChatThreadIcon quote={a.responseQuote} thread={a.thread} />
             <CommIcon type={a.lastCommType} />
           </div>
         </div>
@@ -852,6 +853,50 @@ function AgentRow({
         )}
       </div>
     </div>
+  );
+}
+
+function ChatThreadIcon({ quote, thread }: { quote: string; thread: ThreadMsg[] }) {
+  if (!quote && thread.length === 0) {
+    return (
+      <span className="text-gray-300" title="No conversation yet">
+        <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M2.5 4a1 1 0 011-1h9a1 1 0 011 1v6a1 1 0 01-1 1H6.5l-3 2.5V11h-.5a1 1 0 01-1-1V4z" />
+        </svg>
+      </span>
+    );
+  }
+  return (
+    <span className="relative group">
+      <button
+        type="button"
+        aria-label="View conversation"
+        className="text-gray-400 hover:text-orange-500 cursor-pointer"
+      >
+        <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M2.5 4a1 1 0 011-1h9a1 1 0 011 1v6a1 1 0 01-1 1H6.5l-3 2.5V11h-.5a1 1 0 01-1-1V4z" />
+        </svg>
+      </button>
+      {thread.length > 0 && (
+        <span className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-150 pointer-events-none absolute z-50 top-full right-0 mt-1.5 bg-white border border-gray-200 rounded-lg shadow-[0_4px_14px_rgba(0,0,0,0.08)] p-3 w-[320px] text-left">
+          <span className="block text-[10px] font-semibold tracking-wider uppercase text-orange-600 mb-2">
+            Conversation
+          </span>
+          <span className="flex flex-col gap-2">
+            {thread.map((m, i) => (
+              <span key={i} className={`flex flex-col ${m[0] === "out" ? "items-end" : "items-start"}`}>
+                <span className={`text-[12px] leading-snug max-w-[85%] ${m[0] === "out" ? "text-gray-500" : "text-gray-800"}`}>
+                  {m[0] === "in" ? `"${m[3]}"` : m[3]}
+                </span>
+                <span className="text-[9.5px] uppercase tracking-wider text-gray-400 mt-0.5">
+                  {m[0] === "in" ? "Agent" : "You"} · {m[2]} · {m[1]}
+                </span>
+              </span>
+            ))}
+          </span>
+        </span>
+      )}
+    </span>
   );
 }
 
