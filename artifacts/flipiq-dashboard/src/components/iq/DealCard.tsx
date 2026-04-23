@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode, type CSSProperties } from "react";
 import type { DealProperty } from "@/lib/iq/mockData";
 import { useDailyChecklist } from "@/lib/iq/dailyChecklist";
 import { DEAL_DETAILS, type DealDetail } from "@/lib/iq/dealDetails";
@@ -19,6 +19,31 @@ const KW_DOT: Record<DealDetail["kw"], string> = {
   mid: "bg-[#BA7517]",
   low: "bg-[#B4B2A9]",
 };
+const SOURCE_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
+  active:               { bg: "#EAF3DE", text: "#27500A", dot: "#5C9A2A" },
+  pending:              { bg: "#FAEEDA", text: "#854F0B", dot: "#C58323" },
+  "back up offer":      { bg: "#E6F1FB", text: "#185FA5", dot: "#2F86D6" },
+  hold:                 { bg: "#EEEDFE", text: "#534AB7", dot: "#7A6FE0" },
+  closed:               { bg: "#F1EFE8", text: "#2C2C2A", dot: "#5A5A56" },
+  expired:              { bg: "#FCEBEB", text: "#791F1F", dot: "#B83A3A" },
+  cancelled:            { bg: "#FCEBEB", text: "#A32D2D", dot: "#D45656" },
+  "notification opened":{ bg: "#FFF7ED", text: "#9A3412", dot: "#D67432" },
+  "off market":         { bg: "#F4F2EE", text: "#4B5563", dot: "#9CA3AF" },
+};
+
+function sourceKey(source: string, status: string) {
+  const s = (status || source.replace(/^MLS\s*—\s*/i, "")).trim().toLowerCase();
+  return s in SOURCE_COLORS ? s : source.trim().toLowerCase();
+}
+function sourcePillStyle(source: string, status: string): CSSProperties {
+  const c = SOURCE_COLORS[sourceKey(source, status)] ?? SOURCE_COLORS["off market"];
+  return { backgroundColor: c.bg, color: c.text };
+}
+function sourceDotColor(source: string, status: string): string {
+  const c = SOURCE_COLORS[sourceKey(source, status)] ?? SOURCE_COLORS["off market"];
+  return c.dot;
+}
+
 const STATUS_PILL: Record<DealDetail["statusType"], string> = {
   neg: "bg-white text-gray-700 border border-gray-300",
   bu: "bg-white text-gray-700 border border-gray-300",
@@ -273,9 +298,16 @@ export default function DealCard({ property }: { property: DealProperty }) {
             {ICON.globe}
           </button>
           <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help text-gray-500 hover:text-gray-900">
-            Source:{" "}
-            <span className="text-gray-700 font-medium">
+          <span className="relative group cursor-help inline-flex items-center gap-1.5 text-gray-500">
+            <span>Source:</span>
+            <span
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11.5px] font-medium"
+              style={sourcePillStyle(property.source, property.sourceStatus)}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ backgroundColor: sourceDotColor(property.source, property.sourceStatus) }}
+              />
               {property.source}
               {property.sourceStatus ? ` — ${property.sourceStatus}` : ""}
             </span>
