@@ -389,34 +389,22 @@ export default function IqDealReview() {
   );
 }
 
+const UNIFIED_ACTIONS: { call: { key: string; label: string; icon: React.FC }; followUps: { key: string; label: string; icon: React.FC }[] } = {
+  call: { key: "call", label: "Call", icon: PhoneIcon },
+  followUps: [
+    { key: "text", label: "Text", icon: ChatIcon },
+    { key: "email", label: "Email", icon: MailIcon },
+    { key: "voicemail", label: "Text Voicemail", icon: MicIcon },
+  ],
+};
+
 const SEGMENT_ACTIONS: Record<
   "ACTIVE_OFF_MARKET" | "PENDING_BACKUP_HOLD" | "CLOSED_EXPIRED_CANCELED",
   { call: { key: string; label: string; icon: React.FC }; followUps: { key: string; label: string; icon: React.FC }[] }
 > = {
-  ACTIVE_OFF_MARKET: {
-    call: { key: "call", label: "Call Agent", icon: PhoneIcon },
-    followUps: [
-      { key: "text", label: "Text Agent", icon: ChatIcon },
-      { key: "email", label: "Email Agent", icon: MailIcon },
-      { key: "loi", label: "Send LOI", icon: MailIcon },
-    ],
-  },
-  PENDING_BACKUP_HOLD: {
-    call: { key: "call", label: "Call Agent", icon: PhoneIcon },
-    followUps: [
-      { key: "text", label: "Text Agent", icon: ChatIcon },
-      { key: "backup", label: "Email Backup Offer", icon: MailIcon },
-      { key: "reminder", label: "Set Reminder", icon: MicIcon },
-    ],
-  },
-  CLOSED_EXPIRED_CANCELED: {
-    call: { key: "call", label: "Call Owner", icon: PhoneIcon },
-    followUps: [
-      { key: "text", label: "Text Owner", icon: ChatIcon },
-      { key: "postcard", label: "Mail Postcard", icon: MailIcon },
-      { key: "drip", label: "Add to Drip", icon: ChatIcon },
-    ],
-  },
+  ACTIVE_OFF_MARKET: UNIFIED_ACTIONS,
+  PENDING_BACKUP_HOLD: UNIFIED_ACTIONS,
+  CLOSED_EXPIRED_CANCELED: UNIFIED_ACTIONS,
 };
 
 function BulkActionsButton({
