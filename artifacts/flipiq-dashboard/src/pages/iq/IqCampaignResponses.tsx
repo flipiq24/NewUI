@@ -255,6 +255,13 @@ export const AGENTS: Agent[] = [
     responseQuote:"", thread:[]},
 ];
 
+const UNIFIED_AGENT_ACTIONS: { key: string; label: string }[] = [
+  { key: "call", label: "Call" },
+  { key: "text", label: "Text" },
+  { key: "email", label: "Email" },
+  { key: "voicemail", label: "Text Voicemail" },
+];
+
 const SECTIONS: {
   sentiment: Sentiment;
   tail: string;
@@ -269,12 +276,7 @@ const SECTIONS: {
     dot: "#5C9A2A",
     text: "#27500A",
     blurb: "Agents who responded and are engaged. Relationship Built, In Conversations, or actively interested. Call first — these are your warmest calls today.",
-    actions: [
-      { key: "send-terms", label: "Send Terms & Address" },
-      { key: "schedule-call", label: "Schedule Call" },
-      { key: "add-priority", label: "Add to Priority Calls" },
-      { key: "tag-hot", label: "Tag as Hot" },
-    ],
+    actions: UNIFIED_AGENT_ACTIONS,
   },
   {
     sentiment: "neutral",
@@ -282,12 +284,7 @@ const SECTIONS: {
     dot: "#9CA3AF",
     text: "#4B5563",
     blurb: "Agents in-flight. Attempts logged, no response yet, or untouched with high potential. Push for the first yes or the first no.",
-    actions: [
-      { key: "qualifier", label: "Send Qualifying Question" },
-      { key: "intro", label: "Send Intro / Context Reply" },
-      { key: "remind-7", label: "Remind Me in 7 Days" },
-      { key: "tag-warm", label: "Tag as Warm" },
-    ],
+    actions: UNIFIED_AGENT_ACTIONS,
   },
   {
     sentiment: "negative",
@@ -295,12 +292,7 @@ const SECTIONS: {
     dot: "#B83A3A",
     text: "#791F1F",
     blurb: "Agents who said no, declined campaigns, or flagged Do Not Contact. Park them. Do not re-engage outside a hard rule change.",
-    actions: [
-      { key: "unsubscribe", label: "Unsubscribe / Suppress" },
-      { key: "tag-cold", label: "Tag as Cold" },
-      { key: "remind-90", label: "Remind Me in 90 Days" },
-      { key: "mark-not-interested", label: "Mark Not Interested" },
-    ],
+    actions: UNIFIED_AGENT_ACTIONS,
   },
 ];
 
