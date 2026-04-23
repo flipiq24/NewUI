@@ -98,6 +98,23 @@ export default function IqDailyOutreach() {
               <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">
                 1. Select Audience
               </p>
+              <label className="flex items-center gap-3 py-2 border-b border-gray-200 cursor-pointer select-none group">
+                <input
+                  type="checkbox"
+                  checked={selected.size === DAILY_OUTREACH_BUCKETS.length}
+                  onChange={(e) =>
+                    setSelected(
+                      e.target.checked
+                        ? new Set(DAILY_OUTREACH_BUCKETS.map((b) => b.id))
+                        : new Set()
+                    )
+                  }
+                  className="w-3.5 h-3.5 accent-orange-500 cursor-pointer flex-shrink-0"
+                />
+                <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider group-hover:text-gray-700">
+                  Check All
+                </span>
+              </label>
               <div className="flex flex-col">
                 {DAILY_OUTREACH_BUCKETS.map((bucket, i) => {
                   const checked = selected.has(bucket.id);
@@ -142,6 +159,20 @@ export default function IqDailyOutreach() {
                   </span>
                 )}
               </p>
+              <label className="flex items-center gap-3 py-2 border-b border-gray-200 cursor-pointer select-none group">
+                <input
+                  type="checkbox"
+                  checked={smsChecked && emailChecked}
+                  onChange={(e) => {
+                    setSmsChecked(e.target.checked);
+                    setEmailChecked(e.target.checked);
+                  }}
+                  className="w-3.5 h-3.5 accent-orange-500 cursor-pointer flex-shrink-0"
+                />
+                <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider group-hover:text-gray-700">
+                  Check All
+                </span>
+              </label>
               <div className="flex flex-col">
                 {/* SMS row */}
                 <div className="flex items-center gap-3 py-3 border-b border-gray-100">
