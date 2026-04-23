@@ -207,57 +207,75 @@ export default function IqDealReview() {
         {/* AI-style briefing gate */}
         {!started && (
           <div className="flex-1 flex flex-col overflow-hidden relative">
-            <div className="flex-1 overflow-y-auto px-8 pt-10 pb-28">
+            <div className="flex-1 overflow-y-auto px-10 pt-10 pb-24">
 
               {/* Breadcrumb — very subtle */}
-              <p className="text-[11px] text-gray-400 mb-8 tracking-wide">
+              <p className="text-[11px] text-gray-400 mb-10 tracking-wide">
                 Deal Review &nbsp;/&nbsp; 9 High Priority Deals &nbsp;/&nbsp;
                 <span className="text-gray-600">{segmentLabels[currentSeg.key]}</span>
               </p>
 
-              {/* Main message */}
-              <p className="text-[15px] text-gray-900 leading-7 max-w-xl mb-5">
-                {segmentTaskCopy[currentSeg.key].task}
-              </p>
+              {/* Two-column: content left, CTA right */}
+              <div className="flex items-start justify-between gap-12">
 
-              {/* Tip — lighter, smaller */}
-              <p className="text-[13px] text-gray-400 leading-6 max-w-xl mb-8">
-                {segmentTaskCopy[currentSeg.key].tip}
-              </p>
+                {/* Left — message content */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-[15px] text-gray-900 leading-7 mb-5">
+                    {segmentTaskCopy[currentSeg.key].task}
+                  </p>
+                  <p className="text-[13px] text-gray-400 leading-6 mb-10">
+                    {segmentTaskCopy[currentSeg.key].tip}
+                  </p>
 
-              {/* Divider */}
-              <div className="w-8 border-t border-gray-200 mb-6" />
+                  <div className="w-8 border-t border-gray-200 mb-6" />
 
-              {/* Deal counts — single line, plain */}
-              <p className="text-[12px] text-gray-400 mb-3">
-                <span className="text-gray-700 font-semibold">{levelCounts.high}</span> High &nbsp;·&nbsp;
-                <span className="text-gray-700 font-semibold">{levelCounts.mid}</span> Mid &nbsp;·&nbsp;
-                <span className="text-gray-700 font-semibold">{levelCounts.low}</span> Low &nbsp;·&nbsp;
-                <span className="text-gray-700 font-semibold">{levelCounts.new}</span> New
-              </p>
+                  <p className="text-[12px] text-gray-500 mb-2">
+                    <span className="font-semibold text-gray-700">{levelCounts.high}</span> High &nbsp;·&nbsp;
+                    <span className="font-semibold text-gray-700">{levelCounts.mid}</span> Mid &nbsp;·&nbsp;
+                    <span className="font-semibold text-gray-700">{levelCounts.low}</span> Low &nbsp;·&nbsp;
+                    <span className="font-semibold text-gray-700">{levelCounts.new}</span> New
+                  </p>
+                  <p className="text-[12px] text-gray-400">
+                    {notificationCounts.critical > 0 && <><span className="text-gray-500">{notificationCounts.critical} criticals</span><span className="mx-1.5 text-gray-300">·</span></>}
+                    {notificationCounts.reminder > 0 && <><span className="text-gray-500">{notificationCounts.reminder} reminders</span><span className="mx-1.5 text-gray-300">·</span></>}
+                    {notificationCounts.unseen > 0 && <><span className="text-gray-500">{notificationCounts.unseen} unseen</span><span className="mx-1.5 text-gray-300">·</span></>}
+                    {notificationCounts.text > 0 && <span className="text-gray-500">{notificationCounts.text} texts</span>}
+                  </p>
+                </div>
 
-              {/* Notifications — single line, plain */}
-              <p className="text-[12px] text-gray-400">
-                {notificationCounts.critical > 0 && <><span className="text-gray-600">{notificationCounts.critical} criticals</span> &nbsp;·&nbsp; </>}
-                {notificationCounts.reminder > 0 && <><span className="text-gray-600">{notificationCounts.reminder} reminders</span> &nbsp;·&nbsp; </>}
-                {notificationCounts.unseen > 0 && <><span className="text-gray-600">{notificationCounts.unseen} unseen</span> &nbsp;·&nbsp; </>}
-                {notificationCounts.text > 0 && <span className="text-gray-600">{notificationCounts.text} texts</span>}
-              </p>
+                {/* Right — CTA */}
+                <div className="flex-shrink-0 flex flex-col items-end gap-2 pt-1">
+                  <button
+                    onClick={start}
+                    className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white text-xs font-medium px-4 py-2 rounded-full cursor-pointer transition-colors"
+                  >
+                    Get Started
+                    <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
+                  </button>
+                  <span className="text-[10px] text-gray-400">Next: {nextLabel}</span>
+                </div>
 
+              </div>
             </div>
 
-            {/* Floating bottom bar */}
-            <div className="absolute bottom-0 left-0 right-0 px-8 py-4 bg-gradient-to-t from-[#f5f6f8] via-[#f5f6f8]/95 to-transparent flex items-center justify-between">
-              <span className="text-[11px] text-gray-400">
-                Next: <span className="text-gray-600">{nextLabel}</span>
-              </span>
-              <button
-                onClick={start}
-                className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white text-xs font-medium px-4 py-2 rounded-full cursor-pointer transition-colors"
-              >
-                Get Started
-                <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
-              </button>
+            {/* Floating "ask anything" bar */}
+            <div className="absolute bottom-0 left-0 right-0 px-10 py-4 bg-gradient-to-t from-[#f5f6f8] via-[#f5f6f8]/90 to-transparent">
+              <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2.5 shadow-sm">
+                <button className="w-5 h-5 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer">
+                  <svg className="w-3 h-3 text-gray-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <line x1="8" y1="2" x2="8" y2="14" strokeLinecap="round" />
+                    <line x1="2" y1="8" x2="14" y2="8" strokeLinecap="round" />
+                  </svg>
+                </button>
+                <input
+                  type="text"
+                  placeholder="Ask anything…"
+                  className="flex-1 text-[13px] text-gray-700 placeholder-gray-300 bg-transparent outline-none"
+                />
+                <button className="w-6 h-6 rounded-full bg-gray-900 hover:bg-gray-700 flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer">
+                  <svg className="w-3 h-3 text-white" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
+                </button>
+              </div>
             </div>
           </div>
         )}
