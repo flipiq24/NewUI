@@ -108,10 +108,10 @@ interface PriorityProps {
   title: string;
   body: string;
   done?: boolean;
-  stats?: string[];
+  items?: string[];
 }
 
-function Priority({ priority, title, body, done, stats }: PriorityProps) {
+function Priority({ priority, title, body, done, items }: PriorityProps) {
   return (
     <div className="flex gap-3">
       <span className="text-[12px] text-gray-300 mt-[2px] flex-shrink-0 w-4">{priority}.</span>
@@ -127,13 +127,14 @@ function Priority({ priority, title, body, done, stats }: PriorityProps) {
             </span>
           )}
         </div>
-        <p className="text-[13px] text-gray-500 leading-6 mb-1.5">{body}</p>
-        {stats && stats.length > 0 && (
-          <div className="space-y-0.5">
-            {stats.map((line, i) => (
-              <p key={i} className="text-[12px] text-gray-400 leading-5">
-                {line}
-              </p>
+        <p className="text-[13px] text-gray-500 leading-6 mb-2">{body}</p>
+        {items && items.length > 0 && (
+          <div className="space-y-1">
+            {items.map((line, i) => (
+              <div key={i} className="flex items-center gap-2.5 text-[13px] text-gray-500">
+                <span className="text-[11px] text-gray-300 w-3 flex-shrink-0">{i + 1}.</span>
+                <span>{line}</span>
+              </div>
             ))}
           </div>
         )}
@@ -218,39 +219,36 @@ export default function IqTasks() {
                 <Priority
                   priority={1}
                   title="Active Deals"
-                  body="Follow up on your properties — High first, then Mid, Low, and finally New. Update offer status as you go and check notifications for each property."
+                  body={`Follow up on your ${totalDeals} properties — work High first, then Mid, Low, and New. Update offer status as you go.`}
                   done={dealDone}
-                  stats={[
-                    `${totalDeals} deals · ${LEVEL_ORDER.map((l) => `${levelCounts[l]} ${LEVEL_LABEL[l]}`).join(" · ")}`,
-                    "2 Criticals · 4 Reminders · 1 Unseen · 3 Texts",
+                  items={[
+                    `${totalDeals} deals`,
+                    ...LEVEL_ORDER.map((l) => `${levelCounts[l]} ${LEVEL_LABEL[l]}`),
                   ]}
                 />
 
                 <Priority
                   priority={2}
                   title="Agents › Text and Email Campaigns"
-                  body="Send today's outreach across Hot, Warm, Cold, and Unknown agent buckets."
+                  body={`Send today's outreach across Hot, Warm, Cold, and Unknown buckets — ${totalCampaigns} campaigns, ${totalEmails} emails total.`}
                   done={outreachFlag}
-                  stats={[
-                    `${totalCampaigns} campaigns · ${totalEmails} emails total`,
-                    DAILY_OUTREACH_BUCKETS.map((b) => `${b.pendingToday}/${b.totalDB} ${BUCKET_LABEL[b.id] ?? b.id}`).join(" · "),
-                  ]}
+                  items={DAILY_OUTREACH_BUCKETS.map((b) => `${b.pendingToday} / ${b.totalDB} ${BUCKET_LABEL[b.id] ?? b.id}`)}
                 />
 
                 <Priority
                   priority={3}
                   title="Agents › Priority Calls"
-                  body="Call your highest-value agents to keep relationships warm and deals moving."
+                  body="Call your highest-value agents to keep relationships warm and move deals forward."
                   done={priorityFlag}
-                  stats={[`${totalPriorityAgents} priority agents to call`]}
+                  items={[`${totalPriorityAgents} priority agents to call`]}
                 />
 
                 <Priority
                   priority={4}
                   title="New Deals › New High Propensity to Sell Deals"
-                  body="Reach out on high-propensity-to-sell properties to grow your agent network."
+                  body="Reach out on owners likely to list soon to grow your agent network with fresh, high-intent leads."
                   done={newRelFlag}
-                  stats={[`${totalProperties} properties to call today`]}
+                  items={[`${totalProperties} properties to call today`]}
                 />
 
               </div>
