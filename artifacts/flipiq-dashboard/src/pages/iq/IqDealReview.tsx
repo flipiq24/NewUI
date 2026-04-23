@@ -4,7 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
 import IqAskBar from "@/components/iq/IqAskBar";
 import TaskTipBlock from "@/components/iq/TaskTipBlock";
-import MinimalPropertyRow from "@/components/iq/MinimalPropertyRow";
+import DealCard from "@/components/iq/DealCard";
 import { DEAL_REVIEW_PROPERTIES, type DealLevel, type NotificationKind } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 import { useStartGate } from "@/components/iq/useStartGate";
@@ -327,8 +327,8 @@ export default function IqDealReview() {
                 </div>
               ) : (
                 <div>
-                  {visibleProps.map((p, i) => (
-                    <MinimalPropertyRow key={p.id} property={p} index={i + 1} />
+                  {visibleProps.map((p) => (
+                    <DealCard key={p.id} property={p} />
                   ))}
                 </div>
               )}

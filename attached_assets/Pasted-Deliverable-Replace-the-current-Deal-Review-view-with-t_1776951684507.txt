@@ -1,0 +1,285 @@
+Deliverable: Replace the current Deal Review view with the minimalist card layout below. Every data point that currently shows as text becomes either visible on the card or hidden behind a white-background hover tooltip.
+Reference file: flipiq_deal_review.html — standalone working version. Copy the markup patterns and styles directly from that file. Everything in this doc describes what the file already does.
+Do not invent data, fields, or behaviors not listed in this doc. Propose additions — do not build them.
+
+1. Layout (top to bottom)
+[ Top bar       ]   FlipIQ logo · Stepper · Need Help
+[ Breadcrumb    ]   Active Deals › 9 High Priority Deals › 3 Active & Off Market        Next: Pending / Backup / Hold ›
+[ Section 1     ]   SELECT ALL | ACTIVE & OFF MARKET · 3 properties
+                    [description paragraph]
+                    [card] [card] [card]
+[ Section 2     ]   SELECT ALL | PENDING / BACKUP / HOLD · 2 properties
+                    [description paragraph]
+                    [card] [card]
+[ Section 3     ]   SELECT ALL | CLOSED / EXPIRED / CANCELED · 4 properties
+                    [description paragraph]
+                    [card] [card] [card] [card]
+
+2. Card anatomy
+Each deal card is a grid: left nav | main content | status chip with gap of 16px.
+Left nav (vertical stack, 16px wide)
+
+Checkbox (row selector)
+⋮ three-dot icon — click opens the drill-down menu (see section 5)
+💬 chat bubble icon — hover shows "View conversations"
+
+Main content (fills available width)
+Row 1 — Title row
+
+Orange phone icon (circle, 22px, light orange bg, orange outline). Click triggers the post-call nudge.
+Next Step text — 15px, weight 500. On hover, show tooltip:
+
+Task: [the task name]
+Context: [coaching note]
+
+
+
+Row 2 — Address line
+
+Address (13px, hoverable — tooltip shows Property details: Type, Beds/Baths, Garage, Sq Ft/Lot, Built, Pool, DOM/CDOM)
+🌐 globe icon (clickable — opens property detail page)
+· separator
+Price ($399,000, weight 500, hoverable — tooltip shows Price History: Original list, each drop with date and %, Total reduction)
+· separator
+ARV % (e.g. "77% ARV", weight 500, hoverable — tooltip shows Asking, ARV, Asking vs ARV)
+
+Row 3 — Meta row (all hoverable)
+
+● Pain: Low/Mid/High/No data (colored dot + label)
+
+Hover: Flagged, Ownership, Equity, Entity, Propensity, etc.
+
+
+· separator
+● Agent: Responsive/Not Responsive/No contact yet
+
+Hover: Last 5 attempts with outcomes, Response rate
+
+
+· separator
+● Keywords: Low/Mid/High
+
+Hover (wider tooltip): Public Comments + Agent Comments with detected keywords wrapped in red pill tags (AS IS, Motivated, Vacant, etc.)
+
+
+· separator
+Opened 04/23
+
+Hover: First opened, Last opened, Total opens
+
+
+· separator
+Called 01/30
+
+Hover: First call, Last call, Total communications, broken down by Calls / Texts / Emails
+
+
+
+Row 4 — Post-call nudge (hidden by default, shown after Call is triggered)
+
+Light orange bg: "✓ Call logged. Send text + email follow-up?"
+Two buttons: [Yes, send both] (dark) and [Not yet] (outline)
+Clicking either button hides the nudge
+
+Status chip (right column)
+
+Pill: 60% In Negotiations ⌄ — single unified element
+Color maps to stage:
+
+In Negotiations — amber bg (#FAEEDA / #854F0B / #FAC775)
+Back Up — blue bg (#E6F1FB / #185FA5 / #B5D4F4)
+Initial Contact — purple bg (#EEEDFE / #534AB7 / #CECBF6)
+None — gray bg
+
+
+Hover: Offer Status (Completion, Stage, Source, Negotiator, Assigned)
+Click: opens dropdown to change stage (stub for now)
+
+
+3. Color tokens
+
+Primary orange: #F97316
+Orange darker (hover): #EA580C
+Orange text (chip accent): #C2410C
+Light orange (nudge bg): #FFF7ED
+Light orange border: #FED7AA
+Keyword pill: #EF4444 bg, white text
+Background: #FFFFFF (primary surface), #FAFAF9 (page/hover), #F5F5F4 (subtle)
+Text: #1F1F1F (primary), #6B6B6B (secondary), #9CA3AF (tertiary)
+Borders: #E5E5E5 (tertiary), #D1D5DB (secondary)
+Dot colors: gray #B4B2A9 · green #639922 · amber #BA7517 · red #E24B4A
+
+No dark / black card backgrounds. Ever. Tooltips, menus, nudges are all white or light orange.
+
+4. Tooltip rules
+
+White background, dark text, 0.5px border, soft shadow — never black/dark.
+Orange uppercase title at top (10px letter-spacing 0.5px).
+Each data row: label on left (tertiary gray), value on right (primary, weight 500).
+Min-width 240px. Max-width 300px for most. Keywords tooltip gets up to 400px wide with prose.
+Tooltips positioned above the element with 6px gap.
+
+Tooltip catalog (per element)
+ElementTooltip titleFieldsNext Step titleNEXT STEPTask, ContextAddressPROPERTYType, Beds/Baths, Garage, Sq Ft/Lot, Built, Pool, DOM/CDOMPricePRICE HISTORYOriginal list, each drop (date + %), Total reductionARV %ARVAsking, ARV, Asking vs ARVPain pillSELLER PAINFlagged, Ownership, Equity, Entity, PropensityAgent pillLAST ATTEMPTS5 rows of communication attempts + Response rate (footer)Keywords pillLISTING REMARKSPublic Comments, Agent Comments (both with <span class="kw">keyword</span> highlights)OpenedOPEN HISTORYFirst opened, Last opened, Total opensCalledCOMMUNICATION HISTORYFirst call, Last call, Total communications + (footer) Calls, Texts, EmailsStatus chipOFFER STATUSCompletion, Stage, Source, Negotiator, AssignedChat bubble icon(simple)"View conversations"
+
+5. Drill-down menu (opens on ⋮ click)
+Positioned to the right of the kebab icon. White panel, 4 columns, soft shadow.
+Column 1 — Communication
+
+Call (triggers post-call nudge)
+Text
+Email
+Text Voicemail
+AI Connect
+
+Column 2 — Quick Links
+
+Notes
+Tax Data
+Activities
+Create Reminder
+AI Report
+
+Column 3 — Detailed Analysis
+
+PIQ
+Comps
+Investment Analysis
+Offer Terms
+Agent
+
+Footer row (spans all 3 columns, separated by divider)
+
+Auto Tracker (orange accent, indicates it's a distinct tool)
+
+Menu behavior:
+
+Only one menu open at a time across the page
+Click anywhere outside closes the menu
+Menu does not close on hover over its own contents
+
+
+6. Interactions
+ActionResultClick orange phone iconFire "Call" flow, log the call, show post-call nudgeClick ⋮Toggle drill-down menu for that rowClick Communication → Call in menuSame as phone icon clickClick "Yes, send both" in nudgeSend templated text + email (stub for now), hide nudgeClick "Not yet"Hide nudgeClick chat bubble iconOpen conversation panel for this property (stub for now)Click globe iconNavigate to property detail pageClick section Select All checkboxSelect all rows in that sectionClick row checkboxSelect that rowClick status chip(future) Open status stage dropdownHover any data-tip elementShow white tooltip above it
+
+7. Data model
+Each deal needs these fields. Field names must match exactly for the template to render.
+js{
+  id: 1,                                        // unique integer
+  section: 'active',                            // 'active' | 'pending' | 'closed'
+  task: 'Adjust terms',                         // next step text
+  taskNote: 'Agent countered at $425k...',      // context for next-step hover
+  address: '73750 Desert Vista Court, ...',
+  prop: [                                       // array of [label, value] pairs
+    ['Type','Condo · STD'],
+    ['Beds / Baths','3 / 2'],
+    ['Garage','2 car'],
+    ['Sq Ft / Lot','1,248 / 2,613'],
+    ['Built','1976'],
+    ['Pool','In-ground, Gunite'],
+    ['DOM / CDOM','108 / 108']
+  ],
+  price: '$399,000',
+  arv: '$520,000',
+  arvPct: '77% ARV',
+  priceHist: [['Original list','$449,000'],['Drop 03/15/26','$425,000 (-5.3%)']],
+  priceTotal: '-$50,000 (-11.1%)',
+  pain: 'low',                                  // 'high' | 'mid' | 'low' | 'none'
+  painLabel: 'Low',
+  painSig: [['Flagged','No pain'],['Ownership','Absentee']],
+  agent: 'responsive',                          // 'responsive' | 'not-responsive' | 'none'
+  agentLabel: 'Responsive',
+  agentComms: [['Text 04/22','Replied 2h'],['Call 01/30','Answered']],
+  agentRate: '80%',
+  kw: 'low',                                    // 'high' | 'mid' | 'low'
+  kwLabel: 'Low',
+  pubCmt: 'Stunning Palm Desert condo ...',     // can contain <span class="kw">keyword</span>
+  agtCmt: 'Quick close preferred ...',          // can contain <span class="kw">keyword</span>
+
+  // Opened tooltip data
+  opened: '04/23',                              // last opened date (card surface)
+  firstOpened: '12/12/25',
+  totalOpens: 14,
+
+  // Called tooltip data
+  called: '01/30',                              // last called date (card surface)
+  firstCalled: '12/15/25',
+  totalCommsCount: 9,                           // total communications
+  totalCalls: 3,
+  totalTexts: 3,
+  totalEmails: 3,
+
+  // Status chip
+  pct: '60%',
+  status: 'In Negotiations',
+  statusType: 'neg',                            // 'neg' | 'bu' | 'init' | 'none'
+  source: 'MLS — Active',
+  negotiator: 'Josh Santos',
+  assigned: 'Josh Santos'
+}
+
+8. Data source (how to wire to live data)
+The above is the target shape. Map your existing property/offer data into it. Specifically:
+Target fieldLikely source in existing Command datataskoffer_status.next_steptaskNotePull from iQ coaching note for this propertypricelisting.list_pricearvvaluation.arv (from Analyst)arvPctlisting.list_price / valuation.arv roundedpriceHistlisting.price_change_historypainDerive from property pain flags: count flags → severitypainSigRaw pain flags from PropertyRadar / tax dataagentDerive from agent communication log: response rate bucketsagentCommsLast 5 rows from communications table for this agentagentRateCalculated: replies / total attempts over last 90 dayskwNLP pass over pubCmt + agtCmt against keyword dictionarypubCmt / agtCmtlisting.public_remarks, listing.agent_remarks — wrap detected keywords in <span class="kw">…</span>firstOpened / totalOpensproperty_views table aggregated by userfirstCalled / totalCallscommunications table where type='call'totalTexts / totalEmailsSame, split by typestatusTypeMap from offer.status → pill class
+
+9. Keyword detection dictionary (for the Keywords pill)
+Classify each listing's pubCmt + agtCmt concatenation:
+HIGH signals (any of these → level = High, wrap in <span class="kw">…</span>):
+
+AS IS, AS-IS
+MOTIVATED, MOTIVATED SELLER
+PRICE REDUCED, PRICE REDUCTION
+VACANT, DELIVERED VACANT
+PROBATE, ESTATE SALE, AFFIDAVIT OF DEATH
+DIVORCE
+MUST SELL, NEEDS TO SELL
+CASH ONLY, CASH PREFERRED
+NO CONTINGENCIES
+
+MID signals (no HIGH signals, but any of these → level = Mid):
+
+FIXER, NEEDS TLC, TLC, HANDYMAN SPECIAL
+REHAB, NEEDS WORK, PROJECT
+SUBJECT TO INSPECTION
+NO RENT CONTROL
+
+LOW — no signals detected → level = Low.
+Implementation: Simple string matching is fine for v1. Case-insensitive. Wrap every match in <span class="kw">…</span> before injecting into the tooltip.
+
+10. Rules (non-negotiable)
+
+No Text or Email buttons on the card surface. Communication goes through the drill-down or the post-call nudge.
+No priority dots next to the task title. Removed.
+Phone icon triggers the nudge. Don't auto-send text/email until AA clicks Yes.
+All tooltips are white. Never dark.
+Status chip is one unified pill — never split % and stage into two elements.
+Sections render in order: Active & Off Market → Pending/Backup/Hold → Closed/Expired/Canceled.
+Auto Tracker is a menu item, never a left-side icon.
+Don't remove existing functionality. This reorganizes the surface — all current pages, tools, and logic stay intact behind the drill-down.
+
+
+11. Implementation steps for Replit AI
+
+Open the Deal Review component file.
+Back up the current version (branch or copy).
+Replace the deal list render with the data-driven template from flipiq_deal_review.html.
+Wire the data model fields from section 7 to your existing property/offer/communication tables.
+Implement the keyword detection from section 9 as a helper function that runs over listing remarks and returns { level, publicHtml, agentHtml }.
+Add the drill-down menu component (section 5) with click-outside-to-close behavior.
+Add the post-call nudge component (section 6) that opens on phone-button or Communication→Call.
+Wire the Opened/Called aggregation queries (section 7 data model) for the tooltip fields.
+Apply the color tokens from section 3. Verify no black/dark backgrounds anywhere.
+Test all 10 tooltip types render with white background and correct data.
+Test the drill-down menu opens/closes correctly and only one is open at a time.
+Test the nudge flow: phone click → nudge appears → Yes or Not yet hides it.
+
+
+12. What this deliberately does NOT include
+These were discussed and deferred. Do not build them yet:
+
+Spread indicator / spread bar
+Auto-detected motivation flags ("Vacant delivery" etc.) — replaced by the Keywords pill
+Comp confidence dot
+Left-side Auto Tracker icon — moved into the drill-down menu
+
+When ready to add any of these, propose first, build after approval.
