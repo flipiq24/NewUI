@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useLocation } from "wouter";
 import { useIqProgress, type IqProgressSegment } from "@/lib/iq/useIqProgress";
 
@@ -17,34 +17,30 @@ export default function IqProgressStepper() {
   const [hover, setHover] = useState<{ idx: number; kind: "label" | "number" } | null>(null);
 
   return (
-    <div className="flex items-start gap-0">
+    <div className="flex items-center">
       {segments.map((seg, i) => {
         const isCurrent = i === currentIdx;
         const isPast = i < currentIdx;
         const isUpcoming = i > currentIdx;
-        const lineActive = i < segments.length - 1 && (segments[i].done || isPast || isCurrent);
+        const lineActive = i < segments.length - 1 && (seg.done || isPast || isCurrent);
 
-        // Circle styling
         let circleClass = "";
         if (seg.done) {
           circleClass = "bg-white border-2 border-green-500 text-green-600";
-        } else if (isCurrent) {
-          circleClass = "bg-orange-500 border-2 border-orange-500 text-white";
-        } else if (isPast) {
+        } else if (isCurrent || isPast) {
           circleClass = "bg-orange-500 border-2 border-orange-500 text-white";
         } else if (isUpcoming) {
           circleClass = "bg-gray-300 border-2 border-gray-300 text-white";
         }
 
-        // Label color
         const labelClass = seg.done || isCurrent || isPast ? "text-gray-700" : "text-gray-400";
 
         return (
-          <div key={seg.key} className="flex items-start">
-            <div className="flex flex-col items-center">
-              {/* Label */}
+          <Fragment key={seg.key}>
+            <div className="relative flex items-center justify-center">
+              {/* Label sits absolutely above the circle */}
               <div
-                className="relative mb-1.5"
+                className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2"
                 onMouseEnter={() => setHover({ idx: i, kind: "label" })}
                 onMouseLeave={() => setHover(null)}
               >
@@ -79,15 +75,13 @@ export default function IqProgressStepper() {
                 )}
               </div>
             </div>
-            {/* Connector */}
+            {/* Connector — sits in the same flex row, vertically centered with circles, butted up against them */}
             {i < segments.length - 1 && (
-              <div className="flex flex-col items-center" style={{ paddingTop: "30px" }}>
-                <div
-                  className={`h-[2px] w-16 ${lineActive ? "bg-orange-500" : "bg-gray-300"}`}
-                />
-              </div>
+              <div
+                className={`h-[2px] w-16 -mx-px ${lineActive ? "bg-orange-500" : "bg-gray-300"}`}
+              />
             )}
-          </div>
+          </Fragment>
         );
       })}
     </div>
