@@ -276,7 +276,10 @@ export default function DealCard({ property }: { property: DealProperty }) {
           <button
             type="button"
             onClick={triggerCall}
-            className="w-[22px] h-[22px] rounded-full bg-orange-50 border border-orange-300 text-orange-600 flex items-center justify-center flex-shrink-0 hover:bg-orange-500 hover:text-white cursor-pointer"
+            title={done.call ? "Call logged" : "Call this agent first"}
+            className={`w-[22px] h-[22px] rounded-full bg-orange-50 border border-orange-300 text-orange-600 flex items-center justify-center flex-shrink-0 hover:bg-orange-500 hover:text-white cursor-pointer ${
+              !done.call ? "ring-2 ring-orange-300 shadow-[0_0_0_3px_rgba(251,146,60,0.35)] animate-pulse" : ""
+            }`}
           >
             {ICON.phone}
           </button>
