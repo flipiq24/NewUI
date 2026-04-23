@@ -416,6 +416,11 @@ export default function IqCampaignResponses() {
     negative: new Set(),
   });
   const [stepIdx, setStepIdx] = useState(0);
+  const [callsMadeBySection, setCallsMadeBySection] = useState<Record<Sentiment, boolean>>({
+    positive: false,
+    neutral: false,
+    negative: false,
+  });
   const { started, start } = useStartGate(`campaignResponses:${SECTIONS[stepIdx].sentiment}`);
 
   // Auto-select all positive responses when entering the Positive step.
@@ -449,6 +454,9 @@ export default function IqCampaignResponses() {
     if (sel.size === 0) {
       toast({ title: "Select agents first." });
       return;
+    }
+    if (label === "Call") {
+      setCallsMadeBySection((prev) => ({ ...prev, [sentiment]: true }));
     }
     setHandled((prev) => {
       const next = new Set(prev);
@@ -548,6 +556,7 @@ export default function IqCampaignResponses() {
                           count={sectionSel.size}
                           actions={sec.actions}
                           glow={sec.sentiment === "positive" && sectionSel.size > 0 && sectionHandledCount < rows.length}
+                          gateCall={sec.sentiment === "positive" && !callsMadeBySection.positive}
                           onPick={(label) => applyBulkAction(sec.sentiment, label)}
                         />
                       </div>
@@ -979,12 +988,14 @@ function SectionBulkActions({
   actions,
   onPick,
   glow = false,
+  gateCall = false,
 }: {
   enabled: boolean;
   count: number;
   actions: { key: string; label: string }[];
   onPick: (label: string) => void;
   glow?: boolean;
+  gateCall?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -1013,19 +1024,44 @@ function SectionBulkActions({
       </button>
       {open && enabled && (
         <div className="absolute left-0 top-full mt-1.5 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1.5 min-w-[220px]">
-          {actions.map((a) => (
-            <button
-              key={a.key}
-              type="button"
-              onClick={() => {
-                onPick(a.label);
-                setOpen(false);
-              }}
-              className="block w-full text-left px-3 py-1.5 text-[12px] text-gray-700 hover:bg-orange-50 hover:text-orange-700 cursor-pointer"
-            >
-              {a.label}
-            </button>
-          ))}
+          {actions.map((a) => {
+            const isCall = a.label === "Call";
+            const locked = gateCall && !isCall;
+            const callPulse = gateCall && isCall;
+            return (
+              <button
+                key={a.key}
+                type="button"
+                disabled={locked}
+                title={locked ? "Call first to unlock follow-up actions" : undefined}
+                onClick={() => {
+                  if (locked) return;
+                  onPick(a.label);
+                  setOpen(false);
+                }}
+                className={`flex items-center justify-between w-full text-left px-3 py-1.5 text-[12px] font-medium ${
+                  locked
+                    ? "text-gray-300 cursor-not-allowed"
+                    : callPulse
+                    ? "text-orange-600 font-semibold bg-orange-50 ring-1 ring-orange-300 animate-pulse hover:bg-orange-100 cursor-pointer"
+                    : "text-orange-600 hover:bg-orange-50 hover:text-orange-700 cursor-pointer"
+                }`}
+              >
+                <span>{a.label}</span>
+                {locked && (
+                  <svg className="w-3 h-3 text-gray-300" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <rect x="4" y="7" width="8" height="6" rx="1" />
+                    <path d="M5.5 7V5a2.5 2.5 0 015 0v2" />
+                  </svg>
+                )}
+              </button>
+            );
+          })}
+          {gateCall && (
+            <p className="px-3 pt-1.5 pb-0.5 text-[10px] text-gray-400 uppercase tracking-wider border-t border-gray-100 mt-1">
+              Call first to unlock follow-ups
+            </p>
+          )}
         </div>
       )}
     </div>
