@@ -43,18 +43,19 @@ function MorningCheckinPopup({ onDismiss }: { onDismiss: () => void }) {
     hot: "Hot", warm: "Warm", cold: "Cold", unknown: "Unknown",
   };
 
-  function handleConfirm() {
-    if (answer === null || sendCampaigns === null) return;
+  function handleConfirm(choice: "yes" | "no" | "later") {
+    if (answer === null) return;
+    setSendCampaigns(choice);
     const state = resetIqStateIfNewDay();
     saveIqState({
       ...state,
-      outreachCampaignSent: sendCampaigns === "yes" ? true : state.outreachCampaignSent,
+      outreachCampaignSent: choice === "yes" ? true : state.outreachCampaignSent,
       morningCheckin: {
         canWorkFullDay: answer,
-        sendCampaignsNow: sendCampaigns,
+        sendCampaignsNow: choice,
         needsHelp: false,
         canSendOffers: true,
-        canSendCampaigns: sendCampaigns !== "no",
+        canSendCampaigns: choice !== "no",
         canReviewNewDeals: true,
         workExplain: helpText,
         helpExplain: helpText,
@@ -126,36 +127,19 @@ function MorningCheckinPopup({ onDismiss }: { onDismiss: () => void }) {
             </div>
             <div className="flex gap-2 flex-wrap">
               <button
-                onClick={() => setSendCampaigns("yes")}
-                className={`flex-1 min-w-[80px] py-2.5 rounded-full text-sm font-semibold border transition-colors ${
-                  sendCampaigns === "yes"
-                    ? "bg-orange-500 text-white border-orange-500"
-                    : "bg-white text-orange-500 border-orange-300 hover:bg-orange-50"
-                }`}
+                onClick={() => handleConfirm("yes")}
+                className="flex-1 min-w-[80px] py-2.5 rounded-full text-sm font-semibold border bg-white text-orange-500 border-orange-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors"
               >
                 Yes
               </button>
               <button
-                onClick={() => setSendCampaigns("later")}
-                className={`flex-1 min-w-[140px] py-2.5 rounded-full text-sm font-semibold border transition-colors ${
-                  sendCampaigns === "later"
-                    ? "bg-orange-500 text-white border-orange-500"
-                    : "bg-white text-orange-500 border-orange-300 hover:bg-orange-50"
-                }`}
+                onClick={() => handleConfirm("later")}
+                className="flex-1 min-w-[140px] py-2.5 rounded-full text-sm font-semibold border bg-white text-orange-500 border-orange-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors"
               >
                 I will send later
               </button>
             </div>
           </div>
-        )}
-
-        {answer !== null && sendCampaigns !== null && (
-          <button
-            onClick={handleConfirm}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm py-2.5 rounded-lg transition-colors"
-          >
-            Continue
-          </button>
         )}
       </div>
     </div>
