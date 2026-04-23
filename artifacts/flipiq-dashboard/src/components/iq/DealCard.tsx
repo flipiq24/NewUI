@@ -20,10 +20,10 @@ const KW_DOT: Record<DealDetail["kw"], string> = {
   low: "bg-[#B4B2A9]",
 };
 const STATUS_PILL: Record<DealDetail["statusType"], string> = {
-  neg: "bg-[#FAEEDA] text-[#854F0B] border border-[#FAC775]",
-  bu: "bg-[#E6F1FB] text-[#185FA5] border border-[#B5D4F4]",
-  init: "bg-[#EEEDFE] text-[#534AB7] border border-[#CECBF6]",
-  none: "bg-[#F5F5F4] text-[#9CA3AF] border border-[#E5E5E5]",
+  neg: "bg-white text-gray-700 border border-gray-300",
+  bu: "bg-white text-gray-700 border border-gray-300",
+  init: "bg-white text-gray-700 border border-gray-300",
+  none: "bg-white text-gray-700 border border-gray-300",
 };
 
 function fallbackDetail(p: DealProperty): DealDetail {
