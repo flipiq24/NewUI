@@ -280,6 +280,7 @@ export default function IqCampaignResponses() {
     neutral: new Set(),
     negative: new Set(),
   });
+  const [stepIdx, setStepIdx] = useState(0);
   const { started, start } = useStartGate("campaignResponses");
 
   function toggleSelect(sentiment: Sentiment, name: string) {
@@ -328,8 +329,19 @@ export default function IqCampaignResponses() {
     });
   }
 
+  const currentSec = SECTIONS[stepIdx];
+  const isLastStep = stepIdx === SECTIONS.length - 1;
+  const nextLabel = isLastStep
+    ? "Agents › Priority Calls"
+    : `Text and Email Campaigns › ${SECTIONS[stepIdx + 1].tail}`;
+
   function handleNext() {
-    navigate("/iq/priority-agents");
+    if (isLastStep) {
+      navigate("/iq/priority-agents");
+    } else {
+      setStepIdx((i) => Math.min(i + 1, SECTIONS.length - 1));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }
 
   return (
@@ -338,31 +350,57 @@ export default function IqCampaignResponses() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <IqTopBar />
         <IqChatPage
-          breadcrumbHead="Agents ›"
-          breadcrumbTail="Campaign Responses"
+          breadcrumbHead="Agents › Text and Email Campaigns ›"
+          breadcrumbTail={currentSec.tail}
           started={started}
           onStart={start}
           briefingMessage={
             <>
-              Josh, <span className="text-orange-500 font-semibold">{AGENTS.length}</span> agents responded to your text and email campaigns. They're sorted by Investor Source Count, then High → Mid → Low value, so the strongest leads sit at the top.
+              Josh, <span className="text-orange-500 font-semibold">{AGENTS.length}</span> agents responded to your text and email campaigns. We'll work them in three groups — <span className="font-semibold">Positive</span>, <span className="font-semibold">Neutral</span>, then <span className="font-semibold">Negative</span> — so each gets the right follow-up flow.
             </>
           }
-          briefingItems={[
-            { label: `agents replied (across SMS, Email and inbound calls)`, count: AGENTS.length },
-            { label: `responded by SMS`, count: AGENTS.filter(a => a.channel === "text").length },
-            { label: `responded by Email`, count: AGENTS.filter(a => a.channel === "email").length },
-            { label: `inbound calls`, count: AGENTS.filter(a => a.channel === "call").length },
-          ]}
-          nextTaskLabel="Agents › Priority Calls"
+          briefingItems={SECTIONS.map((s) => ({
+            label: `${s.tail.toLowerCase()}`,
+            count: SORTED.filter((a) => a.sentiment === s.sentiment).length,
+          }))}
+          nextTaskLabel={nextLabel}
           onNextTask={handleNext}
           instructions={
             <>
-              Work top-down. Each row shows the agent's value tier, relationship temperature, deal history and the snippet of how they replied. Hover any pill for the full record. Check off each agent as you action their response, then move on to Priority Calls.
+              <span className="font-semibold">Step {stepIdx + 1} of {SECTIONS.length} — {currentSec.tail}.</span>{" "}
+              {currentSec.blurb} Select the agents you want to action, choose a bulk follow-up, then hit Next Task.
             </>
           }
         >
+          {/* Step pills */}
+          <div className="flex items-center gap-2 mb-1">
+            {SECTIONS.map((s, i) => {
+              const active = i === stepIdx;
+              const done = i < stepIdx;
+              return (
+                <button
+                  key={s.sentiment}
+                  type="button"
+                  onClick={() => setStepIdx(i)}
+                  disabled={i > stepIdx}
+                  className={`inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full border transition-colors ${
+                    active
+                      ? "border-transparent text-white"
+                      : done
+                      ? "border-gray-200 text-gray-500 hover:bg-gray-50 cursor-pointer"
+                      : "border-gray-200 text-gray-300 cursor-not-allowed"
+                  }`}
+                  style={active ? { backgroundColor: s.dot } : undefined}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: active ? "#fff" : s.dot }} />
+                  {i + 1}. {s.tail}
+                </button>
+              );
+            })}
+          </div>
+
           <div className="flex flex-col gap-10">
-            {SECTIONS.map((sec) => {
+            {SECTIONS.filter((_, i) => i === stepIdx).map((sec) => {
               const rows = SORTED.filter((a) => a.sentiment === sec.sentiment);
               const names = rows.map((r) => r.name);
               const sectionSel = selectedBySection[sec.sentiment];
@@ -370,16 +408,13 @@ export default function IqCampaignResponses() {
               const sectionHandledCount = rows.filter((r) => handled.has(r.name)).length;
               return (
                 <section key={sec.sentiment}>
-                  {/* Breadcrumb-style heading */}
-                  <div className="flex items-baseline gap-2 mb-2 pb-2 border-b border-gray-200">
-                    <span className="text-[12px] text-gray-400">Agents › Text and Email Campaigns ›</span>
+                  <div className="flex items-baseline justify-between mb-3 pb-2 border-b border-gray-200">
                     <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold" style={{ color: sec.text }}>
                       <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sec.dot }} />
                       {sec.tail}
+                      <span className="text-[11px] text-gray-400 ml-1 font-normal">· {rows.length} agent{rows.length === 1 ? "" : "s"}</span>
                     </span>
-                    <span className="text-[11px] text-gray-400 ml-1">· {rows.length}</span>
                   </div>
-                  <p className="text-[12px] text-gray-500 mb-3">{sec.blurb}</p>
 
                   {/* Per-section action bar */}
                   {rows.length > 0 && (
@@ -537,13 +572,13 @@ export default function IqCampaignResponses() {
 
           <div className="flex items-center justify-between pt-2">
             <p className="text-[13px] text-gray-500">
-              <span className="font-semibold text-gray-800">{handled.size}</span> of {AGENTS.length} responses handled
+              <span className="font-semibold text-gray-800">{handled.size}</span> of {AGENTS.length} responses handled across all groups
             </p>
             <button
               onClick={handleNext}
               className="flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium px-4 py-2 rounded-full cursor-pointer transition-colors"
             >
-              Continue to Priority Calls
+              {isLastStep ? "Continue to Priority Calls" : `Next: ${SECTIONS[stepIdx + 1].tail}`}
               <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <polyline points="6,3 11,8 6,13" />
               </svg>
