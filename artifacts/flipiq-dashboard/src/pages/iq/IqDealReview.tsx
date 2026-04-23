@@ -74,7 +74,7 @@ export default function IqDealReview() {
 
   const currentSeg = segments[segIdx];
   const isLastSeg = segIdx === segments.length - 1;
-  const nextLabel = isLastSeg ? "Daily Outreach" : segmentLabels[segments[segIdx + 1].key];
+  const nextLabel = isLastSeg ? "Agents" : segmentLabels[segments[segIdx + 1].key];
 
   // Subscribe to checklist changes so completion checkmarks update live
   const checklistVersion = useChecklistVersion();

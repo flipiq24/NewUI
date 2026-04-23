@@ -36,8 +36,8 @@ export default function IqPriorityAgents() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <IqTopBar
-          breadcrumb="Daily Outreach > Call Priority Agents"
-          nextTask="Start New Relationship Building"
+          breadcrumb="Agents > Priority Calls"
+          nextTask="New Deals > New High Propensity to Sell Deals"
           onNext={handleTopNext}
           nextIncomplete={calledCount < TOTAL_AGENTS}
         />

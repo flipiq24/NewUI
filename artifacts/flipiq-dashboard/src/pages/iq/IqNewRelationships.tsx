@@ -50,7 +50,7 @@ export default function IqNewRelationships() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <IqTopBar
-          breadcrumb="Daily Outreach > Start New Relationships Building"
+          breadcrumb="New Deals > New High Propensity to Sell Deals"
           nextTask="End of Day Stats"
           onNext={handleTopNext}
           nextIncomplete={calledCount < total}

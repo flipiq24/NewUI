@@ -25,13 +25,15 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
   resetIqStateIfNewDay();
 
   const welcomeBackActive = location === "/iq/welcome-back";
-  const iqActive = location === "/iq" || location === "/iq/tasks";
-  const dealReviewActive = location === "/iq/deal-review";
-  const dailyOutreachLocations = ["/iq/daily-outreach", "/iq/priority-agents", "/iq/new-relationships"];
-  const dailyOutreachActive = dailyOutreachLocations.includes(location);
+  const todaysPlanActive = location === "/iq" || location === "/iq/tasks";
+  const activeDealsActive = location === "/iq/deal-review";
+  const agentsLocations = ["/iq/daily-outreach", "/iq/priority-agents"];
+  const agentsActive = agentsLocations.includes(location);
+  const newDealsActive = location === "/iq/new-relationships";
 
-  const showDealReview = dealReviewActive || dailyOutreachActive || welcomeBackActive;
-  const showDailyOutreach = dailyOutreachActive || welcomeBackActive;
+  const showActiveDeals = activeDealsActive || agentsActive || newDealsActive || welcomeBackActive;
+  const showAgents = agentsActive || newDealsActive || welcomeBackActive;
+  const showNewDeals = newDealsActive || welcomeBackActive;
   const showWelcomeBack = welcomeBackActive;
 
   return (
@@ -47,32 +49,42 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
       </div>
 
       <div className="px-3 pb-2">
-        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-2 py-1">Today's Plan</p>
+        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-2 py-1">iQ</p>
         <Link href="/iq">
           <IqNavItem
             icon={<LightbulbIcon />}
-            label="iQ"
-            active={iqActive}
-            done={!iqActive}
+            label="Today's Plan"
+            active={todaysPlanActive}
+            done={!todaysPlanActive}
           />
         </Link>
-        {showDealReview && (
+        {showActiveDeals && (
           <Link href="/iq/deal-review">
             <IqNavItem
               icon={<FileTextIcon />}
-              label="Deal Review"
-              active={dealReviewActive}
-              done={!dealReviewActive}
+              label="Active Deals"
+              active={activeDealsActive}
+              done={!activeDealsActive}
             />
           </Link>
         )}
-        {showDailyOutreach && (
+        {showAgents && (
           <Link href="/iq/daily-outreach">
             <IqNavItem
               icon={<PhoneIcon />}
-              label="Daily Outreach"
-              active={dailyOutreachActive}
-              done={!dailyOutreachActive}
+              label="Agents"
+              active={agentsActive}
+              done={!agentsActive}
+            />
+          </Link>
+        )}
+        {showNewDeals && (
+          <Link href="/iq/new-relationships">
+            <IqNavItem
+              icon={<FolderIcon />}
+              label="New Deals"
+              active={newDealsActive}
+              done={!newDealsActive}
             />
           </Link>
         )}
