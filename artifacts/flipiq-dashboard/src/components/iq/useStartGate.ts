@@ -11,11 +11,16 @@ export function useStartGate(key: string) {
 
   const [started, setStarted] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
+    if (window.location.search.includes("start=1")) return true;
     return localStorage.getItem(storageKey) === today;
   });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (window.location.search.includes("start=1")) {
+      setStarted(true);
+      return;
+    }
     setStarted(localStorage.getItem(storageKey) === today);
   }, [storageKey, today]);
 
