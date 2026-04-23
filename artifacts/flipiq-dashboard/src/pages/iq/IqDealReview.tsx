@@ -338,16 +338,28 @@ export default function IqDealReview() {
                       />
                     )}
                   </div>
-                  <button
-                    onClick={handleNext}
-                    className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider hover:text-orange-500 transition-colors cursor-pointer"
-                  >
-                    <span className="text-orange-500 normal-case font-medium tracking-normal text-[12px]">
-                      Next Task:
-                    </span>
-                    <span>{nextLabel}</span>
-                    <svg className="w-3 h-3 text-orange-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6,3 11,8 6,13" /></svg>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => window.history.back()}
+                      aria-label="Back"
+                      title="Back"
+                      className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-gray-300 bg-white text-gray-500 hover:text-orange-500 hover:border-orange-300 transition-colors cursor-pointer"
+                    >
+                      <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="10,3 5,8 10,13" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={handleNext}
+                      className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider hover:text-orange-500 transition-colors cursor-pointer"
+                    >
+                      <span className="text-orange-500 normal-case font-medium tracking-normal text-[12px]">
+                        Next Task:
+                      </span>
+                      <span>{nextLabel}</span>
+                      <svg className="w-3 h-3 text-orange-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6,3 11,8 6,13" /></svg>
+                    </button>
+                  </div>
                 </div>
                 <hr className="border-t border-gray-200 mt-2 mb-3" />
               </div>
