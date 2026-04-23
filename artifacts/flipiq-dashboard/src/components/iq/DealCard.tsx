@@ -263,6 +263,23 @@ export default function DealCard({ property }: { property: DealProperty }) {
             {ICON.globe}
           </button>
           <span className="text-gray-300">·</span>
+          <span className="relative group cursor-help text-gray-500 hover:text-gray-900">
+            Source:{" "}
+            <span className="text-gray-700 font-medium">
+              {property.source}
+              {property.sourceStatus ? ` — ${property.sourceStatus}` : ""}
+            </span>
+            <TipPanel
+              title="Source"
+              rows={[
+                ["Source", property.source],
+                ...(property.sourceStatus ? ([["Status", property.sourceStatus]] as [string, string][]) : []),
+                ["Negotiator", detail.negotiator],
+                ["Assigned", detail.assigned],
+              ]}
+            />
+          </span>
+          <span className="text-gray-300">·</span>
           <span className="relative group cursor-help font-medium text-gray-900">
             {property.price}
             <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />

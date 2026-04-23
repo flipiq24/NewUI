@@ -71,8 +71,8 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     opened: "04/22", called: "12/30",
     firstOpened: "11/20/25", totalOpens: 8,
     firstCalled: "12/01/25", totalCommsCount: 5, totalCalls: 2, totalTexts: 2, totalEmails: 1,
-    pct: "30%", status: "Back Up", statusType: "bu",
-    source: "MLS — Active", negotiator: "Josh Santos", assigned: "Josh Santos",
+    pct: "50%", status: "Contract Submitted", statusType: "neg",
+    source: "MLS — Pending", negotiator: "Josh Santos", assigned: "Not Assigned",
   },
   3: {
     taskNote: "Strong comps support $960k. Submit backup ready to move.",
@@ -91,8 +91,8 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     opened: "04/23", called: "01/01",
     firstOpened: "12/08/25", totalOpens: 12,
     firstCalled: "12/10/25", totalCommsCount: 7, totalCalls: 2, totalTexts: 3, totalEmails: 2,
-    pct: "30%", status: "Back Up", statusType: "bu",
-    source: "MLS — Active", negotiator: "Josh Santos", assigned: "Josh Santos",
+    pct: "20%", status: "Continue to Follow", statusType: "init",
+    source: "Off Market", negotiator: "Josh Santos", assigned: "Josh Santos",
   },
   4: {
     taskNote: "Buyer performance check. Confirm EMD and contingency removal dates.",
@@ -152,7 +152,7 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     firstOpened: "03/02/26", totalOpens: 4,
     firstCalled: "03/02/26", totalCommsCount: 5, totalCalls: 2, totalTexts: 2, totalEmails: 1,
     pct: "10%", status: "Initial Contact", statusType: "init",
-    source: "MLS — Closed", negotiator: "Josh Santos", assigned: "Josh Santos",
+    source: "Notification Opened", negotiator: "Josh Santos", assigned: "Josh Santos",
   },
   7: {
     taskNote: "Cancelled listing. Call and find out why.",
@@ -171,7 +171,7 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     opened: "04/14", called: "—",
     firstOpened: "04/14/26", totalOpens: 2,
     firstCalled: "—", totalCommsCount: 0, totalCalls: 0, totalTexts: 0, totalEmails: 0,
-    pct: "10%", status: "Initial Contact", statusType: "init",
+    pct: "30%", status: "Offer Terms Sent", statusType: "bu",
     source: "MLS — Cancelled", negotiator: "Josh Santos", assigned: "Not Assigned",
   },
   8: {
@@ -191,7 +191,7 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     opened: "01/02", called: "01/01",
     firstOpened: "12/20/25", totalOpens: 6,
     firstCalled: "12/15/25", totalCommsCount: 5, totalCalls: 2, totalTexts: 2, totalEmails: 1,
-    pct: "30%", status: "Back Up", statusType: "bu",
+    pct: "80%", status: "Offer Accepted", statusType: "neg",
     source: "MLS — Closed", negotiator: "Josh Santos", assigned: "Not Assigned",
   },
   9: {
@@ -211,7 +211,7 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     opened: "04/15", called: "04/14",
     firstOpened: "04/01/26", totalOpens: 5,
     firstCalled: "04/01/26", totalCommsCount: 8, totalCalls: 3, totalTexts: 3, totalEmails: 2,
-    pct: "0%", status: "None", statusType: "none",
-    source: "MLS — Closed", negotiator: "Josh Santos", assigned: "Not Assigned",
+    pct: "100%", status: "Acquired", statusType: "neg",
+    source: "MLS — Expired", negotiator: "Josh Santos", assigned: "Not Assigned",
   },
 };
