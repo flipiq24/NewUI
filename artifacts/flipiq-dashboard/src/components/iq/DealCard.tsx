@@ -296,12 +296,15 @@ export default function DealCard({ property }: { property: DealProperty }) {
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help text-gray-500 hover:text-gray-900">
             Source:{" "}
+            <span className="text-gray-700 font-medium">
+              {property.source.replace(/\s*—\s*.*$/, "")}
+              {property.sourceStatus || /\s*—\s*/.test(property.source) ? " — " : ""}
+            </span>
             <span
               className="font-medium"
               style={{ color: sourceTextColor(property.source, property.sourceStatus) }}
             >
-              {property.source}
-              {property.sourceStatus ? ` — ${property.sourceStatus}` : ""}
+              {property.sourceStatus || (property.source.match(/\s*—\s*(.*)$/)?.[1] ?? (property.source.toLowerCase() in SOURCE_COLORS ? property.source : ""))}
             </span>
             <TipPanel
               title="Source"
