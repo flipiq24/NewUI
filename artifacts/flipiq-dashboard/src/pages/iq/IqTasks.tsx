@@ -142,7 +142,13 @@ function Priority({ priority, title, body, done, items }: PriorityProps) {
           <div className="space-y-1">
             {items.map((line, i) => (
               <div key={i} className="flex items-center gap-2.5 text-[13px] text-gray-500">
-                <span className="text-[11px] text-gray-300 w-3 flex-shrink-0">{i + 1}.</span>
+                {done ? (
+                  <svg className="w-3 h-3 text-green-600 flex-shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3,8 7,12 13,4" />
+                  </svg>
+                ) : (
+                  <span className="text-[11px] text-gray-300 w-3 flex-shrink-0">{i + 1}.</span>
+                )}
                 <span>{highlightNumbers(line)}</span>
               </div>
             ))}
