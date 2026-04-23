@@ -226,6 +226,7 @@ export default function IqTasks() {
 
   const iqState = useMemo(() => loadIqState(), [checklistVersion, showCheckin]);
   const outreachFlag = !!iqState?.outreachCampaignSent;
+  const responsesFlag = !!iqState?.campaignResponsesComplete;
   const priorityFlag = !!iqState?.priorityAgentsComplete;
   const newRelFlag = !!iqState?.newRelationshipsComplete;
   const dayDone = !!iqState && allTasksComplete(iqState);
@@ -314,6 +315,14 @@ export default function IqTasks() {
 
                 <Priority
                   priority={3}
+                  title="Agents › Campaign Responses"
+                  body="Work the agents who replied to today's campaigns — Positive first, then Neutral, then Negative — and apply the right follow-up to each."
+                  done={responsesFlag}
+                  items={["Positive Response", "Neutral Response", "Negative Response"]}
+                />
+
+                <Priority
+                  priority={4}
                   title="Agents › Priority Calls"
                   body="Call your highest-value agents to keep relationships warm and move deals forward."
                   done={priorityFlag}
@@ -321,7 +330,7 @@ export default function IqTasks() {
                 />
 
                 <Priority
-                  priority={4}
+                  priority={5}
                   title="New Deals › New High Propensity to Sell Deals"
                   body="Reach out on owners likely to list soon to grow your agent network with fresh, high-intent leads."
                   done={newRelFlag}

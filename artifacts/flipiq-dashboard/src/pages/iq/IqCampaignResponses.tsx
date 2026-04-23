@@ -471,6 +471,8 @@ export default function IqCampaignResponses() {
 
   function handleNext() {
     if (isLastStep) {
+      const state = resetIqStateIfNewDay();
+      saveIqState({ ...state, campaignResponsesComplete: true });
       navigate("/iq/priority-agents");
     } else {
       setStepIdx((i) => Math.min(i + 1, SECTIONS.length - 1));

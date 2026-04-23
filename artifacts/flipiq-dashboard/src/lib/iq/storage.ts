@@ -16,6 +16,7 @@ export type IqState = {
   flowStarted?: boolean;
   dealReviewComplete?: boolean;
   outreachCampaignSent?: boolean;
+  campaignResponsesComplete?: boolean;
   priorityAgentsComplete?: boolean;
   newRelationshipsComplete?: boolean;
 };
@@ -85,6 +86,7 @@ export function allTasksComplete(s: IqState): boolean {
   return !!(
     s.dealReviewComplete &&
     s.outreachCampaignSent &&
+    s.campaignResponsesComplete &&
     s.priorityAgentsComplete &&
     s.newRelationshipsComplete
   );
@@ -93,6 +95,7 @@ export function allTasksComplete(s: IqState): boolean {
 export function firstIncompleteRoute(s: IqState): string {
   if (!s.dealReviewComplete) return "/iq/deal-review";
   if (!s.outreachCampaignSent) return "/iq/daily-outreach";
+  if (!s.campaignResponsesComplete) return "/iq/campaign-responses";
   if (!s.priorityAgentsComplete) return "/iq/priority-agents";
   if (!s.newRelationshipsComplete) return "/iq/new-relationships";
   return "/iq/tasks";
