@@ -8,7 +8,7 @@ import MinimalPropertyRow from "@/components/iq/MinimalPropertyRow";
 import { DEAL_REVIEW_PROPERTIES, type DealLevel, type NotificationKind } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 import { useStartGate } from "@/components/iq/useStartGate";
-import { isPropertyComplete, useChecklistVersion } from "@/lib/iq/dailyChecklist";
+import { isPropertyComplete, setPropertyComplete, useChecklistVersion } from "@/lib/iq/dailyChecklist";
 
 const segments = [
   {
@@ -167,6 +167,13 @@ export default function IqDealReview() {
     });
   }
 
+  const allSelected =
+    visibleProps.length > 0 && visibleProps.every((p) => isPropertyComplete(p.id));
+
+  function handleSelectAll(checked: boolean) {
+    visibleProps.forEach((p) => setPropertyComplete(p.id, checked));
+  }
+
   function handleNext() {
     if (isLastSeg) {
       const state = resetIqStateIfNewDay();
@@ -265,11 +272,6 @@ export default function IqDealReview() {
                   {segmentLabels[currentSeg.key]}
                 </span>
               </span>
-              <button onClick={handleNext} className="flex items-center gap-1 text-xs text-gray-400 hover:text-orange-500 transition-colors cursor-pointer">
-                <span className="font-medium text-orange-500">Next Task:</span>
-                <span>{nextLabel}</span>
-                <svg className="w-3 h-3 text-orange-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6,3 11,8 6,13" /></svg>
-              </button>
             </div>
           </>
         )}
@@ -287,12 +289,32 @@ export default function IqDealReview() {
                 <span className="text-[13px] font-semibold text-gray-700 leading-none">FlipiQ</span>
               </div>
 
-              {/* Section heading + instruction */}
+              {/* Section heading row: Select All (left) · Next Task (right) */}
               <div>
-                <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                  {currentSeg.label} — {visibleProps.length}{" "}
-                  {visibleProps.length === 1 ? "property" : "properties"}
-                </p>
+                <div className="flex items-center justify-between">
+                  <label className="inline-flex items-center gap-2 cursor-pointer select-none group">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                      className="w-3.5 h-3.5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer"
+                    />
+                    <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider group-hover:text-gray-700">
+                      Select All
+                    </span>
+                  </label>
+                  <button
+                    onClick={handleNext}
+                    className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider hover:text-orange-500 transition-colors cursor-pointer"
+                  >
+                    <span className="text-orange-500 normal-case font-medium tracking-normal text-[12px]">
+                      Next Task:
+                    </span>
+                    <span>{nextLabel}</span>
+                    <svg className="w-3 h-3 text-orange-400" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6,3 11,8 6,13" /></svg>
+                  </button>
+                </div>
+                <hr className="border-t border-gray-200 mt-2 mb-3" />
                 <p className="text-[14px] text-gray-800 leading-7">
                   {currentSeg.subtitle}
                 </p>
