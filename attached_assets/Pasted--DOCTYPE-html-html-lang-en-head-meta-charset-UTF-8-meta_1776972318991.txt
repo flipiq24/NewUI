@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlipIQ — Agent Relationships</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #1F1F1F; padding: 20px; }
+
+.fq-app { max-width: 1100px; margin: 0 auto; background: #FFFFFF; border: 0.5px solid #E5E5E5; border-radius: 10px; overflow: visible; }
+
+.fq-topbar { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-bottom: 0.5px solid #E5E5E5; }
+.fq-logo { font-size: 16px; font-weight: 600; color: #F97316; flex-shrink: 0; }
+.fq-logo span { color: #1F1F1F; }
+.fq-stepper { display: flex; align-items: center; gap: 6px; margin: 0 auto; font-size: 12px; }
+.fq-step { display: flex; align-items: center; gap: 6px; color: #9CA3AF; }
+.fq-step b { font-weight: 500; color: #6B6B6B; }
+.fq-step.active b { color: #1F1F1F; }
+.fq-step.done b { color: #6B6B6B; }
+.fq-num { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #F5F5F4; color: #9CA3AF; font-size: 11px; font-weight: 500; border: 0.5px solid #E5E5E5; }
+.fq-step.done .fq-num { background: #EAF3DE; color: #27500A; border-color: #C0DD97; }
+.fq-step.active .fq-num { background: #F97316; color: white; border-color: #F97316; }
+.fq-step-line { width: 22px; height: 0.5px; background: #E5E5E5; }
+.fq-help { font-size: 12px; color: #F97316; font-weight: 500; flex-shrink: 0; cursor: pointer; }
+
+.fq-bc { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #6B6B6B; padding: 12px 16px; border-bottom: 0.5px solid #E5E5E5; }
+.fq-bc b { color: #1F1F1F; font-weight: 500; border-bottom: 2px solid #F97316; padding-bottom: 3px; }
+.fq-bc-sep { color: #9CA3AF; }
+.fq-bc-next { margin-left: auto; color: #9CA3AF; cursor: pointer; font-size: 12px; }
+.fq-bc-next b { color: #6B6B6B; border: none; padding: 0; }
+.fq-bc-next:hover b { color: #F97316; }
+
+.fq-sec { padding: 16px 16px 4px; }
+.fq-sec-top { display: flex; align-items: center; gap: 10px; padding: 6px 0 8px; border-bottom: 0.5px solid #E5E5E5; margin-bottom: 4px; }
+.fq-cb { width: 14px; height: 14px; border: 1px solid #D1D5DB; border-radius: 3px; cursor: pointer; display: inline-block; background: #FFFFFF; flex-shrink: 0; }
+.fq-cb:hover { border-color: #6B6B6B; }
+.fq-cb.on { background: #F97316; border-color: #F97316; position: relative; }
+.fq-cb.on::after { content: ""; position: absolute; top: 1px; left: 3px; width: 4px; height: 7px; border: solid white; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+.fq-all-lbl { font-size: 10px; letter-spacing: 0.8px; color: #9CA3AF; font-weight: 500; }
+.fq-sec-ttl { font-size: 11px; letter-spacing: 0.8px; color: #6B6B6B; font-weight: 500; margin-left: auto; }
+.fq-sec-ttl b { color: #1F1F1F; font-weight: 500; }
+.fq-sec-desc { font-size: 13px; color: #6B6B6B; margin: 8px 0 4px; line-height: 1.5; }
+
+.row { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: flex-start; padding: 14px 0; border-bottom: 0.5px solid #E5E5E5; position: relative; }
+.row:hover { background: #FAFAF9; }
+.row:last-child { border-bottom: none; }
+
+.lnav { display: flex; flex-direction: column; gap: 7px; padding-top: 3px; align-items: center; position: relative; }
+.ico { width: 16px; height: 16px; color: #9CA3AF; cursor: pointer; position: relative; display: flex; align-items: center; justify-content: center; border-radius: 3px; }
+.ico:hover { color: #1F1F1F; }
+.ico svg { width: 16px; height: 16px; display: block; }
+
+.main { min-width: 0; }
+.title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.phone-btn { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #FFF7ED; color: #EA580C; border: 0.5px solid #FED7AA; cursor: pointer; flex-shrink: 0; }
+.phone-btn:hover { background: #F97316; color: white; border-color: #F97316; }
+.phone-btn svg { width: 11px; height: 11px; }
+.agent-name { font-size: 15px; font-weight: 500; color: #1F1F1F; line-height: 1.3; cursor: help; position: relative; }
+.agent-name:hover { color: #EA580C; }
+.city-chip { font-size: 12px; color: #6B6B6B; cursor: help; position: relative; }
+.city-chip:hover { color: #1F1F1F; }
+
+.id-line { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; margin-bottom: 6px; font-size: 13px; color: #6B6B6B; }
+.office-i { position: relative; cursor: help; }
+.office-i:hover { color: #1F1F1F; }
+.id-sep { color: #9CA3AF; opacity: 0.5; }
+.phone-i { color: #1F1F1F; font-weight: 500; cursor: pointer; }
+.phone-i:hover { color: #EA580C; }
+.email-i { color: #1F1F1F; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; }
+.email-i:hover { color: #EA580C; }
+.email-i svg { width: 11px; height: 11px; }
+
+.meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: #9CA3AF; align-items: center; }
+.meta-i { position: relative; cursor: help; color: #6B6B6B; }
+.meta-i:hover { color: #1F1F1F; }
+.meta-sep { color: #9CA3AF; opacity: 0.5; }
+.meta-plain { color: #9CA3AF; }
+.meta-plain b { color: #6B6B6B; font-weight: 400; }
+
+.dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+.d-gray { background: #B4B2A9; }
+.d-green { background: #639922; }
+.d-amber { background: #BA7517; }
+.d-red { background: #E24B4A; }
+.d-purple { background: #7F77DD; }
+
+/* Relationship pill colors */
+.rel-priority { background: #EEEDFE; color: #3C3489; border: 0.5px solid #CECBF6; }
+.rel-hot { background: #FCEBEB; color: #791F1F; border: 0.5px solid #F7C1C1; }
+.rel-warm { background: #FAEEDA; color: #633806; border: 0.5px solid #FAC775; }
+.rel-cold { background: #E6F1FB; color: #0C447C; border: 0.5px solid #B5D4F4; }
+.rel-unknown { background: #F5F5F4; color: #6B6B6B; border: 0.5px solid #E5E5E5; }
+.rel-dnc { background: #1F1F1F; color: #FFFFFF; border: 0.5px solid #1F1F1F; }
+
+.rel-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 500; cursor: help; position: relative; }
+
+.basket { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11.5px; font-weight: 500; cursor: help; position: relative; }
+.bkt-clients { background: #EEEDFE; color: #3C3489; }
+.bkt-high { background: #EAF3DE; color: #27500A; }
+.bkt-mid { background: #FAEEDA; color: #633806; }
+.bkt-low { background: #F5F5F4; color: #6B6B6B; }
+.bkt-prospect { background: #E6F1FB; color: #0C447C; }
+.bkt-unknown { background: #F5F5F4; color: #9CA3AF; }
+
+.next-step-text { font-size: 13px; font-weight: 500; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 240px; }
+.next-step-positive { color: #27500A; }
+.next-step-neutral { color: #854F0B; }
+.next-step-negative { color: #791F1F; }
+.chip-col { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; width: 240px; max-width: 240px; margin-left: auto; }
+.resp-line { font-size: 11.5px; color: #6B6B6B; font-style: italic; line-height: 1.4; text-align: right; cursor: help; position: relative; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 240px; }
+.resp-line:hover { color: #1F1F1F; }
+.resp-tip { white-space: normal; text-align: left; min-width: 280px; max-width: 360px; padding: 0; }
+.resp-thread { display: flex; flex-direction: column; gap: 8px; padding: 12px; }
+.resp-msg { display: flex; flex-direction: column; gap: 2px; max-width: 85%; }
+.resp-msg-out { align-self: flex-end; align-items: flex-end; }
+.resp-msg-in { align-self: flex-start; align-items: flex-start; }
+.resp-msg-text { font-size: 12px; line-height: 1.4; color: #1F1F1F; }
+.resp-msg-out .resp-msg-text { color: #6B6B6B; }
+.resp-msg-meta { font-size: 9.5px; color: #9CA3AF; letter-spacing: 0.3px; text-transform: uppercase; }
+.track-record { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: #6B6B6B; cursor: help; position: relative; font-weight: 500; }
+.track-record:hover { color: #1F1F1F; }
+.tr-sep { color: #D1D5DB; font-weight: 400; }
+.a-dim { color: #9CA3AF; font-weight: 500; }
+.a-glow { color: #F97316; font-weight: 600; text-shadow: 0 0 6px rgba(249, 115, 22, 0.5); animation: flipiq-glow 1.8s ease-in-out infinite; }
+@keyframes flipiq-glow {
+  0%, 100% { text-shadow: 0 0 4px rgba(249, 115, 22, 0.4); }
+  50% { text-shadow: 0 0 10px rgba(249, 115, 22, 0.85), 0 0 14px rgba(249, 115, 22, 0.4); }
+}
+
+/* Follow-up status chip colors */
+.fu-built { background: #EAF3DE; color: #27500A; border-color: #C0DD97; }
+.fu-convo { background: #E6F1FB; color: #0C447C; border-color: #B5D4F4; }
+.fu-attempt { background: #FAEEDA; color: #633806; border-color: #FAC775; }
+.fu-noresp { background: #F5F5F4; color: #6B6B6B; border-color: #E5E5E5; }
+.fu-not { background: #FCEBEB; color: #791F1F; border-color: #F7C1C1; }
+.fu-continue { background: #FAEEDA; color: #633806; border-color: #FAC775; }
+.fu-na { background: #F5F5F4; color: #9CA3AF; border-color: #E5E5E5; }
+.fu-dnc { background: #1F1F1F; color: #FFFFFF; border-color: #1F1F1F; }
+
+.critical-flag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; background: #FCEBEB; color: #791F1F; border: 0.5px solid #F7C1C1; border-radius: 4px; font-size: 11px; font-weight: 500; cursor: help; position: relative; }
+.reminder-flag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; background: #FFF7ED; color: #9A3412; border: 0.5px solid #FED7AA; border-radius: 4px; font-size: 11px; font-weight: 500; cursor: help; position: relative; }
+
+.deals-summary { font-size: 12px; color: #6B6B6B; cursor: help; position: relative; font-weight: 500; }
+.deals-summary:hover { color: #1F1F1F; }
+.deals-summary b { color: #1F1F1F; font-weight: 500; }
+
+.menu { display: none; position: absolute; top: 0; left: calc(100% + 8px); background: #FFFFFF; border: 0.5px solid #D1D5DB; border-radius: 8px; padding: 10px; z-index: 50; box-shadow: 0 4px 16px rgba(0,0,0,0.08); min-width: 450px; }
+.menu.open { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0 14px; }
+.menu-col h5 { font-size: 10px; letter-spacing: 0.8px; color: #9CA3AF; font-weight: 500; margin: 4px 0 4px; padding: 0 6px; text-transform: uppercase; }
+.menu-col a { display: flex; align-items: center; gap: 6px; padding: 5px 8px; font-size: 12px; color: #1F1F1F; cursor: pointer; border-radius: 4px; text-decoration: none; }
+.menu-col a:hover { background: #F5F5F4; }
+.menu-col a svg { width: 12px; height: 12px; color: #9CA3AF; flex-shrink: 0; }
+
+.nudge { display: none; margin-top: 10px; padding: 9px 12px; background: #FFF7ED; border: 0.5px solid #FED7AA; border-radius: 8px; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 12.5px; color: #7C2D12; }
+.nudge.open { display: flex; }
+.nudge b { font-weight: 500; }
+.nudge-btns { display: flex; gap: 6px; }
+.n-yes { padding: 4px 11px; background: #1F1F1F; color: #FFFFFF; border: none; border-radius: 4px; font-size: 11.5px; font-weight: 500; cursor: pointer; }
+.n-no { padding: 4px 11px; background: transparent; color: #6B6B6B; border: 0.5px solid #D1D5DB; border-radius: 4px; font-size: 11.5px; cursor: pointer; }
+
+.tip { visibility: hidden; opacity: 0; position: absolute; bottom: calc(100% + 6px); left: 0; background: #FFFFFF; color: #1F1F1F; font-size: 12px; font-weight: 400; padding: 10px 12px; border-radius: 6px; z-index: 100; line-height: 1.55; transition: opacity 0.1s; pointer-events: none; text-align: left; min-width: 240px; max-width: 300px; border: 0.5px solid #D1D5DB; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+[data-tip]:hover > .tip { visibility: visible; opacity: 1; }
+.ico:hover > .tip { visibility: visible; opacity: 1; }
+.tip-ttl { font-weight: 500; color: #EA580C; margin-bottom: 6px; display: block; font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
+.tip-row { display: flex; justify-content: space-between; gap: 14px; padding: 1.5px 0; }
+.tip-row span:first-child { color: #9CA3AF; }
+.tip-row span:last-child { color: #1F1F1F; font-weight: 500; }
+.tip-foot { margin-top: 6px; padding-top: 6px; border-top: 0.5px solid #E5E5E5; }
+.tip-right { left: auto; right: 0; }
+</style>
+</head>
+<body>
+
+<div class="fq-app">
+  <div class="fq-topbar">
+    <div class="fq-logo">Flip<span>iQ</span></div>
+    <div class="fq-stepper">
+      <div class="fq-step done"><span class="fq-num">&#10003;</span><b>Today's Plan</b></div>
+      <div class="fq-step-line"></div>
+      <div class="fq-step done"><span class="fq-num">&#10003;</span><b>Active Deals</b></div>
+      <div class="fq-step-line"></div>
+      <div class="fq-step active"><span class="fq-num">22</span><b>Agents</b></div>
+      <div class="fq-step-line"></div>
+      <div class="fq-step"><span class="fq-num">1</span><b>New Deals</b></div>
+    </div>
+    <div class="fq-help">Need Help?</div>
+  </div>
+
+  <div class="fq-bc">
+    Agents <span class="fq-bc-sep">&rsaquo;</span> 22 Agent Relationships <span class="fq-bc-sep">&rsaquo;</span> <b>2 Positive Response</b>
+    <div class="fq-bc-next">Next: <b>Neutral Response &rsaquo;</b></div>
+  </div>
+
+  <div id="sections"></div>
+</div>
+
+<script>
+const AGENTS = [
+  {id:1, section:'positive', name:'Jose Ponce', office:'PONCE & PONCE REALTY, INC', phone:'909-266-0934', email:'joseponce909@yahoo.com', city:'Fontana', licenseYear:'2011',
+   rel:'Priority', relClass:'rel-priority',
+   basket:'High Value', basketClass:'bkt-high',
+   investor:'Yes', sourceCount:19, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:3, backup:0, sold:54, totalDeals:57,
+   lastCommDate:'03/18/26', lastCommType:'Call', lastAddr:'2378 Crestview Dr, Laguna Beach', lastCommAA:'Josh Santos',
+   fuStatus:'Relationship Built', fuClass:'fu-built', fuDate:'03/18/26',
+   critical:1, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Check in on recent listings', otherListings:7, responseQuote:"Got your text — call me back, I have one in Fontana you'll like.", thread:[['out','03/10/26','Text','Hey Jose, Josh at FlipIQ — saw your Fontana listing come up. Any flex on price or terms?'],['in','03/11/26','Text','Let me check with seller and circle back this week.'],['out','03/17/26','Text','Following up — any update from the seller?'],['in','03/18/26','Text',"Got your text — call me back, I have one in Fontana you'll like."]]},
+
+  {id:2, section:'neutral', name:'Tony Diaz', office:'Flipiq', phone:'714-581-7805', email:'tony@flipiq.com', city:'Irvine', licenseYear:'2018',
+   rel:'Priority', relClass:'rel-priority',
+   basket:'Clients', basketClass:'bkt-clients',
+   investor:'No', sourceCount:2, activeYr:'FALSE', avgDeals:null, doubleEnded:null,
+   pending:0, backup:0, sold:0, totalDeals:0,
+   lastCommDate:'11/27/25', lastCommType:'Email', lastAddr:'—', lastCommAA:'Josh Santos',
+   fuStatus:'Attempt 5', fuClass:'fu-attempt', fuDate:'11/27/25',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Re-engage — platform client', otherListings:0, responseQuote:'', thread:[]},
+
+  {id:3, section:'neutral', name:'Hadaly Khoum', office:'REALTY MASTERS & ASSOCIATES', phone:'909-767-9474', email:'hadalykhoum5268@gmail.com', city:'Chino', licenseYear:'2015',
+   rel:'Hot', relClass:'rel-hot',
+   basket:'Mid Value', basketClass:'bkt-mid',
+   investor:'No', sourceCount:11, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:1, backup:0, sold:8, totalDeals:9,
+   lastCommDate:'04/07/26', lastCommType:'Call', lastAddr:'9283 Atsina Rd, Phelan', lastCommAA:'Josh Santos',
+   fuStatus:'Attempt 2', fuClass:'fu-attempt', fuDate:'04/07/26',
+   critical:1, reminders:1, assigned:'Josh Santos',
+   nextSteps:'Second attempt — responded once', otherListings:4, responseQuote:"Yes send me the details, I'm on a call back in 10.", thread:[['out','04/06/26','Text','Hi Hadaly — Josh from FlipIQ. Interested in the Phelan property on Atsina. Cash buyer, quick close.'],['in','04/07/26','Text',"Yes send me the details, I'm on a call back in 10."]]},
+
+  {id:4, section:'neutral', name:'Salvador Armijo', office:'CARNAVAL REALTY', phone:'626-290-0373', email:'salvadorarmijo007@gmail.com', city:'El Monte', licenseYear:'2012',
+   rel:'Hot', relClass:'rel-hot',
+   basket:'High Value', basketClass:'bkt-high',
+   investor:'Yes', sourceCount:null, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:1, backup:0, sold:2, totalDeals:3,
+   lastCommDate:'01/23/26', lastCommType:'Text', lastAddr:'—', lastCommAA:'Josh Santos',
+   fuStatus:'Attempt 1', fuClass:'fu-attempt', fuDate:'01/23/26',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Follow up on first attempt', otherListings:2, responseQuote:'Appreciate the follow up. Give me till next week.', thread:[['out','01/20/26','Text','Salvador — Josh from FlipIQ. Wanted to introduce myself. We buy SGV flips at scale.'],['in','01/23/26','Text','Appreciate the follow up. Give me till next week.']]},
+
+  {id:5, section:'neutral', name:'Belinda Sadberry', office:'Nelson Shelton & Associates', phone:'424-355-9140', email:'sadberryelite@gmail.com', city:'Los Angeles', licenseYear:'2017',
+   rel:'Hot', relClass:'rel-hot',
+   basket:'Low Value', basketClass:'bkt-low',
+   investor:'No', sourceCount:4, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:0, backup:0, sold:1, totalDeals:1,
+   lastCommDate:'—', lastCommType:'—', lastAddr:'—', lastCommAA:'—',
+   fuStatus:'N/A', fuClass:'fu-na', fuDate:'—',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'First contact — cold intro', otherListings:1, responseQuote:'', thread:[]},
+
+  {id:6, section:'positive', name:'Christy Davenport', office:'COLDWELL BANKER REALTY', phone:'951-312-5017', email:'christydavenport1@yahoo.com', city:'Riverside', licenseYear:'2009',
+   rel:'Warm', relClass:'rel-warm',
+   basket:'Low Value', basketClass:'bkt-low',
+   investor:'No', sourceCount:null, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:1, backup:0, sold:3, totalDeals:4,
+   lastCommDate:'04/02/26', lastCommType:'Email', lastAddr:'—', lastCommAA:'Josh Santos',
+   fuStatus:'Relationship Built', fuClass:'fu-built', fuDate:'04/02/26',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Monthly check-in', otherListings:3, responseQuote:'Always open to bring your buyers first — call anytime.', thread:[['out','03/28/26','Email','Christy — we close fast with proof of funds. Would love to see anything Riverside that needs work.'],['in','04/02/26','Email','Always open to bring your buyers first — call anytime.']]},
+
+  {id:7, section:'neutral', name:'Beberly Morales', office:'eXp Realty of California Inc', phone:'323-842-4154', email:'beberly.realestate@gmail.com', city:'Los Angeles', licenseYear:'2019',
+   rel:'Warm', relClass:'rel-warm',
+   basket:'Low Value', basketClass:'bkt-low',
+   investor:'No', sourceCount:4, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:1, backup:0, sold:0, totalDeals:1,
+   lastCommDate:'—', lastCommType:'—', lastAddr:'—', lastCommAA:'—',
+   fuStatus:'N/A', fuClass:'fu-na', fuDate:'—',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Re-engage on pending deal', otherListings:1, responseQuote:'', thread:[]},
+
+  {id:8, section:'negative', name:'Adam Rodell', office:'RE/MAX Select One', phone:'714-747-2117', email:'adamrodell@aol.com', city:'Anaheim', licenseYear:'2005',
+   rel:'Warm', relClass:'rel-warm',
+   basket:'High Value', basketClass:'bkt-high',
+   investor:'No', sourceCount:4, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:1, backup:0, sold:17, totalDeals:18,
+   lastCommDate:'01/04/26', lastCommType:'Call', lastAddr:'—', lastCommAA:'Josh Santos',
+   fuStatus:'Not Interested', fuClass:'fu-not', fuDate:'01/04/26',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Park — circle back Q3', otherListings:6, responseQuote:"Thanks but we're going direct to buyer on this one.", thread:[['out','01/02/26','Call','Left VM about Anaheim listing.'],['in','01/04/26','Call',"Thanks but we're going direct to buyer on this one."]]},
+
+  {id:9, section:'neutral', name:'Maria Diaz', office:'REALTY ONE GROUP ROADS', phone:'951-334-3955', email:'mdiazrealtor@gmail.com', city:'Moreno Valley', licenseYear:'2016',
+   rel:'Warm', relClass:'rel-warm',
+   basket:'Low Value', basketClass:'bkt-low',
+   investor:'No', sourceCount:null, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:1, backup:0, sold:0, totalDeals:1,
+   lastCommDate:'—', lastCommType:'—', lastAddr:'—', lastCommAA:'—',
+   fuStatus:'N/A', fuClass:'fu-na', fuDate:'—',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'First contact needed', otherListings:1, responseQuote:'', thread:[]},
+
+  {id:10, section:'neutral', name:'Malou Toler', office:'C-21 Classic Estates', phone:'562-547-7475', email:'bluemalou@gmail.com', city:'Long Beach', licenseYear:'2010',
+   rel:'Cold', relClass:'rel-cold',
+   basket:'High Value', basketClass:'bkt-high',
+   investor:'No', sourceCount:null, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:0, backup:0, sold:0, totalDeals:0,
+   lastCommDate:'12/02/25', lastCommType:'Text', lastAddr:'—', lastCommAA:'Josh Santos',
+   fuStatus:'Attempt 2', fuClass:'fu-attempt', fuDate:'12/02/25',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Re-warm — high-value territory', otherListings:0, responseQuote:'', thread:[]},
+
+  {id:11, section:'neutral', name:'Steven Bogoyevac', office:'Steven M. Bogoyevac, Broker', phone:'562-257-1231', email:'steve.bogoyevac@marcusmillichap.com', city:'Long Beach', licenseYear:'2008',
+   rel:'Unknown', relClass:'rel-unknown',
+   basket:'Prospect', basketClass:'bkt-prospect',
+   investor:'No', sourceCount:24, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:8, backup:0, sold:14, totalDeals:22,
+   lastCommDate:'—', lastCommType:'—', lastAddr:'—', lastCommAA:'—',
+   fuStatus:'N/A', fuClass:'fu-na', fuDate:'—',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'High investor count — introduce', otherListings:12, responseQuote:'', thread:[]},
+
+  {id:12, section:'neutral', name:'Jerry Macias', office:'Vida Real Estate', phone:'562-544-2413', email:'jerry@meetvida.com', city:'Long Beach', licenseYear:'2014',
+   rel:'Unknown', relClass:'rel-unknown',
+   basket:'Low Value', basketClass:'bkt-low',
+   investor:'No', sourceCount:4, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:0, backup:0, sold:2, totalDeals:2,
+   lastCommDate:'—', lastCommType:'—', lastAddr:'—', lastCommAA:'—',
+   fuStatus:'N/A', fuClass:'fu-na', fuDate:'—',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Cold intro', otherListings:2, responseQuote:'', thread:[]},
+
+  {id:13, section:'neutral', name:'Susan Lubinbrownlie', office:'Coldwell Banker / Gay Dales', phone:'831-320-3001', email:'sbrownliecb@outlook.com', city:'Salinas', licenseYear:'2007',
+   rel:'Unknown', relClass:'rel-unknown',
+   basket:'Unknown', basketClass:'bkt-unknown',
+   investor:'No', sourceCount:null, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:2, backup:2, sold:16, totalDeals:20,
+   lastCommDate:'—', lastCommType:'—', lastAddr:'—', lastCommAA:'—',
+   fuStatus:'N/A', fuClass:'fu-na', fuDate:'—',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Strong producer — cold intro', otherListings:8, responseQuote:'', thread:[]},
+
+  {id:14, section:'neutral', name:'Matthew Hutchens', office:'Legacy Real Estate & Assoc.', phone:'650-245-2264', email:'mhutchens@legacyrea.com', city:'San Mateo', licenseYear:'2013',
+   rel:'Unknown', relClass:'rel-unknown',
+   basket:'Unknown', basketClass:'bkt-unknown',
+   investor:'No', sourceCount:null, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:0, backup:0, sold:17, totalDeals:17,
+   lastCommDate:'—', lastCommType:'—', lastAddr:'—', lastCommAA:'—',
+   fuStatus:'N/A', fuClass:'fu-na', fuDate:'—',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'17 sold — worth an intro', otherListings:5, responseQuote:'', thread:[]},
+
+  {id:15, section:'neutral', name:'Hilary Marks', office:'LEGACY HOMES MANAGEMENT INC', phone:'909-529-3707', email:'hilary@legacyhomesmgmt.com', city:'San Bernardino', licenseYear:'2011',
+   rel:'Unknown', relClass:'rel-unknown',
+   basket:'Low Value', basketClass:'bkt-low',
+   investor:'No', sourceCount:3, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:4, backup:1, sold:23, totalDeals:28,
+   lastCommDate:'—', lastCommType:'—', lastAddr:'—', lastCommAA:'—',
+   fuStatus:'N/A', fuClass:'fu-na', fuDate:'—',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Large pipeline — prioritize', otherListings:9, responseQuote:'', thread:[]},
+
+  {id:16, section:'neutral', name:'Tony Gonzales', office:"Vista Sotheby's International Realty", phone:'949-378-6322', email:'tony@tonygonzales.la', city:'Rancho PV', licenseYear:'2006',
+   rel:'Unknown', relClass:'rel-unknown',
+   basket:'Low Value', basketClass:'bkt-low',
+   investor:'No', sourceCount:2, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:3, backup:1, sold:3, totalDeals:7,
+   lastCommDate:'—', lastCommType:'—', lastAddr:'—', lastCommAA:'—',
+   fuStatus:'N/A', fuClass:'fu-na', fuDate:'—',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Active pipeline — cold intro', otherListings:3, responseQuote:'', thread:[]},
+
+  {id:17, section:'neutral', name:'Team Michael', office:'Keller Williams Realty', phone:'760-770-1555', email:'teammichaeloffice@gmail.com', city:'Palm Desert', licenseYear:'2012',
+   rel:'Unknown', relClass:'rel-unknown',
+   basket:'Clients', basketClass:'bkt-clients',
+   investor:'No', sourceCount:3, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:5, backup:0, sold:13, totalDeals:18,
+   lastCommDate:'—', lastCommType:'—', lastAddr:'—', lastCommAA:'—',
+   fuStatus:'N/A', fuClass:'fu-na', fuDate:'—',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Client basket — confirm status', otherListings:6, responseQuote:'', thread:[]},
+
+  {id:18, section:'neutral', name:'Brian Tran', office:'HPT Realty', phone:'714-501-1770', email:'briantran3154@gmail.com', city:'Garden Grove', licenseYear:'2018',
+   rel:'Unknown', relClass:'rel-unknown',
+   basket:'High Value', basketClass:'bkt-high',
+   investor:'No', sourceCount:2, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:1, backup:0, sold:0, totalDeals:1,
+   lastCommDate:'11/23/25', lastCommType:'Email', lastAddr:'—', lastCommAA:'Josh Santos',
+   fuStatus:'Attempt 1', fuClass:'fu-attempt', fuDate:'11/23/25',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Follow up on first contact', otherListings:1, responseQuote:'Hey this a test number?', thread:[['out','11/20/25','Email','Brian — Josh from FlipIQ. Introducing our buyer network.'],['in','11/23/25','Email','Hey this a test number?']]},
+
+  {id:19, section:'neutral', name:'Rich Worcester', office:'Pinnacle Estate Properties, Inc.', phone:'951-500-8783', email:'rich@78homes.com', city:'Corona', licenseYear:'2015',
+   rel:'Unknown', relClass:'rel-unknown',
+   basket:'Low Value', basketClass:'bkt-low',
+   investor:'No', sourceCount:null, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:0, backup:0, sold:1, totalDeals:1,
+   lastCommDate:'—', lastCommType:'—', lastAddr:'—', lastCommAA:'—',
+   fuStatus:'N/A', fuClass:'fu-na', fuDate:'—',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Cold intro', otherListings:0, responseQuote:'', thread:[]},
+
+  {id:20, section:'neutral', name:'Miguel Briones', office:'HomeSmart', phone:'760-969-8401', email:'brionesmcarthy@gmail.com', city:'Cathedral City', licenseYear:'2020',
+   rel:'Unknown', relClass:'rel-unknown',
+   basket:'Prospect', basketClass:'bkt-prospect',
+   investor:'No', sourceCount:null, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:0, backup:0, sold:7, totalDeals:7,
+   lastCommDate:'—', lastCommType:'—', lastAddr:'—', lastCommAA:'—',
+   fuStatus:'N/A', fuClass:'fu-na', fuDate:'—',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Cold intro — solid sold history', otherListings:2, responseQuote:'', thread:[]},
+
+  {id:21, section:'neutral', name:'Peter Gillin', office:'—', phone:'—', email:'pdg@morganskenderian.com', city:'Newport Beach', licenseYear:'2009',
+   rel:'Unknown', relClass:'rel-unknown',
+   basket:'Unknown', basketClass:'bkt-unknown',
+   investor:'No', sourceCount:4, activeYr:'TRUE', avgDeals:null, doubleEnded:null,
+   pending:3, backup:0, sold:1, totalDeals:4,
+   lastCommDate:'—', lastCommType:'—', lastAddr:'—', lastCommAA:'—',
+   fuStatus:'N/A', fuClass:'fu-na', fuDate:'—',
+   critical:0, reminders:0, assigned:'Josh Santos',
+   nextSteps:'Email-only contact — build profile', otherListings:3, responseQuote:'', thread:[]},
+
+  {id:22, section:'negative', name:'Johnyy Doeee', office:'ARIAL', phone:'—', email:'testemail@example.com', city:'—', licenseYear:'—',
+   rel:'DO NOT CONTACT', relClass:'rel-dnc',
+   basket:'Unknown', basketClass:'bkt-unknown',
+   investor:'No', sourceCount:0, activeYr:'—', avgDeals:0, doubleEnded:0,
+   pending:0, backup:0, sold:0, totalDeals:0,
+   lastCommDate:'01/04/26', lastCommType:'—', lastAddr:'4036 Clairemont Dr, San Diego', lastCommAA:'Josh Santos',
+   fuStatus:'Do Not Contact', fuClass:'fu-dnc', fuDate:'01/04/26',
+   critical:0, reminders:0, assigned:'Not Assigned',
+   nextSteps:'Do not contact — flagged', otherListings:0, responseQuote:'', thread:[]}
+];
+
+const SECTIONS = [
+  {id:'positive', title:'Positive Response', desc:"Agents who responded and are engaged. Relationship Built, In Conversations, or actively interested. Call first — these are your warmest calls today."},
+  {id:'neutral', title:'Neutral Response', desc:"Agents in-flight. Attempts logged, no response yet, or untouched with high potential. Push for the first yes or the first no."},
+  {id:'negative', title:'Negative Response', desc:"Agents who said no, declined campaigns, or flagged Do Not Contact. Park them. Do not re-engage outside a hard rule change."}
+];
+
+const ICONS = {
+  kebab: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>',
+  chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>',
+  email: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+  call: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  text: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>',
+  trend: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 17 9 11 13 15 21 7"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5"/></svg>',
+  filter: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.5 10 19 14 21 14 12.5 22 3"/></svg>',
+  note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+  alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+};
+
+function tipRows(rows) {
+  let html = '';
+  rows.forEach(r => {
+    if (r[1] === null || r[1] === undefined || r[1] === '—' || r[1] === '') return;
+    html += '<div class="tip-row"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>';
+  });
+  return html;
+}
+
+function menuHTML(id) {
+  return `
+    <div class="menu" id="menu-${id}" onclick="event.stopPropagation()">
+      <div class="menu-col">
+        <h5>Communication</h5>
+        <a onclick="triggerCall(${id})">${ICONS.call}Call</a>
+        <a>${ICONS.text}Text</a>
+        <a>${ICONS.email}Email</a>
+        <a>${ICONS.mic}Text VM</a>
+      </div>
+      <div class="menu-col">
+        <h5>Follow Up</h5>
+        <a>${ICONS.trend}Set Status</a>
+        <a>${ICONS.clock}Set Reminder</a>
+        <a>${ICONS.alert}Set Critical</a>
+      </div>
+      <div class="menu-col">
+        <h5>Organize</h5>
+        <a>${ICONS.star}Favorites</a>
+        <a>${ICONS.filter}Agent Deals</a>
+      </div>
+      <div class="menu-col">
+        <h5>Notes</h5>
+        <a>${ICONS.note}View / Add</a>
+      </div>
+    </div>
+  `;
+}
+
+function pendingBadge(a) {
+  return a.totalDeals > 0 ? `<b>${a.totalDeals}</b> deals <span style="color:#9CA3AF">&middot;</span> ${a.pending}P / ${a.backup}B / ${a.sold}S` : `<b>0</b> deals`;
+}
+
+function cardHTML(a) {
+  const commText = a.lastCommDate !== '—' ? `Last ${a.lastCommDate}` : 'Never contacted';
+  const investorDot = a.investor === 'Yes' ? '<span class="dot d-green"></span>' : (a.investor === 'Interested' ? '<span class="dot d-amber"></span>' : '<span class="dot d-gray"></span>');
+  const activeDot = a.activeYr === 'TRUE' ? '<span class="dot d-green"></span>' : '<span class="dot d-gray"></span>';
+  const activeLabel = a.activeYr === 'TRUE' ? 'Active 2yr' : (a.activeYr === 'FALSE' ? 'Inactive 2yr' : 'Activity unknown');
+
+  return `
+    <div class="row">
+      <div class="lnav">
+        <span class="fq-cb"></span>
+        <span class="ico" onclick="toggleMenu(event, ${a.id})">
+          ${ICONS.kebab}
+          ${menuHTML(a.id)}
+        </span>
+        <span class="ico" data-tip>
+          ${ICONS.chat}
+          <span class="tip">View conversations</span>
+        </span>
+      </div>
+      <div class="main">
+        <div class="title-row">
+          <span class="phone-btn" onclick="triggerCall(${a.id})" title="Quick call">${ICONS.phone}</span>
+          <span class="agent-name" data-tip>
+            ${a.name}
+            <span class="tip"><span class="tip-ttl">Agent</span>${tipRows([['Home city',a.city],['License year',a.licenseYear],['Years licensed', a.licenseYear !== '—' ? String(2026 - parseInt(a.licenseYear)) + ' years' : '—'],['Assigned AA',a.assigned],['Next step',a.nextSteps]])}</span>
+          </span>
+          ${a.critical > 0 ? `<span class="critical-flag" data-tip>${a.critical} Critical<span class="tip"><span class="tip-ttl">Critical Task</span>${tipRows([['Count',String(a.critical)],['Action',a.nextSteps]])}</span></span>` : ''}
+          ${a.reminders > 0 ? `<span class="reminder-flag" data-tip>${a.reminders} Reminder<span class="tip"><span class="tip-ttl">Reminder</span>${tipRows([['Count',String(a.reminders)],['Due',a.fuDate]])}</span></span>` : ''}
+        </div>
+        <div class="id-line">
+          <span class="office-i" data-tip>
+            ${a.office}
+            <span class="tip"><span class="tip-ttl">Office</span>${tipRows([['Name',a.office],['Assigned AA',a.assigned]])}</span>
+          </span>
+          <span class="id-sep">&middot;</span>
+          <span class="phone-i">${a.phone}</span>
+          <span class="id-sep">&middot;</span>
+          <span class="email-i">${ICONS.email}${a.email}</span>
+        </div>
+        <div class="meta">
+          <span class="rel-pill ${a.relClass}" data-tip>
+            <span class="dot" style="background:currentColor;opacity:0.7"></span>${a.rel}
+            <span class="tip"><span class="tip-ttl">Relationship</span>${tipRows([['Status',a.rel],['Basket',a.basket],['Assigned AA',a.assigned]])}</span>
+          </span>
+          <span class="basket ${a.basketClass}" data-tip>
+            ${a.basket}
+            <span class="tip"><span class="tip-ttl">Basket</span>${tipRows([['Tier',a.basket],['Relationship',a.rel]])}</span>
+          </span>
+          <span class="meta-sep">&middot;</span>
+          <span class="meta-i" data-tip>
+            ${investorDot}Investor: ${a.investor}
+            <span class="tip"><span class="tip-ttl">Investor Flag</span>${tipRows([['Works with investors',a.investor],['Double-ended',a.doubleEnded !== null ? a.doubleEnded : 'Not tracked']])}</span>
+          </span>
+          <span class="meta-sep">&middot;</span>
+          <span class="meta-i" data-tip>
+            ISC: <b style="color:#1F1F1F;font-weight:500">${a.sourceCount !== null ? a.sourceCount : '—'}</b>
+            <span class="tip"><span class="tip-ttl">Investor Source Count</span>${tipRows([['ISC',a.sourceCount !== null ? String(a.sourceCount) : 'Not tracked'],['Meaning','How many investors this agent sources to'],['Signal',a.sourceCount >= 10 ? 'High deal flow' : (a.sourceCount >= 3 ? 'Moderate flow' : (a.sourceCount > 0 ? 'Light flow' : 'No flow yet'))]])}</span>
+          </span>
+          <span class="meta-sep">&middot;</span>
+          <span class="meta-i" data-tip>
+            ${activeDot}${activeLabel}
+            <span class="tip"><span class="tip-ttl">Activity</span>${tipRows([['Active in 2yrs',a.activeYr],['Avg deals/yr',a.avgDeals !== null ? a.avgDeals : 'Not tracked']])}</span>
+          </span>
+          <span class="meta-sep">&middot;</span>
+          <span class="track-record" data-tip>
+            <span class="${a.otherListings > 0 ? 'a-glow' : 'a-dim'}">${a.otherListings}A</span>
+            <span class="tr-sep">/</span>
+            <span>${a.pending}P</span>
+            <span class="tr-sep">/</span>
+            <span>${a.backup}B</span>
+            <span class="tr-sep">/</span>
+            <span>${a.sold}S</span>
+            <span class="tip"><span class="tip-ttl">Deal Track Record</span>${tipRows([['Active',String(a.otherListings)],['Pending',String(a.pending)],['Backup',String(a.backup)],['Sold',String(a.sold)],['Total',String(a.totalDeals)]])}</span>
+          </span>
+          <span class="meta-sep">&middot;</span>
+          <span class="meta-i" data-tip>
+            ${commText}
+            <span class="tip"><span class="tip-ttl">Last Communication</span>${tipRows([['Date',a.lastCommDate],['Type',a.lastCommType],['Address discussed',a.lastAddr],['Logged by',a.lastCommAA]])}</span>
+          </span>
+        </div>
+        <div class="nudge" id="nudge-${a.id}">
+          <span>&#10003; Call logged. <b>Send text + email follow-up?</b></span>
+          <div class="nudge-btns">
+            <button class="n-yes" onclick="document.getElementById('nudge-${a.id}').classList.remove('open')">Yes, send both</button>
+            <button class="n-no" onclick="document.getElementById('nudge-${a.id}').classList.remove('open')">Not yet</button>
+          </div>
+        </div>
+      </div>
+      <div class="chip-col">
+        <div class="next-step-text next-step-${a.section}">${a.nextSteps}</div>
+        ${a.responseQuote ? `<div class="resp-line" data-tip>&ldquo;${a.responseQuote}&rdquo;<span class="tip tip-right resp-tip"><div class="resp-thread">${a.thread.map(m => `<div class="resp-msg resp-msg-${m[0]}"><div class="resp-msg-text">${m[0] === 'in' ? '&ldquo;' + m[3] + '&rdquo;' : m[3]}</div><div class="resp-msg-meta">${m[0] === 'in' ? 'Agent' : 'You'} &middot; ${m[2]} &middot; ${m[1]}</div></div>`).join('')}</div></span></div>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function render() {
+  const container = document.getElementById('sections');
+  let html = '';
+  SECTIONS.forEach(sec => {
+    const items = AGENTS.filter(a => a.section === sec.id);
+    if (items.length === 0) return;
+    html += `
+      <div class="fq-sec">
+        <div class="fq-sec-top">
+          <span class="fq-cb" onclick="this.classList.toggle('on')"></span>
+          <span class="fq-all-lbl">SELECT ALL</span>
+          <span class="fq-sec-ttl">${sec.title.toUpperCase()} &middot; <b>${items.length} ${items.length === 1 ? 'agent' : 'agents'}</b></span>
+        </div>
+        <p class="fq-sec-desc">${sec.desc}</p>
+        ${items.map(cardHTML).join('')}
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+function toggleMenu(e, id) {
+  e.stopPropagation();
+  document.querySelectorAll('.menu').forEach(m => { if (m.id !== 'menu-' + id) m.classList.remove('open'); });
+  document.getElementById('menu-' + id).classList.toggle('open');
+}
+
+function triggerCall(id) {
+  const menu = document.getElementById('menu-' + id);
+  if (menu) menu.classList.remove('open');
+  document.getElementById('nudge-' + id).classList.add('open');
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.menu').forEach(m => m.classList.remove('open'));
+});
+
+render();
+</script>
+
+</body>
+</html>
