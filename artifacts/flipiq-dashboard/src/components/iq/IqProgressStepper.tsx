@@ -14,6 +14,10 @@ export default function IqProgressStepper() {
   const segments = useIqProgress();
   const currentKey = currentSegmentKey(location);
   const currentIdx = segments.findIndex((s) => s.key === currentKey);
+  // Furthest step the user has reached: the last completed step, the
+  // current step, or the step right after the last completed step.
+  const lastDoneIdx = segments.reduce((acc, s, i) => (s.done ? i : acc), -1);
+  const maxReachableIdx = Math.max(currentIdx, lastDoneIdx + 1);
 
   const [hover, setHover] = useState<{ idx: number; kind: "label" | "number" } | null>(null);
 
@@ -73,9 +77,10 @@ export default function IqProgressStepper() {
                 onMouseLeave={() => setHover(null)}
               >
                 <button
-                  onClick={() => navigate(seg.route)}
+                  onClick={() => { if (i <= maxReachableIdx) navigate(seg.route); }}
+                  disabled={i > maxReachableIdx}
                   aria-label={`Go to ${seg.label}`}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-semibold cursor-pointer transition-colors ${circleClass}`}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-semibold transition-colors ${circleClass} ${i > maxReachableIdx ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
                 >
                   {seg.done ? (
                     <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
