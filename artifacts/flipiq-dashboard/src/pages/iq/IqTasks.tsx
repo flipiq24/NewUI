@@ -271,7 +271,7 @@ export default function IqTasks() {
                 {dayDone ? (
                   <button
                     onClick={() => navigate("/")}
-                    className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium px-4 py-2 rounded-full cursor-pointer transition-colors"
+                    className="flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium px-4 py-2 rounded-full cursor-pointer transition-colors"
                   >
                     View End of Day Stats
                     <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
