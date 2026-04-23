@@ -441,7 +441,9 @@ function BulkActionsButton({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-md transition-colors cursor-pointer"
+        className={`bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-md transition-colors cursor-pointer ${
+          gated ? "shadow-[0_0_0_3px_rgba(251,146,60,0.45)] ring-2 ring-orange-300 animate-pulse" : ""
+        }`}
       >
         Bulk Actions
       </button>
@@ -464,6 +466,8 @@ function BulkActionsButton({
               className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-left text-[13px] ${
                 locked
                   ? "text-gray-300 cursor-not-allowed"
+                  : a.key === "call" && gated
+                  ? "text-orange-600 font-semibold bg-orange-50 ring-1 ring-orange-300 animate-pulse hover:bg-orange-100 cursor-pointer"
                   : "text-gray-700 hover:bg-orange-50 hover:text-orange-600 cursor-pointer"
               }`}
             >
