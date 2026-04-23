@@ -731,7 +731,7 @@ function AgentRow({
             ]}
           >
             <span className="text-gray-600">
-              ISC: <span className="text-gray-900 font-semibold">{iscDisplay}</span>
+              ISC: <span className="font-semibold" style={{ color: "#0C447C" }}>{iscDisplay}</span>
             </span>
           </Tip>
           <span className="text-gray-300">·</span>
