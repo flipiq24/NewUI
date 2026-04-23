@@ -150,8 +150,9 @@ function DefaultSidebar({ location, onLogoClick }: { location: string; onLogoCli
         <Link href="/iq">
           <NavItem icon={<HomeIcon />} label="iQ" />
         </Link>
-        <NavItem icon={<FileTextIcon />} label="Deal Review" badge="0 / 4" />
-        <NavItem icon={<PhoneIcon />} label="Daily Outreach" badge="0 / 12" />
+        <NavItem icon={<FileTextIcon />} label="Active Deals" badge="0 / 4" />
+        <NavItem icon={<PhoneIcon />} label="Agents" badge="0 / 12" />
+        <NavItem icon={<FolderIcon />} label="New Deals" badge="0 / 1" />
       </div>
 
       <div className="px-3 pb-2">

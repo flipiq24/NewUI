@@ -57,8 +57,8 @@ export default function IqDailyOutreach() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <IqTopBar
-          breadcrumb="Agents > Text and Email Campaigns"
-          nextTask="Agents > Priority Calls"
+          breadcrumb="Agents › Text and Email Campaigns"
+          nextTask="Agents › Priority Calls"
           onNext={handleNext}
           nextIncomplete={campaignsSent < totalCampaigns}
         />
