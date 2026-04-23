@@ -240,7 +240,7 @@ export default function IqDealReview() {
                   <div className="flex justify-end">
                     <button
                       onClick={start}
-                      className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white text-xs font-medium px-4 py-2 rounded-full cursor-pointer transition-colors"
+                      className="flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium px-4 py-2 rounded-full cursor-pointer transition-colors"
                     >
                       Get Started
                       <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
@@ -249,24 +249,28 @@ export default function IqDealReview() {
                 </div>
               </div>
 
-              {/* Ask anything — floats right below the message */}
-              <div className="ml-10 flex items-center gap-2 border border-gray-200 rounded-2xl px-4 py-2.5 bg-white shadow-sm">
-                <button className="w-5 h-5 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer">
-                  <svg className="w-2.5 h-2.5 text-gray-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <line x1="8" y1="2" x2="8" y2="14" strokeLinecap="round" />
-                    <line x1="2" y1="8" x2="14" y2="8" strokeLinecap="round" />
-                  </svg>
-                </button>
-                <input
-                  type="text"
-                  placeholder="Ask anything…"
-                  className="flex-1 text-[13px] text-gray-700 placeholder-gray-300 bg-transparent outline-none"
-                />
-                <button className="w-6 h-6 rounded-full bg-gray-900 hover:bg-gray-700 flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer">
-                  <svg className="w-3 h-3 text-white" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
-                </button>
-              </div>
+            </div>
+          </div>
+        )}
 
+        {/* Ask anything — pinned to bottom when gate is showing */}
+        {!started && (
+          <div className="flex-shrink-0 px-6 py-4 bg-white border-t border-gray-100">
+            <div className="max-w-3xl flex items-center gap-2 border border-gray-200 rounded-2xl px-4 py-2.5 bg-white shadow-sm">
+              <button className="w-5 h-5 rounded-full border border-orange-400 bg-white flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer">
+                <svg className="w-2.5 h-2.5 text-gray-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <line x1="8" y1="2" x2="8" y2="14" strokeLinecap="round" />
+                  <line x1="2" y1="8" x2="14" y2="8" strokeLinecap="round" />
+                </svg>
+              </button>
+              <input
+                type="text"
+                placeholder="Ask anything…"
+                className="flex-1 text-[13px] text-gray-700 placeholder-gray-300 bg-transparent outline-none"
+              />
+              <button className="w-6 h-6 rounded-full bg-gray-900 hover:bg-gray-700 flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer">
+                <svg className="w-3 h-3 text-white" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
+              </button>
             </div>
           </div>
         )}
