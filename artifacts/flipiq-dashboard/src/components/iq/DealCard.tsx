@@ -294,9 +294,8 @@ export default function DealCard({ property }: { property: DealProperty }) {
             {ICON.globe}
           </button>
           <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help text-gray-500 hover:text-gray-900">
-            Sales Type:{" "}
-            <span className="text-gray-700 font-medium">{property.type}</span>
+          <span className="relative group cursor-help text-gray-700 font-medium hover:text-gray-900">
+            {property.type}
             <TipPanel
               title="Sales Type"
               rows={[
