@@ -21,9 +21,11 @@ const BUCKET_LABEL: Record<string, string> = {
 export default function IqDailyOutreach() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [selected, setSelected] = useState<Set<string>>(
+    () => new Set(DAILY_OUTREACH_BUCKETS.map((b) => b.id))
+  );
   const [smsChecked, setSmsChecked] = useState(true);
-  const [emailChecked, setEmailChecked] = useState(false);
+  const [emailChecked, setEmailChecked] = useState(true);
   const [smsTemplate, setSmsTemplate] = useState(SMS_TEMPLATES[0]);
   const [emailTemplate, setEmailTemplate] = useState(EMAIL_TEMPLATES[0]);
   const { started, start } = useStartGate("dailyOutreach");
