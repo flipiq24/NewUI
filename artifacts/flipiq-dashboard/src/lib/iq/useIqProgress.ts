@@ -38,6 +38,7 @@ export function useIqProgress(): IqProgressSegment[] {
       if (isPropertyComplete(p.id)) completed += 1;
     }
     const dealsTotal = DEAL_REVIEW_PROPERTIES.length;
+    const dealsRemaining = Math.max(0, dealsTotal - completed);
     const dealsDone = dealsTotal > 0 && completed === dealsTotal;
     const dealsBreakdown = (["high", "mid", "low", "new"] as DealLevel[])
       .filter((l) => levelCounts[l] > 0)
@@ -70,12 +71,12 @@ export function useIqProgress(): IqProgressSegment[] {
       {
         key: "deals",
         label: "Active Deals",
-        count: dealsTotal,
+        count: dealsRemaining,
         done: dealsDone,
         labelTooltip: "Deals that need your attention today.",
         numberTooltip: dealsDone
           ? `All ${dealsTotal} deals completed today.`
-          : dealsBreakdown,
+          : `${completed} of ${dealsTotal} complete · ${dealsBreakdown}`,
         route: "/iq/deal-review",
       },
       {
