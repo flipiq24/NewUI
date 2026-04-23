@@ -174,6 +174,18 @@ export default function IqDealReview() {
     visibleProps.forEach((p) => setPropertyComplete(p.id, checked));
   }
 
+  // Pre-select the first two visible properties on first arrival of each segment.
+  const preselectedSegRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (preselectedSegRef.current.has(currentSeg.key)) return;
+    if (visibleProps.length === 0) return;
+    preselectedSegRef.current.add(currentSeg.key);
+    visibleProps.slice(0, 2).forEach((p) => {
+      if (!isPropertyComplete(p.id)) setPropertyComplete(p.id, true);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSeg.key, visibleProps.length]);
+
   function handleNext() {
     if (isLastSeg) {
       const state = resetIqStateIfNewDay();
