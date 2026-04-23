@@ -99,7 +99,17 @@ export default function IqChatPage({
           </div>
 
           <div>
-            <div className="flex items-center justify-end">
+            <div className="flex items-center justify-end gap-2">
+              <button
+                onClick={() => window.history.back()}
+                aria-label="Back"
+                title="Back"
+                className="inline-flex items-center justify-center w-6 h-6 rounded-full border border-gray-300 bg-white text-gray-500 hover:text-orange-500 hover:border-orange-300 transition-colors cursor-pointer"
+              >
+                <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="10,3 5,8 10,13" />
+                </svg>
+              </button>
               <button
                 onClick={onNextTask}
                 className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider hover:text-orange-500 transition-colors cursor-pointer"
