@@ -576,15 +576,34 @@ export default function IqCampaignResponses() {
             <p className="text-[13px] text-gray-500">
               <span className="font-semibold text-gray-800">{handled.size}</span> of {AGENTS.length} responses handled across all groups
             </p>
-            <button
-              onClick={handleNext}
-              className="flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium px-4 py-2 rounded-full cursor-pointer transition-colors"
-            >
-              {isLastStep ? "Continue to Priority Calls" : `Next: ${SECTIONS[stepIdx + 1].tail}`}
-              <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <polyline points="6,3 11,8 6,13" />
-              </svg>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  if (stepIdx === 0) {
+                    navigate("/iq/daily-outreach");
+                  } else {
+                    setStepIdx((i) => Math.max(0, i - 1));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                }}
+                aria-label="Back"
+                title={stepIdx === 0 ? "Back to Text and Email Campaigns" : `Back: ${SECTIONS[stepIdx - 1].tail}`}
+                className="flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-600 hover:text-gray-900 hover:border-gray-400 cursor-pointer transition-colors"
+              >
+                <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="10,3 5,8 10,13" />
+                </svg>
+              </button>
+              <button
+                onClick={handleNext}
+                className="flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium px-4 py-2 rounded-full cursor-pointer transition-colors"
+              >
+                {isLastStep ? "Continue to Priority Calls" : `Next: ${SECTIONS[stepIdx + 1].tail}`}
+                <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="6,3 11,8 6,13" />
+                </svg>
+              </button>
+            </div>
           </div>
         </IqChatPage>
       </div>
