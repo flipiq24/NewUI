@@ -491,12 +491,12 @@ function BulkActionsButton({
                 setOpen(false);
               }}
               title={locked ? "Call first to unlock follow-up actions" : undefined}
-              className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-left text-[13px] ${
+              className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-left text-[13px] font-medium ${
                 locked
                   ? "text-gray-300 cursor-not-allowed"
                   : a.key === "call" && gated
                   ? "text-orange-600 font-semibold bg-orange-50 ring-1 ring-orange-300 animate-pulse hover:bg-orange-100 cursor-pointer"
-                  : "text-gray-700 hover:bg-orange-50 hover:text-orange-600 cursor-pointer"
+                  : "text-orange-600 hover:bg-orange-50 hover:text-orange-700 cursor-pointer"
               }`}
             >
               <a.icon />
