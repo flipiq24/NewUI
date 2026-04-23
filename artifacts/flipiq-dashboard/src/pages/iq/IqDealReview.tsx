@@ -304,17 +304,24 @@ export default function IqDealReview() {
               {/* Section heading row: Select All (left) · Next Task (right) */}
               <div>
                 <div className="flex items-center justify-between">
-                  <label className="inline-flex items-center gap-2 cursor-pointer select-none group">
-                    <input
-                      type="checkbox"
-                      checked={allSelected}
-                      onChange={(e) => handleSelectAll(e.target.checked)}
-                      className="w-3.5 h-3.5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer"
-                    />
-                    <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider group-hover:text-gray-700">
-                      Select All
-                    </span>
-                  </label>
+                  <div className="flex items-center gap-3">
+                    <label className="inline-flex items-center gap-2 cursor-pointer select-none group">
+                      <input
+                        type="checkbox"
+                        checked={allSelected}
+                        onChange={(e) => handleSelectAll(e.target.checked)}
+                        className="w-3.5 h-3.5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer"
+                      />
+                      <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider group-hover:text-gray-700">
+                        Select All
+                      </span>
+                    </label>
+                    {allSelected && (
+                      <BulkActionsButton
+                        highOnly={visibleProps.some((p) => p.level === "high")}
+                      />
+                    )}
+                  </div>
                   <button
                     onClick={handleNext}
                     className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider hover:text-orange-500 transition-colors cursor-pointer"
@@ -365,5 +372,86 @@ export default function IqDealReview() {
         <IqAskBar />
       </div>
     </div>
+  );
+}
+
+function BulkActionsButton({ highOnly }: { highOnly: boolean }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onDoc(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
+
+  const actions = highOnly
+    ? [{ key: "call", label: "Call", icon: PhoneIcon }]
+    : [
+        { key: "call", label: "Call", icon: PhoneIcon },
+        { key: "text", label: "Text", icon: ChatIcon },
+        { key: "email", label: "Email", icon: MailIcon },
+        { key: "voicemail", label: "Text Voicemail", icon: MicIcon },
+      ];
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-semibold uppercase tracking-wider px-3 py-1.5 rounded-md transition-colors cursor-pointer"
+      >
+        Bulk Actions
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full mt-1.5 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1.5 min-w-[180px]">
+          {actions.map((a) => (
+            <button
+              key={a.key}
+              type="button"
+              onClick={() => setOpen(false)}
+              className="w-full flex items-center gap-2.5 px-3.5 py-2 text-left text-[13px] text-gray-700 hover:bg-orange-50 hover:text-orange-600 cursor-pointer"
+            >
+              <a.icon />
+              <span>{a.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PhoneIcon() {
+  return (
+    <svg className="w-4 h-4 text-gray-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M3 2h3l1.5 3.5-2 1.2C6.3 9 7 9.7 8.3 10.5l1.2-2L13 10v3c0 .6-.5 1-1 1C5.4 14 2 6.6 2 3c0-.5.4-1 1-1z" />
+    </svg>
+  );
+}
+function ChatIcon() {
+  return (
+    <svg className="w-4 h-4 text-gray-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <path d="M2 4a2 2 0 012-2h8a2 2 0 012 2v5a2 2 0 01-2 2H7l-3 3v-3H4a2 2 0 01-2-2V4z" />
+    </svg>
+  );
+}
+function MailIcon() {
+  return (
+    <svg className="w-4 h-4 text-gray-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <rect x="2" y="3" width="12" height="10" rx="1" />
+      <polyline points="2,4 8,9 14,4" />
+    </svg>
+  );
+}
+function MicIcon() {
+  return (
+    <svg className="w-4 h-4 text-gray-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <rect x="6" y="2" width="4" height="8" rx="2" />
+      <path d="M3 8a5 5 0 0010 0" />
+      <line x1="8" y1="13" x2="8" y2="15" />
+    </svg>
   );
 }
