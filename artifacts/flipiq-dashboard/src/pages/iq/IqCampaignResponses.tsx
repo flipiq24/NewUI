@@ -421,7 +421,7 @@ export default function IqCampaignResponses() {
     neutral: false,
     negative: false,
   });
-  const { started, start } = useStartGate(`campaignResponses:${SECTIONS[stepIdx].sentiment}`);
+  const { started, start } = useStartGate("campaignResponses");
 
   // Auto-select all positive responses when entering the Positive step.
   useEffect(() => {
