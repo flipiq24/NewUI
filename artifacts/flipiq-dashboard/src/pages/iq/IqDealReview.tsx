@@ -204,79 +204,98 @@ export default function IqDealReview() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <IqTopBar />
 
-        {/* AI-style briefing gate */}
+        {/* LLM-style chat briefing gate */}
         {!started && (
-          <div className="flex-1 flex flex-col overflow-hidden relative">
-            <div className="flex-1 overflow-y-auto px-10 pt-10 pb-24">
+          <div className="flex-1 flex flex-col overflow-hidden bg-white">
 
-              {/* Breadcrumb — very subtle */}
-              <p className="text-[11px] text-gray-400 mb-10 tracking-wide">
-                Deal Review &nbsp;/&nbsp; 9 High Priority Deals &nbsp;/&nbsp;
-                <span className="text-gray-600">{segmentLabels[currentSeg.key]}</span>
-              </p>
+            {/* Scrollable chat area */}
+            <div className="flex-1 overflow-y-auto px-6 py-8">
+              <div className="max-w-3xl">
 
-              {/* Two-column: content left, CTA right */}
-              <div className="flex items-start justify-between gap-12">
+                {/* AI message row */}
+                <div className="flex gap-3">
+                  {/* Avatar */}
+                  <div className="w-7 h-7 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7z" clipRule="evenodd" />
+                    </svg>
+                  </div>
 
-                {/* Left — message content */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-[15px] text-gray-900 leading-7 mb-5">
-                    {segmentTaskCopy[currentSeg.key].task}
-                  </p>
-                  <p className="text-[13px] text-gray-400 leading-6 mb-10">
-                    {segmentTaskCopy[currentSeg.key].tip}
-                  </p>
+                  {/* Message bubble */}
+                  <div className="flex-1">
+                    <p className="text-[11px] font-semibold text-gray-400 mb-2 uppercase tracking-wider">FlipIQ</p>
 
-                  <div className="w-8 border-t border-gray-200 mb-6" />
+                    {/* Prose */}
+                    <p className="text-[14px] text-gray-800 leading-7 mb-5">
+                      {segmentTaskCopy[currentSeg.key].task}
+                    </p>
+                    <p className="text-[13px] text-gray-500 leading-6 mb-6">
+                      {segmentTaskCopy[currentSeg.key].tip}
+                    </p>
 
-                  <p className="text-[12px] text-gray-500 mb-2">
-                    <span className="font-semibold text-gray-700">{levelCounts.high}</span> High &nbsp;·&nbsp;
-                    <span className="font-semibold text-gray-700">{levelCounts.mid}</span> Mid &nbsp;·&nbsp;
-                    <span className="font-semibold text-gray-700">{levelCounts.low}</span> Low &nbsp;·&nbsp;
-                    <span className="font-semibold text-gray-700">{levelCounts.new}</span> New
-                  </p>
-                  <p className="text-[12px] text-gray-400">
-                    {notificationCounts.critical > 0 && <><span className="text-gray-500">{notificationCounts.critical} criticals</span><span className="mx-1.5 text-gray-300">·</span></>}
-                    {notificationCounts.reminder > 0 && <><span className="text-gray-500">{notificationCounts.reminder} reminders</span><span className="mx-1.5 text-gray-300">·</span></>}
-                    {notificationCounts.unseen > 0 && <><span className="text-gray-500">{notificationCounts.unseen} unseen</span><span className="mx-1.5 text-gray-300">·</span></>}
-                    {notificationCounts.text > 0 && <span className="text-gray-500">{notificationCounts.text} texts</span>}
-                  </p>
+                    {/* Simple checklist */}
+                    <div className="mb-6 space-y-2">
+                      {[
+                        { label: "High priority deals", count: levelCounts.high },
+                        { label: "Mid priority deals", count: levelCounts.mid },
+                        { label: "Low priority deals", count: levelCounts.low },
+                        { label: "New deals", count: levelCounts.new },
+                      ].map(({ label, count }) => (
+                        <div key={label} className="flex items-center gap-2.5 text-[13px] text-gray-600">
+                          <span className="w-4 h-4 rounded border border-gray-300 flex-shrink-0" />
+                          <span>{count} {label}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Notifications — plain inline */}
+                    <p className="text-[12px] text-gray-400 mb-8">
+                      Notifications: &nbsp;
+                      {notificationCounts.critical > 0 && <span className="mr-3">{notificationCounts.critical} criticals</span>}
+                      {notificationCounts.reminder > 0 && <span className="mr-3">{notificationCounts.reminder} reminders</span>}
+                      {notificationCounts.unseen > 0 && <span className="mr-3">{notificationCounts.unseen} unseen</span>}
+                      {notificationCounts.text > 0 && <span>{notificationCounts.text} texts</span>}
+                    </p>
+
+                    {/* Action button — below message, right-aligned */}
+                    <div className="flex items-center justify-end gap-3">
+                      <span className="text-[11px] text-gray-400">Next: {nextLabel}</span>
+                      <button
+                        onClick={start}
+                        className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white text-xs font-medium px-4 py-2 rounded-full cursor-pointer transition-colors"
+                      >
+                        Get Started
+                        <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Right — CTA */}
-                <div className="flex-shrink-0 flex flex-col items-end gap-2 pt-1">
-                  <button
-                    onClick={start}
-                    className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-700 text-white text-xs font-medium px-4 py-2 rounded-full cursor-pointer transition-colors"
-                  >
-                    Get Started
-                    <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
+              </div>
+            </div>
+
+            {/* Pinned input bar */}
+            <div className="flex-shrink-0 px-6 py-4 bg-white border-t border-gray-100">
+              <div className="max-w-3xl">
+                <div className="flex items-center gap-2 border border-gray-200 rounded-2xl px-4 py-2.5 bg-white shadow-sm">
+                  <button className="w-5 h-5 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer">
+                    <svg className="w-2.5 h-2.5 text-gray-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="8" y1="2" x2="8" y2="14" strokeLinecap="round" />
+                      <line x1="2" y1="8" x2="14" y2="8" strokeLinecap="round" />
+                    </svg>
                   </button>
-                  <span className="text-[10px] text-gray-400">Next: {nextLabel}</span>
+                  <input
+                    type="text"
+                    placeholder="Ask anything…"
+                    className="flex-1 text-[13px] text-gray-700 placeholder-gray-300 bg-transparent outline-none"
+                  />
+                  <button className="w-6 h-6 rounded-full bg-gray-900 hover:bg-gray-700 flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer">
+                    <svg className="w-3 h-3 text-white" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
+                  </button>
                 </div>
-
               </div>
             </div>
 
-            {/* Floating "ask anything" bar */}
-            <div className="absolute bottom-0 left-0 right-0 px-10 py-4 bg-gradient-to-t from-[#f5f6f8] via-[#f5f6f8]/90 to-transparent">
-              <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2.5 shadow-sm">
-                <button className="w-5 h-5 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer">
-                  <svg className="w-3 h-3 text-gray-500" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <line x1="8" y1="2" x2="8" y2="14" strokeLinecap="round" />
-                    <line x1="2" y1="8" x2="14" y2="8" strokeLinecap="round" />
-                  </svg>
-                </button>
-                <input
-                  type="text"
-                  placeholder="Ask anything…"
-                  className="flex-1 text-[13px] text-gray-700 placeholder-gray-300 bg-transparent outline-none"
-                />
-                <button className="w-6 h-6 rounded-full bg-gray-900 hover:bg-gray-700 flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer">
-                  <svg className="w-3 h-3 text-white" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,3 11,8 6,13" /></svg>
-                </button>
-              </div>
-            </div>
           </div>
         )}
 
