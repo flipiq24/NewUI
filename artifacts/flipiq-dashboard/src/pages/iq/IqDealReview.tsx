@@ -17,9 +17,9 @@ const segments = [
     borderColor: "border-green-500",
     bgColor: "bg-green-50",
     textColor: "text-green-800",
-    subtitle: (
+    subtitle: (count: number) => (
       <>
-        These are <span className="text-red-600 font-semibold">High Priority</span> Active &amp; Off Market deals at the top of your FlipIQ priority list. MUST call first. Follow up with text and email after the phone call is made.
+        You have <span className="text-orange-500 font-semibold">{count}</span> <span className="text-red-600 font-semibold">High Priority</span> Active &amp; Off Market deal{count === 1 ? "" : "s"} at the top of your FlipIQ priority list. MUST call first. Follow up with text and email after the phone call is made.
       </>
     ),
   },
@@ -29,9 +29,9 @@ const segments = [
     borderColor: "border-amber-500",
     bgColor: "bg-amber-50",
     textColor: "text-amber-800",
-    subtitle: (
+    subtitle: (count: number) => (
       <>
-        These are <span className="text-red-600 font-semibold">High Priority</span> Pending / Backup / Hold deals — they're in contract. Call the agent, find out if the buyer is performing, and stay close until it's confirmed.
+        You have <span className="text-orange-500 font-semibold">{count}</span> <span className="text-red-600 font-semibold">High Priority</span> Pending / Backup / Hold deal{count === 1 ? "" : "s"} — they're in contract. Call the agent, find out if the buyer is performing, and stay close until it's confirmed.
       </>
     ),
   },
@@ -41,16 +41,16 @@ const segments = [
     borderColor: "border-red-400",
     bgColor: "bg-red-50",
     textColor: "text-red-800",
-    subtitle: (
+    subtitle: (count: number) => (
       <>
-        These are <span className="text-red-600 font-semibold">High Priority</span> Closed / Expired / Canceled deals — the property is no longer available, and that's your opening. Find out who the buyer was, whether it sold for more or less than your offer, update the relationship, and ask if they have any other properties coming up.
+        You have <span className="text-orange-500 font-semibold">{count}</span> <span className="text-red-600 font-semibold">High Priority</span> Closed / Expired / Canceled deal{count === 1 ? "" : "s"} — the property is no longer available, and that's your opening. Find out who the buyer was, whether it sold for more or less than your offer, update the relationship, and ask if they have any other properties coming up.
       </>
     ),
   },
 ];
 
-const segmentLabels: Record<typeof segments[number]["key"], string> = {
-  ACTIVE_OFF_MARKET: "3 Active & Off Market",
+const segmentNames: Record<typeof segments[number]["key"], string> = {
+  ACTIVE_OFF_MARKET: "Active & Off Market",
   PENDING_BACKUP_HOLD: "Pending / Backup / Hold",
   CLOSED_EXPIRED_CANCELED: "Closed / Expired / Canceled",
 };
@@ -83,7 +83,7 @@ export default function IqDealReview() {
 
   const currentSeg = segments[segIdx];
   const isLastSeg = segIdx === segments.length - 1;
-  const nextLabel = isLastSeg ? "Agents" : segmentLabels[segments[segIdx + 1].key];
+  const nextLabel = isLastSeg ? "Agents" : segmentNames[segments[segIdx + 1].key];
 
   // Subscribe to checklist changes so completion checkmarks update live
   const checklistVersion = useChecklistVersion();
@@ -290,7 +290,7 @@ export default function IqDealReview() {
               <span className="text-sm text-gray-500">
                 Active Deals › <span className="text-red-600 font-semibold">9 High Priority</span> Deals ›{" "}
                 <span className="font-semibold text-gray-800 underline decoration-orange-500 decoration-2 underline-offset-2">
-                  {segmentLabels[currentSeg.key]}
+                  <span className="text-orange-500">{segmentCounts[currentSeg.key]}</span> {segmentNames[currentSeg.key]}
                 </span>
               </span>
             </div>
@@ -312,7 +312,7 @@ export default function IqDealReview() {
                     <span className="text-[13px] font-semibold text-gray-700 leading-none">FlipiQ</span>
                   </div>
                   <p className="text-[14px] text-gray-800 leading-7">
-                    {currentSeg.subtitle}
+                    {currentSeg.subtitle(segmentCounts[currentSeg.key] ?? 0)}
                   </p>
                 </div>
               </div>
