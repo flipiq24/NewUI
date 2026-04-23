@@ -563,6 +563,15 @@ export default function IqCampaignResponses() {
                           done={handled.has(a.name)}
                           isSelected={sectionSel.has(a.name)}
                           onToggle={() => toggleSelect(sec.sentiment, a.name)}
+                          rowActions={sec.actions}
+                          onRowAction={(label) => {
+                            setHandled((prev) => {
+                              const next = new Set(prev);
+                              next.add(a.name);
+                              return next;
+                            });
+                            toast({ title: `${label} applied to ${a.name}.` });
+                          }}
                         />
                       ))}
                     </div>
@@ -616,11 +625,15 @@ function AgentRow({
   done,
   isSelected,
   onToggle,
+  rowActions,
+  onRowAction,
 }: {
   a: Agent;
   done: boolean;
   isSelected: boolean;
   onToggle: () => void;
+  rowActions: { key: string; label: string }[];
+  onRowAction?: (label: string) => void;
 }) {
   const rel = REL_STYLE[a.rel];
   const basket = BASKET_STYLE[a.basket];
@@ -803,22 +816,109 @@ function AgentRow({
 
       {/* Right column: follow-up status chip + response quote */}
       <div className="flex flex-col items-end gap-1.5 w-[260px] max-w-[260px]">
-        <Tip
-          title="Follow-Up Status"
-          rows={[["Status", a.fuStatus], ["Date", a.fuDate], ["Assigned", a.assigned]]}
-          align="right"
-        >
-          <span
-            className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium"
-            style={{ background: fu.bg, color: fu.text, border: `0.5px solid ${fu.border}` }}
+        <div className="flex items-start gap-2">
+          <Tip
+            title="Follow-Up Status"
+            rows={[["Status", a.fuStatus], ["Date", a.fuDate], ["Assigned", a.assigned]]}
+            align="right"
           >
-            {a.fuStatus}
-          </span>
-        </Tip>
+            <span
+              className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium"
+              style={{ background: fu.bg, color: fu.text, border: `0.5px solid ${fu.border}` }}
+            >
+              {a.fuStatus}
+            </span>
+          </Tip>
+          <div className="flex flex-col items-center gap-0.5 -mt-0.5">
+            <RowMenu actions={rowActions} onPick={(label) => onRowAction?.(label)} />
+            <CommIcon type={a.lastCommType} />
+          </div>
+        </div>
         {a.responseQuote && (
           <ThreadTip quote={a.responseQuote} thread={a.thread} />
         )}
       </div>
+    </div>
+  );
+}
+
+function CommIcon({ type }: { type: string }) {
+  const t = type.toLowerCase();
+  if (t === "text") {
+    return (
+      <span title="Last contact: Text" className="text-gray-400">
+        <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M2 4a1 1 0 011-1h10a1 1 0 011 1v6a1 1 0 01-1 1H6l-3 3v-3H3a1 1 0 01-1-1V4z" />
+        </svg>
+      </span>
+    );
+  }
+  if (t === "email") {
+    return (
+      <span title="Last contact: Email" className="text-gray-400">
+        <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <rect x="2" y="3.5" width="12" height="9" rx="1" />
+          <polyline points="2.5,4.5 8,9 13.5,4.5" />
+        </svg>
+      </span>
+    );
+  }
+  return (
+    <span title="Last contact: Call" className="text-gray-400">
+      <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M3 2h3l1.5 3.5-2 1.2C6.3 9 7 9.7 8.3 10.5l1.2-2L13 10v3c0 .6-.5 1-1 1C5.4 14 2 6.6 2 3c0-.5.4-1 1-1z" />
+      </svg>
+    </span>
+  );
+}
+
+function RowMenu({
+  actions,
+  onPick,
+}: {
+  actions: { key: string; label: string }[];
+  onPick: (label: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function onDoc(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-label="Row actions"
+        className="text-gray-400 hover:text-gray-700 cursor-pointer"
+      >
+        <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor">
+          <circle cx="8" cy="3" r="1.4" />
+          <circle cx="8" cy="8" r="1.4" />
+          <circle cx="8" cy="13" r="1.4" />
+        </svg>
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full mt-1 z-30 bg-white border border-gray-200 rounded-lg shadow-lg py-1.5 min-w-[200px]">
+          {actions.map((a) => (
+            <button
+              key={a.key}
+              type="button"
+              onClick={() => {
+                onPick(a.label);
+                setOpen(false);
+              }}
+              className="w-full text-left px-3.5 py-2 text-[13px] text-gray-700 hover:bg-orange-50 hover:text-orange-600 cursor-pointer"
+            >
+              {a.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
