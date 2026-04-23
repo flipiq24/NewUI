@@ -59,8 +59,6 @@ export default function IqDailyOutreach() {
   }
 
   function handleNext() {
-    const state = resetIqStateIfNewDay();
-    saveIqState({ ...state, outreachCampaignSent: true });
     navigate("/iq/campaign-responses");
   }
 
