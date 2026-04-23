@@ -288,7 +288,7 @@ export default function IqDealReview() {
           <>
             <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
               <span className="text-sm text-gray-500">
-                Active Deals › <span className="text-red-600 font-semibold">9 High Priority</span> Deals ›{" "}
+                Active Deals › <span className="text-orange-500 font-semibold">9</span> <span className="text-red-600 font-semibold">High Priority</span> Deals ›{" "}
                 <span className="font-semibold text-gray-800 underline decoration-orange-500 decoration-2 underline-offset-2">
                   <span className="text-orange-500">{segmentCounts[currentSeg.key]}</span> {segmentNames[currentSeg.key]}
                 </span>
