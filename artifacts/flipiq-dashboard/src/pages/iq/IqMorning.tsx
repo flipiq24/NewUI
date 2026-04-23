@@ -62,7 +62,7 @@ export default function IqMorning() {
     <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <IqTopBar title="FlipIQ Assistant" />
+        <IqTopBar title="FlipiQ Assistant" />
         <div className="flex-1 overflow-y-auto">
           <div className="p-8 max-w-2xl">
             <h1 className="text-[28px] font-bold text-orange-500 mb-8">Good morning, Josh!</h1>
