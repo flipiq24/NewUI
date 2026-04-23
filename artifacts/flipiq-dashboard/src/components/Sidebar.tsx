@@ -22,7 +22,7 @@ export default function Sidebar() {
 }
 
 function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: () => void }) {
-  resetIqStateIfNewDay();
+  const state = resetIqStateIfNewDay();
 
   const welcomeBackActive = location === "/iq/welcome-back";
   const todaysPlanActive = location === "/iq" || location === "/iq/tasks";
@@ -30,11 +30,6 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
   const agentsLocations = ["/iq/daily-outreach", "/iq/priority-agents"];
   const agentsActive = agentsLocations.includes(location);
   const newDealsActive = location === "/iq/new-relationships";
-
-  const showActiveDeals = activeDealsActive || agentsActive || newDealsActive || welcomeBackActive;
-  const showAgents = agentsActive || newDealsActive || welcomeBackActive;
-  const showNewDeals = newDealsActive || welcomeBackActive;
-  const showWelcomeBack = welcomeBackActive;
 
   return (
     <div className="w-[192px] bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
@@ -55,40 +50,34 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
             icon={<LightbulbIcon />}
             label="Today's Plan"
             active={todaysPlanActive}
-            done={!todaysPlanActive}
+            done={!!state.morningCheckin && !todaysPlanActive}
           />
         </Link>
-        {showActiveDeals && (
-          <Link href="/iq/deal-review">
-            <IqNavItem
-              icon={<FileTextIcon />}
-              label="Active Deals"
-              active={activeDealsActive}
-              done={!activeDealsActive}
-            />
-          </Link>
-        )}
-        {showAgents && (
-          <Link href="/iq/daily-outreach">
-            <IqNavItem
-              icon={<PhoneIcon />}
-              label="Agents"
-              active={agentsActive}
-              done={!agentsActive}
-            />
-          </Link>
-        )}
-        {showNewDeals && (
-          <Link href="/iq/new-relationships">
-            <IqNavItem
-              icon={<FolderIcon />}
-              label="New Deals"
-              active={newDealsActive}
-              done={!newDealsActive}
-            />
-          </Link>
-        )}
-        {showWelcomeBack && (
+        <Link href="/iq/deal-review">
+          <IqNavItem
+            icon={<FileTextIcon />}
+            label="Active Deals"
+            active={activeDealsActive}
+            done={!!state.dealReviewComplete && !activeDealsActive}
+          />
+        </Link>
+        <Link href="/iq/daily-outreach">
+          <IqNavItem
+            icon={<PhoneIcon />}
+            label="Agents"
+            active={agentsActive}
+            done={!!(state.outreachCampaignSent && state.priorityAgentsComplete) && !agentsActive}
+          />
+        </Link>
+        <Link href="/iq/new-relationships">
+          <IqNavItem
+            icon={<FolderIcon />}
+            label="New Deals"
+            active={newDealsActive}
+            done={!!state.newRelationshipsComplete && !newDealsActive}
+          />
+        </Link>
+        {welcomeBackActive && (
           <Link href="/iq/welcome-back">
             <IqNavItem
               icon={<LightbulbIcon />}
@@ -125,7 +114,10 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
         <p className="text-[10px] text-gray-400">joshs@fair-close.com</p>
         <div className="flex items-center gap-2 mt-1">
           <Settings className="w-3.5 h-3.5 text-gray-400 cursor-pointer" />
-          <LogOut className="w-3.5 h-3.5 text-gray-400 cursor-pointer" />
+          <LogOut
+            className="w-3.5 h-3.5 text-gray-400 cursor-pointer hover:text-orange-500"
+            onClick={onLogoClick}
+          />
         </div>
       </div>
     </div>
