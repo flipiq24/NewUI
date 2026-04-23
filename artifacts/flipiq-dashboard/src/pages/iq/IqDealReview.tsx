@@ -337,6 +337,7 @@ export default function IqDealReview() {
                     </label>
                     {allSelected && (
                       <BulkActionsButton
+                        segmentKey={currentSeg.key}
                         highOnly={visibleProps.some((p) => p.level === "high")}
                         callsMade={highCallsMade}
                         onCallMade={() => setHighCallsMade(true)}
@@ -405,11 +406,43 @@ export default function IqDealReview() {
   );
 }
 
+const SEGMENT_ACTIONS: Record<
+  "ACTIVE_OFF_MARKET" | "PENDING_BACKUP_HOLD" | "CLOSED_EXPIRED_CANCELED",
+  { call: { key: string; label: string; icon: React.FC }; followUps: { key: string; label: string; icon: React.FC }[] }
+> = {
+  ACTIVE_OFF_MARKET: {
+    call: { key: "call", label: "Call Agent", icon: PhoneIcon },
+    followUps: [
+      { key: "text", label: "Text Agent", icon: ChatIcon },
+      { key: "email", label: "Email Agent", icon: MailIcon },
+      { key: "loi", label: "Send LOI", icon: MailIcon },
+    ],
+  },
+  PENDING_BACKUP_HOLD: {
+    call: { key: "call", label: "Call Agent", icon: PhoneIcon },
+    followUps: [
+      { key: "text", label: "Text Agent", icon: ChatIcon },
+      { key: "backup", label: "Email Backup Offer", icon: MailIcon },
+      { key: "reminder", label: "Set Reminder", icon: MicIcon },
+    ],
+  },
+  CLOSED_EXPIRED_CANCELED: {
+    call: { key: "call", label: "Call Owner", icon: PhoneIcon },
+    followUps: [
+      { key: "text", label: "Text Owner", icon: ChatIcon },
+      { key: "postcard", label: "Mail Postcard", icon: MailIcon },
+      { key: "drip", label: "Add to Drip", icon: ChatIcon },
+    ],
+  },
+};
+
 function BulkActionsButton({
+  segmentKey,
   highOnly,
   callsMade,
   onCallMade,
 }: {
+  segmentKey: "ACTIVE_OFF_MARKET" | "PENDING_BACKUP_HOLD" | "CLOSED_EXPIRED_CANCELED";
   highOnly: boolean;
   callsMade: boolean;
   onCallMade: () => void;
@@ -425,16 +458,11 @@ function BulkActionsButton({
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  const followUps = [
-    { key: "text", label: "Text", icon: ChatIcon },
-    { key: "email", label: "Email", icon: MailIcon },
-    { key: "voicemail", label: "Text Voicemail", icon: MicIcon },
-  ];
-  const callAction = { key: "call", label: "Call", icon: PhoneIcon };
+  const segActions = SEGMENT_ACTIONS[segmentKey];
+  const callAction = segActions.call;
+  const followUps = segActions.followUps;
   const gated = highOnly && !callsMade;
-  const actions = highOnly
-    ? [callAction, ...followUps]
-    : [callAction, ...followUps];
+  const actions = [callAction, ...followUps];
 
   return (
     <div ref={ref} className="relative">
