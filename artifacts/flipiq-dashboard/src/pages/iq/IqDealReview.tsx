@@ -197,7 +197,7 @@ export default function IqDealReview() {
         {/* LLM-style chat briefing gate */}
         {!started && (
           <div className="flex-1 overflow-y-auto bg-white px-6 py-8">
-            <div className="max-w-3xl flex flex-col gap-6">
+            <div className="w-full flex flex-col gap-6">
 
               {/* AI message */}
               <div>
@@ -278,7 +278,7 @@ export default function IqDealReview() {
 
         {started && (
           <div className="flex-1 overflow-y-auto bg-white px-6 py-8">
-            <div className="max-w-3xl flex flex-col gap-6">
+            <div className="w-full flex flex-col gap-6">
               {/* AI message header */}
               <div className="flex items-center gap-2">
                 <img

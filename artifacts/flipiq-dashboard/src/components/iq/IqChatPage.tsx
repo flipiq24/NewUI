@@ -30,7 +30,7 @@ export default function IqChatPage({
     return (
       <>
         <div className="flex-1 overflow-y-auto bg-white px-6 py-8">
-          <div className="max-w-3xl flex flex-col gap-6">
+          <div className="w-full flex flex-col gap-6">
             <FlipiQAvatar />
             <div>
               <p className="text-[14px] text-gray-800 leading-7 mb-5">
@@ -83,7 +83,7 @@ export default function IqChatPage({
       </div>
 
       <div className="flex-1 overflow-y-auto bg-white px-6 py-8">
-        <div className="max-w-3xl flex flex-col gap-6">
+        <div className="w-full flex flex-col gap-6">
           <FlipiQAvatar />
 
           <div>
