@@ -206,10 +206,10 @@ function IqNavItem({ icon, label, active, done }: {
 
   return (
     <div className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer ${
-      active ? "bg-transparent border border-orange-500 text-orange-500" : "text-gray-600 hover:bg-gray-100"
+      active ? "bg-transparent border border-orange-500 text-gray-600" : "text-gray-600 hover:bg-gray-100"
     }`}>
-      <span className={`flex-shrink-0 w-3.5 h-3.5 ${active ? "text-orange-500" : showCheck ? "text-green-600" : "text-gray-500"}`}>{displayIcon}</span>
-      <span className={`text-xs font-medium flex-1 ${active ? "text-orange-500" : ""}`}>{label}</span>
+      <span className={`flex-shrink-0 w-3.5 h-3.5 ${active ? "text-gray-500" : showCheck ? "text-green-600" : "text-gray-500"}`}>{displayIcon}</span>
+      <span className={`text-xs font-medium flex-1 ${active ? "text-gray-600" : ""}`}>{label}</span>
     </div>
   );
 }
@@ -223,10 +223,10 @@ function NavItem({ icon, label, badge, active, small }: {
 }) {
   return (
     <div className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer ${
-      active ? "bg-transparent border border-orange-500 text-orange-500" : "text-gray-600 hover:bg-gray-100"
+      active ? "bg-transparent border border-orange-500 text-gray-600" : "text-gray-600 hover:bg-gray-100"
     } ${small ? "py-1" : ""}`}>
-      {icon && <span className={`flex-shrink-0 ${active ? "text-orange-500" : "text-gray-500"} ${small ? "w-3 h-3" : "w-3.5 h-3.5"}`}>{icon}</span>}
-      <span className={`${small ? "text-[10px]" : "text-xs"} font-medium flex-1 ${active ? "text-orange-500" : ""}`}>{label}</span>
+      {icon && <span className={`flex-shrink-0 ${active ? "text-gray-500" : "text-gray-500"} ${small ? "w-3 h-3" : "w-3.5 h-3.5"}`}>{icon}</span>}
+      <span className={`${small ? "text-[10px]" : "text-xs"} font-medium flex-1 ${active ? "text-gray-600" : ""}`}>{label}</span>
       {badge && <span className="text-[10px] text-gray-400">{badge}</span>}
     </div>
   );
