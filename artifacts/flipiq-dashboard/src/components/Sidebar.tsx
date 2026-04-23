@@ -113,7 +113,7 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
           <span className="text-orange-500 font-bold">+</span>
         </button>
         <Link href="/">
-          <IqNavItem icon={<BackIcon />} label="← Back to COMMAND" />
+          <IqNavItem icon={<BackIcon />} label="← Back to COMMAND 1.5" />
         </Link>
       </div>
 
@@ -247,12 +247,13 @@ function NavItem({ icon, label, badge, active, small }: {
 
 function FlipIQLogo() {
   return (
-    <div className="px-1 cursor-pointer">
+    <div className="px-1 cursor-pointer flex items-end gap-1.5">
       <img
         src={`${import.meta.env.BASE_URL}flipiq-logo.png`}
         alt="FlipIQ"
         className="w-[110px] object-contain"
       />
+      <span className="text-[10px] font-light text-gray-300 leading-none pb-0.5">v2.0</span>
     </div>
   );
 }
