@@ -1,0 +1,217 @@
+export type DealDetail = {
+  taskNote: string;
+  prop: [string, string][];
+  arv: string;
+  arvPct: string;
+  priceHist: [string, string][];
+  priceTotal: string;
+  pain: "high" | "mid" | "low" | "none";
+  painLabel: string;
+  painSig: [string, string][];
+  agent: "responsive" | "not-responsive" | "none";
+  agentLabel: string;
+  agentComms: [string, string][];
+  agentRate: string;
+  kw: "high" | "mid" | "low";
+  kwLabel: string;
+  pubCmt: string;
+  agtCmt: string;
+  opened: string;
+  called: string;
+  firstOpened: string;
+  totalOpens: number;
+  firstCalled: string;
+  totalCommsCount: number;
+  totalCalls: number;
+  totalTexts: number;
+  totalEmails: number;
+  pct: string;
+  status: string;
+  statusType: "neg" | "bu" | "init" | "none";
+  source: string;
+  negotiator: string;
+  assigned: string;
+};
+
+export const DEAL_DETAILS: Record<number, DealDetail> = {
+  1: {
+    taskNote: "Agent countered at $425k. Close the gap.",
+    prop: [["Type","Condo · STD"],["Beds / Baths","3 / 2"],["Garage","2 car"],["Sq Ft / Lot","1,248 / 2,613"],["Built","1976"],["Pool","In-ground, Gunite"],["DOM / CDOM","108 / 108"]],
+    arv: "$520,000", arvPct: "77% ARV",
+    priceHist: [["Original list","$449,000"],["Drop 03/15/26","$425,000 (-5.3%)"],["Drop 04/02/26","$399,000 (-6.1%)"]],
+    priceTotal: "-$50,000 (-11.1%)",
+    pain: "low", painLabel: "Low",
+    painSig: [["Flagged","No pain"],["Ownership","Absentee"],["Equity","High (>50%)"],["Entity","Corp / Trust"],["Propensity","6 / 10"]],
+    agent: "responsive", agentLabel: "Responsive",
+    agentComms: [["Text 04/22","Replied 2h"],["Email 04/20","Opened"],["Call 01/30","Answered"],["Text 01/15","Replied"],["Email 01/10","Replied"]],
+    agentRate: "80%",
+    kw: "low", kwLabel: "Low",
+    pubCmt: "Stunning Palm Desert condo in prestigious gated community. Pool and spa access, turnkey with tasteful upgrades throughout.",
+    agtCmt: "Quick close preferred. Seller reviewing all offers this week.",
+    opened: "04/23", called: "01/30",
+    firstOpened: "12/12/25", totalOpens: 14,
+    firstCalled: "12/15/25", totalCommsCount: 9, totalCalls: 3, totalTexts: 3, totalEmails: 3,
+    pct: "60%", status: "In Negotiations", statusType: "neg",
+    source: "MLS — Active", negotiator: "Josh Santos", assigned: "Josh Santos",
+  },
+  2: {
+    taskNote: "Primary buyer in escrow with 3% EMD. Submit backup at same number.",
+    prop: [["Type","Manuf 433 · REO"],["Beds / Baths","3 / 2"],["Garage","2 car"],["Sq Ft / Lot","1,576 / 95,396"],["Built","1986"],["Pool","None"],["DOM / CDOM","54 / 108"]],
+    arv: "$420,000", arvPct: "80% ARV",
+    priceHist: [["Original list","$369,900"],["Drop 02/10/26","$349,900 (-5.4%)"],["Drop 03/28/26","$335,800 (-4.0%)"]],
+    priceTotal: "-$34,100 (-9.2%)",
+    pain: "low", painLabel: "Low",
+    painSig: [["Flagged","No pain"],["Equity","High (>50%)"],["Mortgage","Free & Clear"],["Transfer","Recent (<2 yrs)"],["Propensity","3 / 10"]],
+    agent: "not-responsive", agentLabel: "Not Responsive",
+    agentComms: [["Call 12/30","No answer"],["Text 12/28","No reply"],["Email 12/26","Opened, no reply"],["Text 12/20","Unread"],["Call 12/15","Voicemail"]],
+    agentRate: "0%",
+    kw: "mid", kwLabel: "Mid",
+    pubCmt: "REO property, lender-owned. Submit clean offers with POF. Property sold subject to lender approval.",
+    agtCmt: '<span class="kw">AS-IS</span> cash preferred. 7-day close. No contingencies.',
+    opened: "04/22", called: "12/30",
+    firstOpened: "11/20/25", totalOpens: 8,
+    firstCalled: "12/01/25", totalCommsCount: 5, totalCalls: 2, totalTexts: 2, totalEmails: 1,
+    pct: "30%", status: "Back Up", statusType: "bu",
+    source: "MLS — Active", negotiator: "Josh Santos", assigned: "Josh Santos",
+  },
+  3: {
+    taskNote: "Strong comps support $960k. Submit backup ready to move.",
+    prop: [["Type","Other (L) · STD"],["Beds / Baths","4 / 4"],["Garage","4 car"],["Sq Ft / Lot","2,360 / 7,203"],["Built","1939"],["Pool","None"],["DOM / CDOM","132 / 132"]],
+    arv: "$1,160,383", arvPct: "77% ARV",
+    priceHist: [["Original list","$950,000"],["Drop 02/01/26","$925,000 (-2.6%)"],["Drop 03/10/26","$895,000 (-3.2%)"]],
+    priceTotal: "-$55,000 (-5.8%)",
+    pain: "low", painLabel: "Low",
+    painSig: [["Flagged","No pain"],["Liens","Open liens"],["Debt","High (LTV >80%)"],["Mortgage","Adjustable rate"],["Propensity","6 / 10"]],
+    agent: "not-responsive", agentLabel: "Not Responsive",
+    agentComms: [["Call 01/01","No answer"],["Email 12/28","No reply"],["Text 12/20","Unread"],["Call 12/15","Voicemail"],["Email 12/10","No reply"]],
+    agentRate: "0%",
+    kw: "high", kwLabel: "High",
+    pubCmt: 'Pleased to present a fourplex in the strong rental market of Compton. Single-story layout, private garden area, close to retail. <span class="kw">SELLER CAN PROBABLY DELIVER ONE OF THE APARTMENT UNITS VACANT</span> AT CLOSE OF ESCROW. Compton is an excellent rental market with <span class="kw">NO MUNICIPAL RENT CONTROL</span>.',
+    agtCmt: '<span class="kw">SELLER CAN PROBABLY DELIVER ONE OF THE UNITS VACANT</span> AT CLOSE OF ESCROW. Please DO NOT DISTURB THE TENANTS as they are unaware of the sale. Submit offers <span class="kw">subject to interior inspection</span>.',
+    opened: "04/23", called: "01/01",
+    firstOpened: "12/08/25", totalOpens: 12,
+    firstCalled: "12/10/25", totalCommsCount: 7, totalCalls: 2, totalTexts: 3, totalEmails: 2,
+    pct: "30%", status: "Back Up", statusType: "bu",
+    source: "MLS — Active", negotiator: "Josh Santos", assigned: "Josh Santos",
+  },
+  4: {
+    taskNote: "Buyer performance check. Confirm EMD and contingency removal dates.",
+    prop: [["Type","Single Family · STD"],["Beds / Baths","3 / 2"],["Garage","3 car"],["Sq Ft / Lot","3,488 / 30,297"],["Built","1930"],["Pool","In-ground"],["DOM / CDOM","134 / 180"]],
+    arv: "$2,200,000", arvPct: "82% ARV",
+    priceHist: [["Original list","$1,950,000"],["Drop 01/15/26","$1,875,000 (-3.8%)"],["Drop 02/28/26","$1,800,000 (-4.0%)"]],
+    priceTotal: "-$150,000 (-7.7%)",
+    pain: "none", painLabel: "No data",
+    painSig: [["Flagged","No pain data"],["Note","Limited profile"],["Action","Pull tax/ownership records"]],
+    agent: "none", agentLabel: "No contact yet",
+    agentComms: [["Attempts","0"],["First contact","Required"]],
+    agentRate: "—",
+    kw: "high", kwLabel: "High",
+    pubCmt: "Historic Hayward home on oversized lot. Bring your imagination — this one needs vision. Large pool, detached garage.",
+    agtCmt: '<span class="kw">Fixer</span>. Sold <span class="kw">AS IS</span>. No credits. Buyer to verify all permits and conditions.',
+    opened: "01/01", called: "01/01",
+    firstOpened: "01/01/26", totalOpens: 1,
+    firstCalled: "—", totalCommsCount: 0, totalCalls: 0, totalTexts: 0, totalEmails: 0,
+    pct: "30%", status: "Back Up", statusType: "bu",
+    source: "MLS — Back Up Offer", negotiator: "Josh Santos", assigned: "Not Assigned",
+  },
+  5: {
+    taskNote: "No activity logged yet. Make first call today.",
+    prop: [["Type","Single Family · STD"],["Beds / Baths","2 / 1"],["Garage","—"],["Sq Ft / Lot","1,025 / 5,227"],["Built","1947"],["Pool","None"],["DOM / CDOM","124 / 124"]],
+    arv: "$410,000", arvPct: "73% ARV",
+    priceHist: [["Original list","$315,000"],["Drop 02/20/26","$299,000 (-5.1%)"]],
+    priceTotal: "-$16,000 (-5.1%)",
+    pain: "low", painLabel: "Low",
+    painSig: [["Flagged","No pain"],["Equity","High (>50%)"],["Propensity","2 / 10"]],
+    agent: "none", agentLabel: "No contact yet",
+    agentComms: [["Attempts","0"],["First contact","Required"]],
+    agentRate: "—",
+    kw: "low", kwLabel: "Low",
+    pubCmt: "Starter home in Lake Elsinore. Quiet neighborhood, walk to park, easy freeway access.",
+    agtCmt: "Standard sale. Submit offers with POF and pre-approval letter.",
+    opened: "01/05", called: "—",
+    firstOpened: "01/05/26", totalOpens: 1,
+    firstCalled: "—", totalCommsCount: 0, totalCalls: 0, totalTexts: 0, totalEmails: 0,
+    pct: "0%", status: "None", statusType: "none",
+    source: "MLS — Hold", negotiator: "Josh Santos", assigned: "Not Assigned",
+  },
+  6: {
+    taskNote: "Sold. Find out who bought, at what price, and what's next from this agent.",
+    prop: [["Type","Townhouse · STD"],["Beds / Baths","3 / 2"],["Garage","2 car"],["Sq Ft / Lot","1,385 / —"],["Built","1985"],["Pool","Community"],["DOM / CDOM","7 / 7"]],
+    arv: "$780,000", arvPct: "81% ARV",
+    priceHist: [["Original list","$649,000"],["Sold","$635,000 (-2.2%)"]],
+    priceTotal: "-$14,000 (-2.2%)",
+    pain: "mid", painLabel: "Mid",
+    painSig: [["Flagged","Moderate pain"],["Life event","Affidavit of Death"],["Equity","High (>50%)"],["Ownership","Long-term 20+ yrs"],["Propensity","10 / 10"]],
+    agent: "responsive", agentLabel: "Responsive",
+    agentComms: [["Text 03/02","Replied"],["Call 03/02","Answered"],["Email 02/28","Opened"],["Call 02/25","Answered"],["Text 02/20","Replied"]],
+    agentRate: "100%",
+    kw: "high", kwLabel: "High",
+    pubCmt: "Charming townhouse in Salinas with community pool. Well-maintained, ready to move in.",
+    agtCmt: '<span class="kw">Probate sale</span> — confirmation of executor required. <span class="kw">Motivated estate</span>.',
+    opened: "03/02", called: "03/02",
+    firstOpened: "03/02/26", totalOpens: 4,
+    firstCalled: "03/02/26", totalCommsCount: 5, totalCalls: 2, totalTexts: 2, totalEmails: 1,
+    pct: "10%", status: "Initial Contact", statusType: "init",
+    source: "MLS — Closed", negotiator: "Josh Santos", assigned: "Josh Santos",
+  },
+  7: {
+    taskNote: "Cancelled listing. Call and find out why.",
+    prop: [["Type","Single Family · STD"],["Beds / Baths","3 / 1.75"],["Garage","—"],["Sq Ft / Lot","1,095 / 6,431"],["Built","1953"],["Pool","None"],["DOM / CDOM","36 / 36"]],
+    arv: "$900,000", arvPct: "83% ARV",
+    priceHist: [["Original list","$779,000"],["Drop 04/01/26","$749,000 (-3.9%)"],["Status","Cancelled"]],
+    priceTotal: "-$30,000 (-3.9%)",
+    pain: "low", painLabel: "Low",
+    painSig: [["Flagged","No pain"],["Ownership","Absentee"],["Equity","High (>50%)"],["Mortgage","Adjustable rate"],["Propensity","5 / 10"]],
+    agent: "none", agentLabel: "No contact yet",
+    agentComms: [["Attempts","0"],["First contact","Required"]],
+    agentRate: "—",
+    kw: "mid", kwLabel: "Mid",
+    pubCmt: 'Cozy La Puente starter home. Original charm, needs some <span class="kw">TLC</span>. Large lot, room to expand.',
+    agtCmt: "Seller reviewing offers. Counters welcomed. Submit with POF.",
+    opened: "04/14", called: "—",
+    firstOpened: "04/14/26", totalOpens: 2,
+    firstCalled: "—", totalCommsCount: 0, totalCalls: 0, totalTexts: 0, totalEmails: 0,
+    pct: "10%", status: "Initial Contact", statusType: "init",
+    source: "MLS — Cancelled", negotiator: "Josh Santos", assigned: "Not Assigned",
+  },
+  8: {
+    taskNote: "Closed but agent may still have seller relationship. Open the door.",
+    prop: [["Type","Single Family · STD"],["Beds / Baths","3 / 2"],["Garage","—"],["Sq Ft / Lot","1,089 / 13,068"],["Built","1955"],["Pool","None"],["DOM / CDOM","9 / 9"]],
+    arv: "$180,000", arvPct: "36% ARV",
+    priceHist: [["Original list","$75,000"],["Sold","$65,000 (-13.3%)"]],
+    priceTotal: "-$10,000 (-13.3%)",
+    pain: "mid", painLabel: "Mid",
+    painSig: [["Flagged","Moderate pain"],["Distress","Tax delinquency"],["Equity","High (>50%)"],["Propensity","7 / 10"]],
+    agent: "not-responsive", agentLabel: "Not Responsive",
+    agentComms: [["Call 01/01","No answer"],["Text 12/28","No reply"],["Email 12/26","Opened, no reply"],["Call 12/20","Voicemail"],["Text 12/15","Unread"]],
+    agentRate: "0%",
+    kw: "high", kwLabel: "High",
+    pubCmt: '<span class="kw">PRICE REDUCED!!!</span> Banning fixer, large lot. <span class="kw">Motivated seller</span>. Won\'t last.',
+    agtCmt: '<span class="kw">AS IS</span>. Tax sale consideration. <span class="kw">Motivated</span>. Cash preferred. No contingencies.',
+    opened: "01/02", called: "01/01",
+    firstOpened: "12/20/25", totalOpens: 6,
+    firstCalled: "12/15/25", totalCommsCount: 5, totalCalls: 2, totalTexts: 2, totalEmails: 1,
+    pct: "30%", status: "Back Up", statusType: "bu",
+    source: "MLS — Closed", negotiator: "Josh Santos", assigned: "Not Assigned",
+  },
+  9: {
+    taskNote: "Sold. Call, ask who bought, learn price and terms.",
+    prop: [["Type","Single Family · STD"],["Beds / Baths","4 / 3"],["Garage","2 car"],["Sq Ft / Lot","1,751 / 6,500"],["Built","1962"],["Pool","None"],["DOM / CDOM","10 / 10"]],
+    arv: "$1,600,000", arvPct: "84% ARV",
+    priceHist: [["Original list","$1,399,000"],["Sold","$1,350,000 (-3.5%)"]],
+    priceTotal: "-$49,000 (-3.5%)",
+    pain: "low", painLabel: "Low",
+    painSig: [["Flagged","No pain"],["Equity","High (>50%)"],["Entity","Corp / Trust"],["Transfer","Recent (<2 yrs)"],["Propensity","3 / 10"]],
+    agent: "responsive", agentLabel: "Responsive",
+    agentComms: [["Call 04/14","Answered"],["Text 04/10","Replied"],["Email 04/08","Opened, replied"],["Call 04/05","Answered"],["Text 04/01","Replied"]],
+    agentRate: "80%",
+    kw: "low", kwLabel: "Low",
+    pubCmt: "Beautifully maintained family home in Westminster. Move-in ready, well-kept throughout.",
+    agtCmt: "Standard sale. No repairs needed. Call for showing appointments.",
+    opened: "04/15", called: "04/14",
+    firstOpened: "04/01/26", totalOpens: 5,
+    firstCalled: "04/01/26", totalCommsCount: 8, totalCalls: 3, totalTexts: 3, totalEmails: 2,
+    pct: "0%", status: "None", statusType: "none",
+    source: "MLS — Closed", negotiator: "Josh Santos", assigned: "Not Assigned",
+  },
+};

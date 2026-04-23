@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlipIQ — Deal Review</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #1F1F1F; padding: 20px; }
+
+.fq-app { max-width: 1100px; margin: 0 auto; background: #FFFFFF; border: 0.5px solid #E5E5E5; border-radius: 10px; overflow: visible; }
+
+.fq-topbar { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-bottom: 0.5px solid #E5E5E5; }
+.fq-logo { font-size: 16px; font-weight: 600; color: #F97316; flex-shrink: 0; }
+.fq-logo span { color: #1F1F1F; }
+.fq-stepper { display: flex; align-items: center; gap: 6px; margin: 0 auto; font-size: 12px; }
+.fq-step { display: flex; align-items: center; gap: 6px; color: #9CA3AF; }
+.fq-step b { font-weight: 500; color: #6B6B6B; }
+.fq-step.active b { color: #1F1F1F; }
+.fq-step.done b { color: #6B6B6B; }
+.fq-num { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #F5F5F4; color: #9CA3AF; font-size: 11px; font-weight: 500; border: 0.5px solid #E5E5E5; }
+.fq-step.done .fq-num { background: #EAF3DE; color: #27500A; border-color: #C0DD97; }
+.fq-step.active .fq-num { background: #F97316; color: white; border-color: #F97316; }
+.fq-step-line { width: 22px; height: 0.5px; background: #E5E5E5; }
+.fq-help { font-size: 12px; color: #F97316; font-weight: 500; flex-shrink: 0; cursor: pointer; }
+
+.fq-bc { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #6B6B6B; padding: 12px 16px; border-bottom: 0.5px solid #E5E5E5; }
+.fq-bc b { color: #1F1F1F; font-weight: 500; border-bottom: 2px solid #F97316; padding-bottom: 3px; }
+.fq-bc-sep { color: #9CA3AF; }
+.fq-bc-next { margin-left: auto; color: #9CA3AF; cursor: pointer; font-size: 12px; }
+.fq-bc-next b { color: #6B6B6B; border: none; padding: 0; }
+.fq-bc-next:hover b { color: #F97316; }
+
+.fq-sec { padding: 16px 16px 4px; }
+.fq-sec-top { display: flex; align-items: center; gap: 10px; padding: 6px 0 8px; border-bottom: 0.5px solid #E5E5E5; margin-bottom: 4px; }
+.fq-cb { width: 14px; height: 14px; border: 1px solid #D1D5DB; border-radius: 3px; cursor: pointer; display: inline-block; background: #FFFFFF; flex-shrink: 0; }
+.fq-cb:hover { border-color: #6B6B6B; }
+.fq-cb.on { background: #F97316; border-color: #F97316; position: relative; }
+.fq-cb.on::after { content: ""; position: absolute; top: 1px; left: 3px; width: 4px; height: 7px; border: solid white; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+.fq-all-lbl { font-size: 10px; letter-spacing: 0.8px; color: #9CA3AF; font-weight: 500; }
+.fq-sec-ttl { font-size: 11px; letter-spacing: 0.8px; color: #6B6B6B; font-weight: 500; margin-left: auto; }
+.fq-sec-ttl b { color: #1F1F1F; font-weight: 500; }
+.fq-sec-desc { font-size: 13px; color: #6B6B6B; margin: 8px 0 4px; line-height: 1.5; }
+
+.row { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: flex-start; padding: 14px 0; border-bottom: 0.5px solid #E5E5E5; position: relative; }
+.row:hover { background: #FAFAF9; }
+.row:last-child { border-bottom: none; }
+
+.lnav { display: flex; flex-direction: column; gap: 7px; padding-top: 3px; align-items: center; position: relative; }
+.ico { width: 16px; height: 16px; color: #9CA3AF; cursor: pointer; position: relative; display: flex; align-items: center; justify-content: center; border-radius: 3px; }
+.ico:hover { color: #1F1F1F; }
+.ico svg { width: 16px; height: 16px; display: block; }
+
+.main { min-width: 0; }
+.title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.phone-btn { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #FFF7ED; color: #EA580C; border: 0.5px solid #FED7AA; cursor: pointer; flex-shrink: 0; }
+.phone-btn:hover { background: #F97316; color: white; border-color: #F97316; }
+.phone-btn svg { width: 11px; height: 11px; }
+.next-step-wrap { position: relative; cursor: help; }
+.next-step { font-size: 15px; font-weight: 500; color: #1F1F1F; line-height: 1.3; }
+.next-step-wrap:hover .next-step { color: #EA580C; }
+
+.addr-line { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; margin-bottom: 6px; font-size: 13px; color: #6B6B6B; }
+.addr-wrap { position: relative; cursor: help; }
+.addr-wrap:hover { color: #1F1F1F; }
+.g { color: #9CA3AF; cursor: pointer; display: inline-flex; vertical-align: middle; text-decoration: none; }
+.g:hover { color: #F97316; }
+.g svg { width: 11px; height: 11px; }
+.price-i { position: relative; cursor: help; color: #1F1F1F; font-weight: 500; }
+.arv-i { position: relative; cursor: help; color: #6B6B6B; font-weight: 500; }
+.arv-i:hover { color: #1F1F1F; }
+.addr-sep { color: #9CA3AF; opacity: 0.5; }
+
+.meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: #9CA3AF; align-items: center; }
+.meta-i { position: relative; cursor: help; color: #6B6B6B; }
+.meta-i:hover { color: #1F1F1F; }
+.meta-sep { color: #9CA3AF; opacity: 0.5; }
+.meta-plain { color: #9CA3AF; }
+.meta-plain b { color: #6B6B6B; font-weight: 400; }
+
+.dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+.d-gray { background: #B4B2A9; }
+.d-green { background: #639922; }
+.d-amber { background: #BA7517; }
+.d-red { background: #E24B4A; }
+
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px 4px 11px; border-radius: 999px; font-size: 12px; font-weight: 500; cursor: pointer; position: relative; border: 0.5px solid transparent; white-space: nowrap; align-self: flex-start; }
+.chip::after { content: ""; width: 0; height: 0; border-left: 3px solid transparent; border-right: 3px solid transparent; border-top: 3.5px solid currentColor; opacity: 0.5; margin-left: 2px; }
+.chip-neg { background: #FAEEDA; color: #854F0B; border-color: #FAC775; }
+.chip-bu { background: #E6F1FB; color: #185FA5; border-color: #B5D4F4; }
+.chip-init { background: #EEEDFE; color: #534AB7; border-color: #CECBF6; }
+.chip-none { background: #F5F5F4; color: #9CA3AF; border-color: #E5E5E5; }
+.chip b { font-weight: 500; }
+
+.menu { display: none; position: absolute; top: 0; left: calc(100% + 8px); background: #FFFFFF; border: 0.5px solid #D1D5DB; border-radius: 8px; padding: 10px; z-index: 50; box-shadow: 0 4px 16px rgba(0,0,0,0.08); min-width: 450px; }
+.menu.open { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 18px; }
+.menu-foot { grid-column: 1 / -1; margin-top: 6px; padding-top: 8px; border-top: 0.5px solid #E5E5E5; }
+.menu-col h5 { font-size: 10px; letter-spacing: 0.8px; color: #9CA3AF; font-weight: 500; margin: 4px 0 4px; padding: 0 6px; text-transform: uppercase; }
+.menu-col a, .menu-foot a { display: flex; align-items: center; gap: 8px; padding: 6px 8px; font-size: 13px; color: #1F1F1F; cursor: pointer; border-radius: 4px; text-decoration: none; }
+.menu-col a:hover, .menu-foot a:hover { background: #F5F5F4; }
+.menu-col a svg, .menu-foot a svg { width: 13px; height: 13px; color: #9CA3AF; flex-shrink: 0; }
+.menu-foot a { font-weight: 500; color: #C2410C; }
+.menu-foot a svg { color: #F97316; }
+
+.nudge { display: none; margin-top: 10px; padding: 9px 12px; background: #FFF7ED; border: 0.5px solid #FED7AA; border-radius: 8px; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 12.5px; color: #7C2D12; }
+.nudge.open { display: flex; }
+.nudge b { font-weight: 500; }
+.nudge-btns { display: flex; gap: 6px; }
+.n-yes { padding: 4px 11px; background: #1F1F1F; color: #FFFFFF; border: none; border-radius: 4px; font-size: 11.5px; font-weight: 500; cursor: pointer; }
+.n-no { padding: 4px 11px; background: transparent; color: #6B6B6B; border: 0.5px solid #D1D5DB; border-radius: 4px; font-size: 11.5px; cursor: pointer; }
+
+.tip { visibility: hidden; opacity: 0; position: absolute; bottom: calc(100% + 6px); left: 0; background: #FFFFFF; color: #1F1F1F; font-size: 12px; font-weight: 400; padding: 10px 12px; border-radius: 6px; z-index: 100; line-height: 1.55; transition: opacity 0.1s; pointer-events: none; text-align: left; min-width: 240px; max-width: 300px; border: 0.5px solid #D1D5DB; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+[data-tip]:hover > .tip { visibility: visible; opacity: 1; }
+.ico:hover > .tip { visibility: visible; opacity: 1; }
+.addr-wrap:hover > .tip, .next-step-wrap:hover > .tip { visibility: visible; opacity: 1; }
+.tip-ttl { font-weight: 500; color: #EA580C; margin-bottom: 6px; display: block; font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
+.tip-row { display: flex; justify-content: space-between; gap: 14px; padding: 1.5px 0; }
+.tip-row span:first-child { color: #9CA3AF; }
+.tip-row span:last-child { color: #1F1F1F; font-weight: 500; }
+.tip-foot { margin-top: 6px; padding-top: 6px; border-top: 0.5px solid #E5E5E5; }
+.tip-right { left: auto; right: 0; }
+
+.tip-long { min-width: 330px; max-width: 400px; }
+.tip-lbl { font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; color: #9CA3AF; font-weight: 500; margin-top: 7px; margin-bottom: 3px; }
+.tip-lbl:first-of-type { margin-top: 0; }
+.tip-prose { font-size: 12px; color: #1F1F1F; line-height: 1.55; margin: 0; }
+.kw { background: #EF4444; color: white; padding: 1px 5px; border-radius: 3px; font-weight: 500; font-size: 10.5px; letter-spacing: 0.3px; }
+</style>
+</head>
+<body>
+
+<div class="fq-app">
+  <div class="fq-topbar">
+    <div class="fq-logo">Flip<span>iQ</span></div>
+    <div class="fq-stepper">
+      <div class="fq-step done"><span class="fq-num">&#10003;</span><b>Today's Plan</b></div>
+      <div class="fq-step-line"></div>
+      <div class="fq-step active"><span class="fq-num">9</span><b>Active Deals</b></div>
+      <div class="fq-step-line"></div>
+      <div class="fq-step"><span class="fq-num">6</span><b>Agents</b></div>
+      <div class="fq-step-line"></div>
+      <div class="fq-step"><span class="fq-num">1</span><b>New Deals</b></div>
+    </div>
+    <div class="fq-help">Need Help?</div>
+  </div>
+
+  <div class="fq-bc">
+    Active Deals <span class="fq-bc-sep">&rsaquo;</span> 9 High Priority Deals <span class="fq-bc-sep">&rsaquo;</span> <b>3 Active &amp; Off Market</b>
+    <div class="fq-bc-next">Next: <b>Pending / Backup / Hold &rsaquo;</b></div>
+  </div>
+
+  <div id="sections"></div>
+</div>
+
+<script>
+const DEALS = [
+  {id:1, section:'active', task:'Adjust terms', taskNote:'Agent countered at $425k. Close the gap.',
+   address:'73750 Desert Vista Court, Palm Desert, CA 92260',
+   prop:[['Type','Condo \u00b7 STD'],['Beds / Baths','3 / 2'],['Garage','2 car'],['Sq Ft / Lot','1,248 / 2,613'],['Built','1976'],['Pool','In-ground, Gunite'],['DOM / CDOM','108 / 108']],
+   price:'$399,000', arv:'$520,000', arvPct:'77% ARV',
+   priceHist:[['Original list','$449,000'],['Drop 03/15/26','$425,000 (-5.3%)'],['Drop 04/02/26','$399,000 (-6.1%)']], priceTotal:'-$50,000 (-11.1%)',
+   pain:'low', painLabel:'Low',
+   painSig:[['Flagged','No pain'],['Ownership','Absentee'],['Equity','High (>50%)'],['Entity','Corp / Trust'],['Propensity','6 / 10']],
+   agent:'responsive', agentLabel:'Responsive',
+   agentComms:[['Text 04/22','Replied 2h'],['Email 04/20','Opened'],['Call 01/30','Answered'],['Text 01/15','Replied'],['Email 01/10','Replied']], agentRate:'80%',
+   kw:'low', kwLabel:'Low',
+   pubCmt:'Stunning Palm Desert condo in prestigious gated community. Pool and spa access, turnkey with tasteful upgrades throughout.',
+   agtCmt:'Quick close preferred. Seller reviewing all offers this week.',
+   opened:'04/23', called:'01/30',
+   firstOpened:'12/12/25', totalOpens:14,
+   firstCalled:'12/15/25', totalCommsCount:9, totalCalls:3, totalTexts:3, totalEmails:3,
+   pct:'60%', status:'In Negotiations', statusType:'neg',
+   source:'MLS \u2014 Active', negotiator:'Josh Santos', assigned:'Josh Santos'},
+
+  {id:2, section:'active', task:'Prepare backup offer', taskNote:'Primary buyer in escrow with 3% EMD. Submit backup at same number.',
+   address:'9283 Atsina Road, Phelan, CA 92371',
+   prop:[['Type','Manuf 433 \u00b7 REO'],['Beds / Baths','3 / 2'],['Garage','2 car'],['Sq Ft / Lot','1,576 / 95,396'],['Built','1986'],['Pool','None'],['DOM / CDOM','54 / 108']],
+   price:'$335,800', arv:'$420,000', arvPct:'80% ARV',
+   priceHist:[['Original list','$369,900'],['Drop 02/10/26','$349,900 (-5.4%)'],['Drop 03/28/26','$335,800 (-4.0%)']], priceTotal:'-$34,100 (-9.2%)',
+   pain:'low', painLabel:'Low',
+   painSig:[['Flagged','No pain'],['Equity','High (>50%)'],['Mortgage','Free & Clear'],['Transfer','Recent (<2 yrs)'],['Propensity','3 / 10']],
+   agent:'not-responsive', agentLabel:'Not Responsive',
+   agentComms:[['Call 12/30','No answer'],['Text 12/28','No reply'],['Email 12/26','Opened, no reply'],['Text 12/20','Unread'],['Call 12/15','Voicemail']], agentRate:'0%',
+   kw:'mid', kwLabel:'Mid',
+   pubCmt:'REO property, lender-owned. Submit clean offers with POF. Property sold subject to lender approval.',
+   agtCmt:'<span class="kw">AS-IS</span> cash preferred. 7-day close. No contingencies.',
+   opened:'04/22', called:'12/30',
+   firstOpened:'11/20/25', totalOpens:8,
+   firstCalled:'12/01/25', totalCommsCount:5, totalCalls:2, totalTexts:2, totalEmails:1,
+   pct:'30%', status:'Back Up', statusType:'bu',
+   source:'MLS \u2014 Active', negotiator:'Josh Santos', assigned:'Josh Santos'},
+
+  {id:3, section:'active', task:'Prepare backup offer', taskNote:'Strong comps support $960k. Submit backup ready to move.',
+   address:'338 W Magnolia Street, Compton, CA 90220',
+   prop:[['Type','Other (L) \u00b7 STD'],['Beds / Baths','4 / 4'],['Garage','4 car'],['Sq Ft / Lot','2,360 / 7,203'],['Built','1939'],['Pool','None'],['DOM / CDOM','132 / 132']],
+   price:'$895,000', arv:'$1,160,383', arvPct:'77% ARV',
+   priceHist:[['Original list','$950,000'],['Drop 02/01/26','$925,000 (-2.6%)'],['Drop 03/10/26','$895,000 (-3.2%)']], priceTotal:'-$55,000 (-5.8%)',
+   pain:'low', painLabel:'Low',
+   painSig:[['Flagged','No pain'],['Liens','Open liens'],['Debt','High (LTV >80%)'],['Mortgage','Adjustable rate'],['Propensity','6 / 10']],
+   agent:'not-responsive', agentLabel:'Not Responsive',
+   agentComms:[['Call 01/01','No answer'],['Email 12/28','No reply'],['Text 12/20','Unread'],['Call 12/15','Voicemail'],['Email 12/10','No reply']], agentRate:'0%',
+   kw:'high', kwLabel:'High',
+   pubCmt:'Pleased to present a fourplex in the strong rental market of Compton. Single-story layout, private garden area, close to retail. <span class="kw">SELLER CAN PROBABLY DELIVER ONE OF THE APARTMENT UNITS VACANT</span> AT CLOSE OF ESCROW. Compton is an excellent rental market with <span class="kw">NO MUNICIPAL RENT CONTROL</span>.',
+   agtCmt:'<span class="kw">SELLER CAN PROBABLY DELIVER ONE OF THE UNITS VACANT</span> AT CLOSE OF ESCROW. Please DO NOT DISTURB THE TENANTS as they are unaware of the sale. Submit offers <span class="kw">subject to interior inspection</span>.',
+   opened:'04/23', called:'01/01',
+   firstOpened:'12/08/25', totalOpens:12,
+   firstCalled:'12/10/25', totalCommsCount:7, totalCalls:2, totalTexts:3, totalEmails:2,
+   pct:'30%', status:'Back Up', statusType:'bu',
+   source:'MLS \u2014 Active', negotiator:'Josh Santos', assigned:'Josh Santos'},
+
+  {id:4, section:'pending', task:'Reminder scheduled', taskNote:'Buyer performance check. Confirm EMD and contingency removal dates.',
+   address:'921 Warren Street, Hayward, CA 94541',
+   prop:[['Type','Single Family \u00b7 STD'],['Beds / Baths','3 / 2'],['Garage','3 car'],['Sq Ft / Lot','3,488 / 30,297'],['Built','1930'],['Pool','In-ground'],['DOM / CDOM','134 / 180']],
+   price:'$1,800,000', arv:'$2,200,000', arvPct:'82% ARV',
+   priceHist:[['Original list','$1,950,000'],['Drop 01/15/26','$1,875,000 (-3.8%)'],['Drop 02/28/26','$1,800,000 (-4.0%)']], priceTotal:'-$150,000 (-7.7%)',
+   pain:'none', painLabel:'No data',
+   painSig:[['Flagged','No pain data'],['Note','Limited profile'],['Action','Pull tax/ownership records']],
+   agent:'none', agentLabel:'No contact yet',
+   agentComms:[['Attempts','0'],['First contact','Required']], agentRate:'\u2014',
+   kw:'high', kwLabel:'High',
+   pubCmt:'Historic Hayward home on oversized lot. Bring your imagination \u2014 this one needs vision. Large pool, detached garage.',
+   agtCmt:'<span class="kw">Fixer</span>. Sold <span class="kw">AS IS</span>. No credits. Buyer to verify all permits and conditions.',
+   opened:'01/01', called:'01/01',
+   firstOpened:'01/01/26', totalOpens:1,
+   firstCalled:'\u2014', totalCommsCount:0, totalCalls:0, totalTexts:0, totalEmails:0,
+   pct:'30%', status:'Back Up', statusType:'bu',
+   source:'MLS \u2014 Back Up Offer', negotiator:'Josh Santos', assigned:'Not Assigned'},
+
+  {id:5, section:'pending', task:'Call agent', taskNote:'No activity logged yet. Make first call today.',
+   address:'33087 Wood St, Lake Elsinore, CA 92530',
+   prop:[['Type','Single Family \u00b7 STD'],['Beds / Baths','2 / 1'],['Garage','\u2014'],['Sq Ft / Lot','1,025 / 5,227'],['Built','1947'],['Pool','None'],['DOM / CDOM','124 / 124']],
+   price:'$299,000', arv:'$410,000', arvPct:'73% ARV',
+   priceHist:[['Original list','$315,000'],['Drop 02/20/26','$299,000 (-5.1%)']], priceTotal:'-$16,000 (-5.1%)',
+   pain:'low', painLabel:'Low',
+   painSig:[['Flagged','No pain'],['Equity','High (>50%)'],['Propensity','2 / 10']],
+   agent:'none', agentLabel:'No contact yet',
+   agentComms:[['Attempts','0'],['First contact','Required']], agentRate:'\u2014',
+   kw:'low', kwLabel:'Low',
+   pubCmt:'Starter home in Lake Elsinore. Quiet neighborhood, walk to park, easy freeway access.',
+   agtCmt:'Standard sale. Submit offers with POF and pre-approval letter.',
+   opened:'01/05', called:'\u2014',
+   firstOpened:'01/05/26', totalOpens:1,
+   firstCalled:'\u2014', totalCommsCount:0, totalCalls:0, totalTexts:0, totalEmails:0,
+   pct:'0%', status:'None', statusType:'none',
+   source:'MLS \u2014 Hold', negotiator:'Josh Santos', assigned:'Not Assigned'},
+
+  {id:6, section:'closed', task:'Call and update offer status', taskNote:'Sold. Find out who bought, at what price, and what\'s next from this agent.',
+   address:'132 Nissen Road #3, Salinas, CA 93901',
+   prop:[['Type','Townhouse \u00b7 STD'],['Beds / Baths','3 / 2'],['Garage','2 car'],['Sq Ft / Lot','1,385 / \u2014'],['Built','1985'],['Pool','Community'],['DOM / CDOM','7 / 7']],
+   price:'$635,000', arv:'$780,000', arvPct:'81% ARV',
+   priceHist:[['Original list','$649,000'],['Sold','$635,000 (-2.2%)']], priceTotal:'-$14,000 (-2.2%)',
+   pain:'mid', painLabel:'Mid',
+   painSig:[['Flagged','Moderate pain'],['Life event','Affidavit of Death'],['Equity','High (>50%)'],['Ownership','Long-term 20+ yrs'],['Propensity','10 / 10']],
+   agent:'responsive', agentLabel:'Responsive',
+   agentComms:[['Text 03/02','Replied'],['Call 03/02','Answered'],['Email 02/28','Opened'],['Call 02/25','Answered'],['Text 02/20','Replied']], agentRate:'100%',
+   kw:'high', kwLabel:'High',
+   pubCmt:'Charming townhouse in Salinas with community pool. Well-maintained, ready to move in.',
+   agtCmt:'<span class="kw">Probate sale</span> \u2014 confirmation of executor required. <span class="kw">Motivated estate</span>.',
+   opened:'03/02', called:'03/02',
+   firstOpened:'03/02/26', totalOpens:4,
+   firstCalled:'03/02/26', totalCommsCount:5, totalCalls:2, totalTexts:2, totalEmails:1,
+   pct:'10%', status:'Initial Contact', statusType:'init',
+   source:'MLS \u2014 Closed', negotiator:'Josh Santos', assigned:'Josh Santos'},
+
+  {id:7, section:'closed', task:'Call and update offer status', taskNote:'Cancelled listing. Call and find out why.',
+   address:'902 Ballista Avenue, La Puente, CA 91744',
+   prop:[['Type','Single Family \u00b7 STD'],['Beds / Baths','3 / 1.75'],['Garage','\u2014'],['Sq Ft / Lot','1,095 / 6,431'],['Built','1953'],['Pool','None'],['DOM / CDOM','36 / 36']],
+   price:'$749,000', arv:'$900,000', arvPct:'83% ARV',
+   priceHist:[['Original list','$779,000'],['Drop 04/01/26','$749,000 (-3.9%)'],['Status','Cancelled']], priceTotal:'-$30,000 (-3.9%)',
+   pain:'low', painLabel:'Low',
+   painSig:[['Flagged','No pain'],['Ownership','Absentee'],['Equity','High (>50%)'],['Mortgage','Adjustable rate'],['Propensity','5 / 10']],
+   agent:'none', agentLabel:'No contact yet',
+   agentComms:[['Attempts','0'],['First contact','Required']], agentRate:'\u2014',
+   kw:'mid', kwLabel:'Mid',
+   pubCmt:'Cozy La Puente starter home. Original charm, needs some <span class="kw">TLC</span>. Large lot, room to expand.',
+   agtCmt:'Seller reviewing offers. Counters welcomed. Submit with POF.',
+   opened:'04/14', called:'\u2014',
+   firstOpened:'04/14/26', totalOpens:2,
+   firstCalled:'\u2014', totalCommsCount:0, totalCalls:0, totalTexts:0, totalEmails:0,
+   pct:'10%', status:'Initial Contact', statusType:'init',
+   source:'MLS \u2014 Cancelled', negotiator:'Josh Santos', assigned:'Not Assigned'},
+
+  {id:8, section:'closed', task:'Follow up and send offer', taskNote:'Closed but agent may still have seller relationship. Open the door.',
+   address:'18635 Keyes, Banning, CA 92220',
+   prop:[['Type','Single Family \u00b7 STD'],['Beds / Baths','3 / 2'],['Garage','\u2014'],['Sq Ft / Lot','1,089 / 13,068'],['Built','1955'],['Pool','None'],['DOM / CDOM','9 / 9']],
+   price:'$65,000', arv:'$180,000', arvPct:'36% ARV',
+   priceHist:[['Original list','$75,000'],['Sold','$65,000 (-13.3%)']], priceTotal:'-$10,000 (-13.3%)',
+   pain:'mid', painLabel:'Mid',
+   painSig:[['Flagged','Moderate pain'],['Distress','Tax delinquency'],['Equity','High (>50%)'],['Propensity','7 / 10']],
+   agent:'not-responsive', agentLabel:'Not Responsive',
+   agentComms:[['Call 01/01','No answer'],['Text 12/28','No reply'],['Email 12/26','Opened, no reply'],['Call 12/20','Voicemail'],['Text 12/15','Unread']], agentRate:'0%',
+   kw:'high', kwLabel:'High',
+   pubCmt:'<span class="kw">PRICE REDUCED!!!</span> Banning fixer, large lot. <span class="kw">Motivated seller</span>. Won\'t last.',
+   agtCmt:'<span class="kw">AS IS</span>. Tax sale consideration. <span class="kw">Motivated</span>. Cash preferred. No contingencies.',
+   opened:'01/02', called:'01/01',
+   firstOpened:'12/20/25', totalOpens:6,
+   firstCalled:'12/15/25', totalCommsCount:5, totalCalls:2, totalTexts:2, totalEmails:1,
+   pct:'30%', status:'Back Up', statusType:'bu',
+   source:'MLS \u2014 Closed', negotiator:'Josh Santos', assigned:'Not Assigned'},
+
+  {id:9, section:'closed', task:'Call agent', taskNote:'Sold. Call, ask who bought, learn price and terms.',
+   address:'9461 Lotus, Westminster, CA 92683',
+   prop:[['Type','Single Family \u00b7 STD'],['Beds / Baths','4 / 3'],['Garage','2 car'],['Sq Ft / Lot','1,751 / 6,500'],['Built','1962'],['Pool','None'],['DOM / CDOM','10 / 10']],
+   price:'$1,350,000', arv:'$1,600,000', arvPct:'84% ARV',
+   priceHist:[['Original list','$1,399,000'],['Sold','$1,350,000 (-3.5%)']], priceTotal:'-$49,000 (-3.5%)',
+   pain:'low', painLabel:'Low',
+   painSig:[['Flagged','No pain'],['Equity','High (>50%)'],['Entity','Corp / Trust'],['Transfer','Recent (<2 yrs)'],['Propensity','3 / 10']],
+   agent:'responsive', agentLabel:'Responsive',
+   agentComms:[['Call 04/14','Answered'],['Text 04/10','Replied'],['Email 04/08','Opened, replied'],['Call 04/05','Answered'],['Text 04/01','Replied']], agentRate:'80%',
+   kw:'low', kwLabel:'Low',
+   pubCmt:'Beautifully maintained family home in Westminster. Move-in ready, well-kept throughout.',
+   agtCmt:'Standard sale. No repairs needed. Call for showing appointments.',
+   opened:'04/15', called:'04/14',
+   firstOpened:'04/01/26', totalOpens:5,
+   firstCalled:'04/01/26', totalCommsCount:8, totalCalls:3, totalTexts:3, totalEmails:2,
+   pct:'0%', status:'None', statusType:'none',
+   source:'MLS \u2014 Closed', negotiator:'Josh Santos', assigned:'Not Assigned'}
+];
+
+const SECTIONS = [
+  {id:'active', title:'Active & Off Market', desc:"Highest-priority active and off-market properties. Call first. Text and email follow-up offered after the call."},
+  {id:'pending', title:'Pending / Backup / Hold', desc:"In contract. Call the agent. Find out if the buyer is performing. Stay close until it's confirmed."},
+  {id:'closed', title:'Closed / Expired / Canceled', desc:"No longer available \u2014 that's your opening. Find out who bought it, at what price, and what's next."}
+];
+
+const ICONS = {
+  kebab: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>',
+  chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+  phone: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.21c.28-.26.36-.65.25-1C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>',
+  call: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  text: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  email: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>',
+  ai: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg>',
+  note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+  tax: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/></svg>',
+  cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+  layers: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg>',
+  trend: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 17 9 11 13 15 21 7"/></svg>',
+  person: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>'
+};
+
+function tipRows(rows, total) {
+  let html = '';
+  rows.forEach(r => html += '<div class="tip-row"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>');
+  if (total) html += '<div class="tip-foot tip-row"><span>Total reduction</span><span>' + total + '</span></div>';
+  return html;
+}
+
+function painDot(pain) {
+  const map = { 'high':'d-green', 'mid':'d-amber', 'low':'d-gray', 'none':'d-gray' };
+  return '<span class="dot ' + (map[pain] || 'd-gray') + '"></span>';
+}
+function agentDot(agent) {
+  const map = { 'responsive':'d-green', 'not-responsive':'d-red', 'none':'d-gray' };
+  return '<span class="dot ' + map[agent] + '"></span>';
+}
+function kwDot(kw) {
+  const map = { 'high':'d-green', 'mid':'d-amber', 'low':'d-gray' };
+  return '<span class="dot ' + map[kw] + '"></span>';
+}
+
+function menuHTML(id) {
+  return `
+    <div class="menu" id="menu-${id}" onclick="event.stopPropagation()">
+      <div class="menu-col">
+        <h5>Communication</h5>
+        <a onclick="triggerCall(${id})">${ICONS.call}Call</a>
+        <a>${ICONS.text}Text</a>
+        <a>${ICONS.email}Email</a>
+        <a>${ICONS.mic}Text Voicemail</a>
+        <a>${ICONS.ai}AI Connect</a>
+      </div>
+      <div class="menu-col">
+        <h5>Quick Links</h5>
+        <a>${ICONS.note}Notes</a>
+        <a>${ICONS.tax}Tax Data</a>
+        <a>${ICONS.cal}Activities</a>
+        <a>${ICONS.clock}Create Reminder</a>
+        <a>${ICONS.chart}AI Report</a>
+      </div>
+      <div class="menu-col">
+        <h5>Detailed Analysis</h5>
+        <a>${ICONS.home}PIQ</a>
+        <a>${ICONS.layers}Comps</a>
+        <a>${ICONS.trend}Investment Analysis</a>
+        <a>${ICONS.note}Offer Terms</a>
+        <a>${ICONS.person}Agent</a>
+      </div>
+      <div class="menu-foot">
+        <a>${ICONS.target}Auto Tracker</a>
+      </div>
+    </div>
+  `;
+}
+
+function cardHTML(d) {
+  return `
+    <div class="row">
+      <div class="lnav">
+        <span class="fq-cb"></span>
+        <span class="ico" onclick="toggleMenu(event, ${d.id})">
+          ${ICONS.kebab}
+          ${menuHTML(d.id)}
+        </span>
+        <span class="ico" data-tip>
+          ${ICONS.chat}
+          <span class="tip">View conversations</span>
+        </span>
+      </div>
+      <div class="main">
+        <div class="title-row">
+          <span class="phone-btn" onclick="triggerCall(${d.id})" title="Quick call">${ICONS.phone}</span>
+          <span class="next-step-wrap" data-tip>
+            <span class="next-step">${d.task}</span>
+            <span class="tip"><span class="tip-ttl">Next Step</span>${tipRows([['Task',d.task],['Context',d.taskNote]])}</span>
+          </span>
+        </div>
+        <div class="addr-line">
+          <span class="addr-wrap" data-tip>
+            <span>${d.address}</span>
+            <span class="tip"><span class="tip-ttl">Property</span>${tipRows(d.prop)}</span>
+          </span>
+          <a class="g" href="#" onclick="event.stopPropagation();event.preventDefault()">${ICONS.globe}</a>
+          <span class="addr-sep">\u00b7</span>
+          <span class="price-i" data-tip>
+            ${d.price}
+            <span class="tip"><span class="tip-ttl">Price History</span>${tipRows(d.priceHist, d.priceTotal)}</span>
+          </span>
+          <span class="addr-sep">\u00b7</span>
+          <span class="arv-i" data-tip>
+            ${d.arvPct}
+            <span class="tip"><span class="tip-ttl">ARV</span>${tipRows([['Asking',d.price],['ARV',d.arv],['Asking vs ARV',d.arvPct]])}</span>
+          </span>
+        </div>
+        <div class="meta">
+          <span class="meta-i" data-tip>
+            ${painDot(d.pain)}Pain: ${d.painLabel}
+            <span class="tip"><span class="tip-ttl">Seller Pain</span>${tipRows(d.painSig)}</span>
+          </span>
+          <span class="meta-sep">\u00b7</span>
+          <span class="meta-i" data-tip>
+            ${agentDot(d.agent)}Agent: ${d.agentLabel}
+            <span class="tip"><span class="tip-ttl">Last attempts</span>${tipRows(d.agentComms)}<div class="tip-foot tip-row"><span>Response rate</span><span>${d.agentRate}</span></div></span>
+          </span>
+          <span class="meta-sep">\u00b7</span>
+          <span class="meta-i" data-tip>
+            ${kwDot(d.kw)}Keywords: ${d.kwLabel}
+            <span class="tip tip-long">
+              <span class="tip-ttl">Listing Remarks</span>
+              <div class="tip-lbl">Public Comments</div>
+              <p class="tip-prose">${d.pubCmt}</p>
+              <div class="tip-lbl">Agent Comments</div>
+              <p class="tip-prose">${d.agtCmt}</p>
+            </span>
+          </span>
+          <span class="meta-sep">\u00b7</span>
+          <span class="meta-i" data-tip>
+            Opened <b>${d.opened}</b>
+            <span class="tip"><span class="tip-ttl">Open History</span>${tipRows([['First opened',d.firstOpened],['Last opened',d.opened],['Total opens',d.totalOpens]])}</span>
+          </span>
+          <span class="meta-sep">\u00b7</span>
+          <span class="meta-i" data-tip>
+            Called <b>${d.called}</b>
+            <span class="tip"><span class="tip-ttl">Communication History</span>${tipRows([['First call',d.firstCalled],['Last call',d.called],['Total communications',String(d.totalCommsCount)]])}<div class="tip-foot">${tipRows([['Calls',String(d.totalCalls)],['Texts',String(d.totalTexts)],['Emails',String(d.totalEmails)]])}</div></span>
+          </span>
+        </div>
+        <div class="nudge" id="nudge-${d.id}">
+          <span>\u2713 Call logged. <b>Send text + email follow-up?</b></span>
+          <div class="nudge-btns">
+            <button class="n-yes" onclick="document.getElementById('nudge-${d.id}').classList.remove('open')">Yes, send both</button>
+            <button class="n-no" onclick="document.getElementById('nudge-${d.id}').classList.remove('open')">Not yet</button>
+          </div>
+        </div>
+      </div>
+      <div class="chip chip-${d.statusType}" data-tip>
+        <b>${d.pct}</b> ${d.status}
+        <span class="tip tip-right"><span class="tip-ttl">Offer Status</span>${tipRows([['Completion',d.pct],['Stage',d.status],['Source',d.source],['Negotiator',d.negotiator],['Assigned',d.assigned]])}</span>
+      </div>
+    </div>
+  `;
+}
+
+function render() {
+  const container = document.getElementById('sections');
+  let html = '';
+  SECTIONS.forEach(sec => {
+    const items = DEALS.filter(d => d.section === sec.id);
+    html += `
+      <div class="fq-sec">
+        <div class="fq-sec-top">
+          <span class="fq-cb" onclick="this.classList.toggle('on')"></span>
+          <span class="fq-all-lbl">SELECT ALL</span>
+          <span class="fq-sec-ttl">${sec.title.toUpperCase()} \u00b7 <b>${items.length} ${items.length === 1 ? 'property' : 'properties'}</b></span>
+        </div>
+        <p class="fq-sec-desc">${sec.desc}</p>
+        ${items.map(cardHTML).join('')}
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+function toggleMenu(e, id) {
+  e.stopPropagation();
+  document.querySelectorAll('.menu').forEach(m => { if (m.id !== 'menu-' + id) m.classList.remove('open'); });
+  document.getElementById('menu-' + id).classList.toggle('open');
+}
+
+function triggerCall(id) {
+  const menu = document.getElementById('menu-' + id);
+  if (menu) menu.classList.remove('open');
+  document.getElementById('nudge-' + id).classList.add('open');
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.menu').forEach(m => m.classList.remove('open'));
+});
+
+render();
+</script>
+
+</body>
+</html>
