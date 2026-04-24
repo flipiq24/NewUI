@@ -66,14 +66,16 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
             done={!!state.morningCheckin && !todaysPlanActive}
           />
         </Link>
-        <Link href="/iq/inbox">
-          <IqNavItem
-            icon={<InboxIcon />}
-            label="Inbox"
-            active={inboxActive}
-            unreadDot={unread > 0}
-          />
-        </Link>
+        {(inboxActive || !!state.dealReviewComplete) && (
+          <Link href="/iq/inbox">
+            <IqNavItem
+              icon={<InboxIcon />}
+              label="Inbox"
+              active={inboxActive}
+              unreadDot={unread > 0}
+            />
+          </Link>
+        )}
         {(activeDealsActive || !!state.dealReviewComplete) && (
           <Link href="/iq/deal-review">
             <IqNavItem
