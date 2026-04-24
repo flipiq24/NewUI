@@ -243,10 +243,10 @@ function IqNavItem({ icon, label, active, done, unreadDot }: {
   ) : icon;
 
   return (
-    <div className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer ${
+    <div className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-shadow ${
       active ? "bg-transparent border border-orange-500 text-gray-600" : "text-gray-600 hover:bg-gray-100"
-    }`}>
-      <span className={`relative flex-shrink-0 w-3.5 h-3.5 ${active ? "text-gray-500" : showCheck ? "text-orange-600" : "text-gray-500"}`}>
+    } ${unreadDot ? "iq-inbox-glow bg-orange-50" : ""}`}>
+      <span className={`relative flex-shrink-0 w-3.5 h-3.5 ${active ? "text-gray-500" : showCheck ? "text-orange-600" : unreadDot ? "text-orange-500" : "text-gray-500"}`}>
         {displayIcon}
         {unreadDot && (
           <span className="absolute -top-0.5 -right-0.5">
@@ -254,7 +254,7 @@ function IqNavItem({ icon, label, active, done, unreadDot }: {
           </span>
         )}
       </span>
-      <span className={`text-xs font-medium flex-1 ${active ? "text-gray-600" : ""}`}>{label}</span>
+      <span className={`text-xs font-medium flex-1 ${active ? "text-gray-600" : unreadDot ? "text-orange-600" : ""}`}>{label}</span>
     </div>
   );
 }
