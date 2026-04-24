@@ -129,17 +129,18 @@ function MorningCheckinPopup({ onDismiss }: { onDismiss: () => void }) {
                 Do you want me to send out your <strong>email campaigns</strong> now?
               </h2>
             </div>
-            <div className="flex items-center gap-3 flex-wrap">
-              {(["hot", "warm", "cold", "unknown"] as const).map((k) => (
-                <span key={k} className="inline-flex items-center gap-1.5 text-[12px] text-gray-600">
-                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: bucketDot[k] }} />
-                  <span className="font-medium">{bucketLabel[k]}</span>
+            <div className="space-y-1">
+              {(["hot", "warm", "cold", "unknown"] as const).map((k, i) => (
+                <div key={k} className="flex items-center gap-2.5 text-[13px] text-gray-500">
+                  <span className="text-[11px] text-gray-300 w-3 flex-shrink-0">{i + 1}.</span>
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: bucketDot[k] }} />
+                  <span className="font-medium text-gray-700">{bucketLabel[k]}</span>
                   <span className="text-orange-500 font-semibold">{bucketCounts[k] ?? 0}</span>
-                </span>
+                </div>
               ))}
-              <span className="text-[12px] text-gray-400">
+              <div className="text-[12px] text-gray-400 pl-[22px]">
                 · <span className="text-gray-700 font-medium">{bucketTotal}</span> agents
-              </span>
+              </div>
             </div>
             <div className="flex gap-3">
               <button

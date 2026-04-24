@@ -203,17 +203,18 @@ function CampaignQuestion({
       <p className="text-sm font-medium text-gray-800 mb-2">
         Do you want me to send out your email campaigns now?
       </p>
-      <div className="flex items-center gap-4 mb-3 flex-wrap">
-        {(["hot", "warm", "cold", "unknown"] as const).map((k) => (
-          <span key={k} className="inline-flex items-center gap-1.5 text-[12px] text-gray-600">
-            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: dotColor[k] }} />
-            <span className="font-medium">{labels[k]}</span>
+      <div className="space-y-1 mb-3">
+        {(["hot", "warm", "cold", "unknown"] as const).map((k, i) => (
+          <div key={k} className="flex items-center gap-2.5 text-[13px] text-gray-500">
+            <span className="text-[11px] text-gray-300 w-3 flex-shrink-0">{i + 1}.</span>
+            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: dotColor[k] }} />
+            <span className="font-medium text-gray-700">{labels[k]}</span>
             <span className="text-orange-500 font-semibold">{counts[k] ?? 0}</span>
-          </span>
+          </div>
         ))}
-        <span className="text-[12px] text-gray-400">
+        <div className="text-[12px] text-gray-400 pl-[22px]">
           · <span className="text-gray-700 font-medium">{total}</span> agents pending today
-        </span>
+        </div>
       </div>
       <div className="flex items-center gap-3 flex-wrap">
         <ToggleButton label="Yes" selected={value === "yes"} onClick={() => onChange("yes")} />
