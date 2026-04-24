@@ -11,7 +11,6 @@ import {
 import { resetIqStateIfNewDay, saveIqState, loadIqState, allTasksComplete } from "@/lib/iq/storage";
 import { AGENTS as RESPONSE_AGENTS } from "@/pages/iq/IqCampaignResponses";
 import { isPropertyComplete, useChecklistVersion } from "@/lib/iq/dailyChecklist";
-import { InboxIcon, UnreadPulseDot } from "@/components/iq/InboxBits";
 import FlipiqLabel from "@/components/iq/FlipiqLabel";
 import FindOutMore from "@/components/iq/FindOutMore";
 import { FIND_OUT_MORE } from "@/lib/iq/findOutMoreContent";
@@ -224,31 +223,6 @@ function Priority({ priority, title, body, done, items, footer }: PriorityProps)
   );
 }
 
-function InboxSample() {
-  const [, navigate] = useLocation();
-  return (
-    <div className="bg-gray-50 rounded-lg p-3 flex items-center gap-3">
-      <button
-        onClick={() => navigate("/iq/inbox")}
-        className="flex items-center gap-2 px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-100 cursor-pointer w-[150px] bg-white"
-        title="Open Inbox"
-      >
-        <span className="relative flex-shrink-0 w-3.5 h-3.5 text-gray-500">
-          <InboxIcon />
-          <span className="absolute -top-0.5 -right-0.5">
-            <UnreadPulseDot size={8} ring srLabel="Unread messages" />
-          </span>
-        </span>
-        <span className="text-xs font-medium flex-1 text-left">Inbox</span>
-      </button>
-      <p className="text-[12px] text-gray-500 leading-snug flex-1">
-        When agents reply, you'll see them light up here — open the{" "}
-        <span className="text-orange-500 font-medium">Inbox</span> in the left sidebar.
-      </p>
-    </div>
-  );
-}
-
 export default function IqTasks() {
   const [, navigate] = useLocation();
   const checklistVersion = useChecklistVersion();
@@ -346,7 +320,6 @@ export default function IqTasks() {
                   body={`Send today's outreach across Hot, Warm, Cold, and Unknown buckets — ${totalCampaigns} campaigns, ${totalEmails} emails total.`}
                   done={outreachFlag}
                   items={DAILY_OUTREACH_BUCKETS.map((b) => `${b.pendingToday} / ${b.totalDB} ${BUCKET_LABEL[b.id] ?? b.id}`)}
-                  footer={<InboxSample />}
                 />
 
                 <Priority
