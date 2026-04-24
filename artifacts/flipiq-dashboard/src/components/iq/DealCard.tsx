@@ -1,7 +1,18 @@
 import { useState, useEffect, useRef, type ReactNode } from "react";
-import type { DealProperty } from "@/lib/iq/mockData";
+import type { DealProperty, ResponseStatus } from "@/lib/iq/mockData";
 import { useDailyChecklist } from "@/lib/iq/dailyChecklist";
 import { DEAL_DETAILS, type DealDetail } from "@/lib/iq/dealDetails";
+
+const RESPONSE_DOT: Record<ResponseStatus, string> = {
+  positive: "bg-[#639922]",
+  neutral: "bg-[#B4B2A9]",
+  negative: "bg-[#E24B4A]",
+};
+const RESPONSE_LABEL: Record<ResponseStatus, string> = {
+  positive: "Positive",
+  neutral: "Neutral",
+  negative: "Negative",
+};
 
 const PAIN_DOT: Record<DealDetail["pain"], string> = {
   high: "bg-[#E24B4A]",
@@ -55,10 +66,10 @@ function sourceTextColor(source: string, status: string): string {
 }
 
 const STATUS_PILL: Record<DealDetail["statusType"], string> = {
-  neg: "bg-white text-gray-700 border border-gray-300",
-  bu: "bg-white text-gray-700 border border-gray-300",
-  init: "bg-white text-gray-700 border border-gray-300",
-  none: "bg-white text-gray-700 border border-gray-300",
+  neg: "text-gray-700",
+  bu: "text-gray-700",
+  init: "text-gray-700",
+  none: "text-gray-700",
 };
 
 function fallbackDetail(p: DealProperty): DealDetail {
@@ -149,7 +160,32 @@ const ICON = {
   globe: <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4" className="w-3 h-3"><circle cx="6" cy="6" r="5" /><line x1="1" y1="6" x2="11" y2="6" /><path d="M6 1c1.5 1.5 1.5 8.5 0 10M6 1c-1.5 1.5-1.5 8.5 0 10" /></svg>,
   phone: <svg viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3"><path d="M3 2h3l1.5 3.5-2 1.2C6.3 9 7 9.7 8.3 10.5l1.2-2L13 10v3c0 .6-.5 1-1 1C5.4 14 2 6.6 2 3c0-.5.4-1 1-1z" /></svg>,
   caret: <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-2.5 h-2.5 opacity-70"><polyline points="3,5 6,8 9,5" /></svg>,
+  chPhone: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M3 2.5h2.5l1.2 3-1.5 1A8 8 0 0010.5 11l1-1.5 3 1.2v2.5a1 1 0 01-1 1C7 14.2 1.8 9 1.8 3.5a1 1 0 011-1z" /></svg>,
+  chText: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M2 3.5h12v7H6.5L3.5 13v-2.5H2v-7z" /></svg>,
+  chMail: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3"><rect x="2" y="3.5" width="12" height="9" rx="1" /><polyline points="2.5,4.5 8,9 13.5,4.5" strokeLinecap="round" /></svg>,
 };
+
+function ChannelChips({ property }: { property: DealProperty }) {
+  const channels: { key: string; icon: ReactNode; label: string; status: ResponseStatus }[] = [];
+  if (property.callResponse) channels.push({ key: "call", icon: ICON.chPhone, label: "Call", status: property.callResponse });
+  if (property.textResponse) channels.push({ key: "text", icon: ICON.chText, label: "Text", status: property.textResponse });
+  if (property.emailResponse) channels.push({ key: "email", icon: ICON.chMail, label: "Email", status: property.emailResponse });
+  if (channels.length === 0) return null;
+  return (
+    <span className="inline-flex items-center gap-2.5">
+      {channels.map((c) => (
+        <span
+          key={c.key}
+          title={`${c.label}: ${RESPONSE_LABEL[c.status]}`}
+          className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-800 cursor-help"
+        >
+          {c.icon}
+          <span className={`w-1.5 h-1.5 rounded-full ${RESPONSE_DOT[c.status]}`} />
+        </span>
+      ))}
+    </span>
+  );
+}
 
 const MENU_ITEMS = {
   comm: ["Call", "Text", "Email", "Text Voicemail", "AI Connect"],
@@ -382,6 +418,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
               </div>
             </TipPanel>
           </span>
+          <ChannelChips property={property} />
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help inline-flex items-center gap-1.5 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
@@ -435,9 +472,9 @@ export default function DealCard({ property }: { property: DealProperty }) {
         )}
       </div>
 
-      {/* Status pill */}
+      {/* Status */}
       <div className="flex items-start pt-1">
-        <span className={`relative group cursor-pointer inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-medium whitespace-nowrap ${STATUS_PILL[detail.statusType]}`}>
+        <span className={`relative group cursor-pointer inline-flex items-center gap-1 text-[12px] font-medium whitespace-nowrap hover:text-gray-900 ${STATUS_PILL[detail.statusType]}`}>
           <span className="font-semibold">{detail.pct}</span>
           <span>{detail.status}</span>
           {ICON.caret}

@@ -704,10 +704,8 @@ function AgentRow({
               title="Critical Task"
               rows={[["Count", String(a.critical)], ["Action", a.nextSteps]]}
             >
-              <span
-                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10.5px] font-semibold"
-                style={{ background: "#FCEBEB", color: "#791F1F", border: "0.5px solid #F7C1C1" }}
-              >
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-red-600">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                 {a.critical} Critical
               </span>
             </Tip>
@@ -717,10 +715,8 @@ function AgentRow({
               title="Reminder"
               rows={[["Count", String(a.reminders)], ["Due", a.fuDate]]}
             >
-              <span
-                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10.5px] font-semibold"
-                style={{ background: "#FFF7ED", color: "#9A3412", border: "0.5px solid #FED7AA" }}
-              >
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-orange-600">
+                <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
                 {a.reminders} Reminder
               </span>
             </Tip>
@@ -747,25 +743,18 @@ function AgentRow({
             title="Relationship"
             rows={[["Status", a.rel], ["Basket", a.basket], ["Assigned AA", a.assigned]]}
           >
-            <span
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-medium"
-              style={{ background: rel.bg, color: rel.text, border: `0.5px solid ${rel.border}` }}
-            >
-              <span
-                className="w-1.5 h-1.5 rounded-full"
-                style={{ background: rel.text, opacity: a.rel === "DO NOT CONTACT" ? 0.9 : 0.7 }}
-              />
+            <span className="inline-flex items-center gap-1.5 font-medium" style={{ color: rel.text }}>
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: rel.text }} />
               {a.rel}
             </span>
           </Tip>
+          <span className="text-gray-300">·</span>
           <Tip
             title="Basket"
             rows={[["Tier", a.basket], ["Relationship", a.rel]]}
           >
-            <span
-              className="inline-flex items-center px-2 py-0.5 rounded font-medium"
-              style={{ background: basket.bg, color: basket.text }}
-            >
+            <span className="inline-flex items-center gap-1.5 font-medium" style={{ color: basket.text }}>
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: basket.text }} />
               {a.basket}
             </span>
           </Tip>

@@ -1,5 +1,55 @@
 import { useState } from "react";
-import { PRIORITY_AGENT_JOSE } from "@/lib/iq/mockData";
+import { PRIORITY_AGENT_JOSE, type ResponseStatus } from "@/lib/iq/mockData";
+
+const RESPONSE_DOT: Record<ResponseStatus, string> = {
+  positive: "bg-[#639922]",
+  neutral: "bg-[#B4B2A9]",
+  negative: "bg-[#E24B4A]",
+};
+const RESPONSE_LABEL: Record<ResponseStatus, string> = {
+  positive: "Positive",
+  neutral: "Neutral",
+  negative: "Negative",
+};
+
+function ChannelChip({
+  status,
+  label,
+  children,
+}: {
+  status: ResponseStatus;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <span
+      title={`${label}: ${RESPONSE_LABEL[status]}`}
+      className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-800 cursor-help"
+    >
+      {children}
+      <span className={`w-1.5 h-1.5 rounded-full ${RESPONSE_DOT[status]}`} />
+    </span>
+  );
+}
+
+const CHANNEL_ICON = {
+  phone: (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 2.5h2.5l1.2 3-1.5 1A8 8 0 0010.5 11l1-1.5 3 1.2v2.5a1 1 0 01-1 1C7 14.2 1.8 9 1.8 3.5a1 1 0 011-1z" />
+    </svg>
+  ),
+  text: (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2 3.5h12v7H6.5L3.5 13v-2.5H2v-7z" />
+    </svg>
+  ),
+  mail: (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3">
+      <rect x="2" y="3.5" width="12" height="9" rx="1" />
+      <polyline points="2.5,4.5 8,9 13.5,4.5" strokeLinecap="round" />
+    </svg>
+  ),
+};
 
 export default function AgentRecordCard() {
   const agent = PRIORITY_AGENT_JOSE;
@@ -26,12 +76,19 @@ export default function AgentRecordCard() {
             <option>{agent.assignedTo}</option>
           </select>
         </div>
-        <div className="ml-auto flex items-center gap-2">
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
-            ⚠ {agent.criticals} Critical
+        <div className="ml-auto flex items-center gap-3">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-red-600">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+            {agent.criticals} Critical
           </span>
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-            🔔 {agent.reminders} Reminders
+          <span className="inline-flex items-center gap-2.5 pl-2 border-l border-gray-200">
+            <ChannelChip status={agent.callResponse} label="Call">{CHANNEL_ICON.phone}</ChannelChip>
+            <ChannelChip status={agent.textResponse} label="Text">{CHANNEL_ICON.text}</ChannelChip>
+            <ChannelChip status={agent.emailResponse} label="Email">{CHANNEL_ICON.mail}</ChannelChip>
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-gray-500 pl-2 border-l border-gray-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+            {agent.reminders} Reminders
           </span>
           <div className="flex items-center gap-1.5 ml-2">
             <span className="text-[10px] text-gray-500">Do Not Call</span>

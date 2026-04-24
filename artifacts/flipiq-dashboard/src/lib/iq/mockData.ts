@@ -16,6 +16,7 @@ export type DealProperty = {
   segment: PropertySegment;
   level: DealLevel;
   notifications: NotificationKind[];
+  callResponse?: ResponseStatus;
   textResponse?: ResponseStatus;
   emailResponse?: ResponseStatus;
   address: string;
@@ -55,6 +56,7 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
     segment: "ACTIVE_OFF_MARKET",
     level: "high",
     notifications: ["critical", "text"],
+    callResponse: "positive",
     textResponse: "positive",
     emailResponse: "positive",
     address: "73750 Desert Vista Court, Palm Desert, CA 92260",
@@ -201,6 +203,8 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
     segment: "PENDING_BACKUP_HOLD",
     level: "mid",
     notifications: ["text"],
+    callResponse: "neutral",
+    textResponse: "neutral",
     address: "33087 Wood St, Lake Elsinore, CA 92530",
     type: "STD",
     propertyType: "Single Family",
@@ -224,6 +228,7 @@ export const DEAL_REVIEW_PROPERTIES: DealProperty[] = [
     segment: "CLOSED_EXPIRED_CANCELED",
     level: "high",
     notifications: ["reminder"],
+    emailResponse: "positive",
     address: "132 Nissen Road 3, Salinas, CA 93901",
     type: "STD",
     propertyType: "Townhouse",
@@ -377,6 +382,9 @@ export const PRIORITY_AGENT_JOSE = {
   assignedTo: "Josh Santos",
   criticals: 1,
   reminders: 0,
+  callResponse: "positive" as ResponseStatus,
+  textResponse: "neutral" as ResponseStatus,
+  emailResponse: "positive" as ResponseStatus,
   doNotCall: false,
   phone: "909-266-0934",
   email: "joseponce909@yahoo.com",
