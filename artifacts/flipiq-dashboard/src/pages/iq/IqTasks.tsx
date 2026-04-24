@@ -68,52 +68,64 @@ function MorningCheckinPopup({ onDismiss }: { onDismiss: () => void }) {
     onDismiss();
   }
 
+  const card = "bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 flex gap-3";
+  const num = "text-[12px] text-gray-300 mt-[2px] flex-shrink-0 w-4 leading-none pt-0.5";
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8 flex flex-col gap-6">
-        <div>
-          <p className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-2">Morning Check-in</p>
-          <h2 className="text-xl font-bold text-gray-900 leading-snug">
-            Are you able to commit a full day and complete all your tasks?
-          </h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm overflow-y-auto py-8">
+      <div className="flex flex-col gap-4 w-full items-center">
+        {/* 1. Commit */}
+        <div className={card}>
+          <span className={num}>1.</span>
+          <div className="flex-1 min-w-0 flex flex-col gap-4">
+            <div>
+              <p className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-1.5">Morning Check-in</p>
+              <h2 className="text-[15px] font-semibold text-gray-800 leading-snug">
+                Are you able to commit a full day and complete all your tasks?
+              </h2>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setAnswer(true)}
+                className={`flex-1 py-2 rounded-full text-sm font-semibold border transition-colors ${
+                  answer === true
+                    ? "bg-orange-500 text-white border-orange-500"
+                    : "bg-white text-orange-500 border-orange-300 hover:bg-orange-50"
+                }`}
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setAnswer(false)}
+                className={`flex-1 py-2 rounded-full text-sm font-semibold border transition-colors ${
+                  answer === false
+                    ? "bg-orange-500 text-white border-orange-500"
+                    : "bg-white text-orange-500 border-orange-300 hover:bg-orange-50"
+                }`}
+              >
+                No
+              </button>
+            </div>
+            <textarea
+              value={helpText}
+              onChange={(e) => setHelpText(e.target.value)}
+              placeholder="Explain or request any help…"
+              rows={3}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-200 resize-none bg-white"
+            />
+          </div>
         </div>
 
-        <div className="flex gap-3">
-          <button
-            onClick={() => setAnswer(true)}
-            className={`flex-1 py-2.5 rounded-full text-sm font-semibold border transition-colors ${
-              answer === true
-                ? "bg-orange-500 text-white border-orange-500"
-                : "bg-white text-orange-500 border-orange-300 hover:bg-orange-50"
-            }`}
-          >
-            Yes
-          </button>
-          <button
-            onClick={() => setAnswer(false)}
-            className={`flex-1 py-2.5 rounded-full text-sm font-semibold border transition-colors ${
-              answer === false
-                ? "bg-orange-500 text-white border-orange-500"
-                : "bg-white text-orange-500 border-orange-300 hover:bg-orange-50"
-            }`}
-          >
-            No
-          </button>
-        </div>
-
-        <textarea
-          value={helpText}
-          onChange={(e) => setHelpText(e.target.value)}
-          placeholder="Explain or request any help…"
-          rows={3}
-          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-200 resize-none bg-white"
-        />
-
-        {answer !== null && (
-          <div className="border-t border-gray-100 pt-5 flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-gray-900 leading-snug">
-              Do you want me to send out your email campaigns now?
-            </h2>
+        {/* 2. Campaigns */}
+        <div className={`${card} ${answer === null ? "opacity-50 pointer-events-none" : ""}`}>
+          <span className={num}>2.</span>
+          <div className="flex-1 min-w-0 flex flex-col gap-4">
+            <div>
+              <p className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-1.5">Today's Outreach</p>
+              <h2 className="text-[15px] font-semibold text-gray-800 leading-snug">
+                Do you want me to send out your email campaigns now?
+              </h2>
+            </div>
             <div className="flex items-center gap-3 flex-wrap">
               {(["hot", "warm", "cold", "unknown"] as const).map((k) => (
                 <span key={k} className="inline-flex items-center gap-1.5 text-[12px] text-gray-600">
@@ -126,22 +138,22 @@ function MorningCheckinPopup({ onDismiss }: { onDismiss: () => void }) {
                 · <span className="text-gray-700 font-medium">{bucketTotal}</span> agents
               </span>
             </div>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-3">
               <button
                 onClick={() => handleConfirm("yes")}
-                className="flex-1 min-w-[80px] py-2.5 rounded-full text-sm font-semibold border bg-white text-orange-500 border-orange-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors"
+                className="flex-1 py-2 rounded-full text-sm font-semibold border bg-white text-orange-500 border-orange-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors"
               >
                 Yes
               </button>
               <button
                 onClick={() => handleConfirm("later")}
-                className="flex-1 min-w-[140px] py-2.5 rounded-full text-sm font-semibold border bg-white text-orange-500 border-orange-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors"
+                className="flex-1 py-2 rounded-full text-sm font-semibold border bg-white text-orange-500 border-orange-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors"
               >
                 I will send later
               </button>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
