@@ -166,6 +166,8 @@ export function resetInbox(): void {
   saveInbox(SEED_INBOX);
 }
 
+export const seedDemoInbox = resetInbox;
+
 export function allTasksComplete(s: IqState): boolean {
   return !!(
     s.dealReviewComplete &&

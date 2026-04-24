@@ -227,7 +227,7 @@ function InboxSample() {
     <div className="bg-gray-50 rounded-lg p-3 flex items-center gap-3">
       <button
         onClick={() => navigate("/iq/inbox")}
-        className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-white border border-gray-200 hover:border-orange-300 transition-colors cursor-pointer w-[150px]"
+        className="flex items-center gap-2 px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-100 cursor-pointer w-[150px] bg-white"
         title="Open Inbox"
       >
         <span className="relative flex-shrink-0 w-3.5 h-3.5 text-gray-500">
@@ -236,7 +236,7 @@ function InboxSample() {
             <UnreadPulseDot size={8} ring srLabel="Unread messages" />
           </span>
         </span>
-        <span className="text-xs font-medium text-gray-700 flex-1 text-left">Inbox</span>
+        <span className="text-xs font-medium flex-1 text-left">Inbox</span>
       </button>
       <p className="text-[12px] text-gray-500 leading-snug flex-1">
         When agents reply, you'll see them light up here — open the{" "}

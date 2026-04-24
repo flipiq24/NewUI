@@ -71,7 +71,7 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
             icon={<InboxIcon />}
             label="Inbox"
             active={inboxActive}
-            unreadDot={unread > 0 && !inboxActive}
+            unreadDot={unread > 0}
           />
         </Link>
         {(activeDealsActive || !!state.dealReviewComplete) && (
