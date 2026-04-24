@@ -1,6 +1,8 @@
 import { Settings, LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useLocation, Link } from "wouter";
-import { resetIqStateIfNewDay, startNewIqDay } from "@/lib/iq/storage";
+import { resetIqStateIfNewDay, startNewIqDay, inboxUnreadCount } from "@/lib/iq/storage";
+import { InboxIcon, UnreadPulseDot } from "@/components/iq/InboxBits";
 
 export default function Sidebar() {
   const [location, navigate] = useLocation();
@@ -30,6 +32,17 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
   const agentsLocations = ["/iq/daily-outreach", "/iq/campaign-responses", "/iq/priority-agents"];
   const agentsActive = agentsLocations.includes(location);
   const newDealsActive = location === "/iq/new-relationships";
+  const inboxActive = location === "/iq/inbox";
+
+  const [unread, setUnread] = useState(() => inboxUnreadCount());
+  useEffect(() => {
+    function refresh() {
+      setUnread(inboxUnreadCount());
+    }
+    refresh();
+    window.addEventListener("iq:inbox-changed", refresh);
+    return () => window.removeEventListener("iq:inbox-changed", refresh);
+  }, [location]);
 
   return (
     <div className="w-[192px] bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
@@ -51,6 +64,14 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
             label="Today's Plan"
             active={todaysPlanActive}
             done={!!state.morningCheckin && !todaysPlanActive}
+          />
+        </Link>
+        <Link href="/iq/inbox">
+          <IqNavItem
+            icon={<InboxIcon />}
+            label="Inbox"
+            active={inboxActive}
+            unreadDot={unread > 0 && !inboxActive}
           />
         </Link>
         {(activeDealsActive || !!state.dealReviewComplete) && (
@@ -205,11 +226,12 @@ function DefaultSidebar({ location, onLogoClick }: { location: string; onLogoCli
   );
 }
 
-function IqNavItem({ icon, label, active, done }: {
+function IqNavItem({ icon, label, active, done, unreadDot }: {
   icon: React.ReactNode;
   label: string;
   active?: boolean;
   done?: boolean;
+  unreadDot?: boolean;
 }) {
   const showCheck = done && !active;
   const displayIcon = showCheck ? (
@@ -222,7 +244,14 @@ function IqNavItem({ icon, label, active, done }: {
     <div className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer ${
       active ? "bg-transparent border border-orange-500 text-gray-600" : "text-gray-600 hover:bg-gray-100"
     }`}>
-      <span className={`flex-shrink-0 w-3.5 h-3.5 ${active ? "text-gray-500" : showCheck ? "text-orange-600" : "text-gray-500"}`}>{displayIcon}</span>
+      <span className={`relative flex-shrink-0 w-3.5 h-3.5 ${active ? "text-gray-500" : showCheck ? "text-orange-600" : "text-gray-500"}`}>
+        {displayIcon}
+        {unreadDot && (
+          <span className="absolute -top-0.5 -right-0.5">
+            <UnreadPulseDot size={8} ring srLabel="Unread messages" />
+          </span>
+        )}
+      </span>
       <span className={`text-xs font-medium flex-1 ${active ? "text-gray-600" : ""}`}>{label}</span>
     </div>
   );

@@ -12,6 +12,7 @@ import IqCampaignResponses from "@/pages/iq/IqCampaignResponses";
 import IqPriorityAgents from "@/pages/iq/IqPriorityAgents";
 import IqNewRelationships from "@/pages/iq/IqNewRelationships";
 import IqWelcomeBack from "@/pages/iq/IqWelcomeBack";
+import IqInbox from "@/pages/iq/IqInbox";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ function Router() {
       <Route path="/iq/priority-agents" component={IqPriorityAgents} />
       <Route path="/iq/new-relationships" component={IqNewRelationships} />
       <Route path="/iq/welcome-back" component={IqWelcomeBack} />
+      <Route path="/iq/inbox" component={IqInbox} />
       <Route component={NotFound} />
     </Switch>
   );

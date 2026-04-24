@@ -11,6 +11,7 @@ import {
 import { resetIqStateIfNewDay, saveIqState, loadIqState, allTasksComplete } from "@/lib/iq/storage";
 import { AGENTS as RESPONSE_AGENTS } from "@/pages/iq/IqCampaignResponses";
 import { isPropertyComplete, useChecklistVersion } from "@/lib/iq/dailyChecklist";
+import { InboxIcon, UnreadPulseDot } from "@/components/iq/InboxBits";
 
 const LEVEL_ORDER: DealLevel[] = ["priority", "high", "mid", "low", "new"];
 const LEVEL_LABEL: Record<DealLevel, string> = {
@@ -165,6 +166,7 @@ interface PriorityProps {
   body: string;
   done?: boolean;
   items?: string[];
+  footer?: React.ReactNode;
 }
 
 function highlightNumbers(text: string) {
@@ -180,7 +182,7 @@ function highlightNumbers(text: string) {
   });
 }
 
-function Priority({ priority, title, body, done, items }: PriorityProps) {
+function Priority({ priority, title, body, done, items, footer }: PriorityProps) {
   return (
     <div className="flex gap-3">
       <span className="text-[12px] text-gray-300 mt-[2px] flex-shrink-0 w-4">{priority}.</span>
@@ -213,7 +215,33 @@ function Priority({ priority, title, body, done, items }: PriorityProps) {
             ))}
           </div>
         )}
+        {footer && <div className="mt-3">{footer}</div>}
       </div>
+    </div>
+  );
+}
+
+function InboxSample() {
+  const [, navigate] = useLocation();
+  return (
+    <div className="bg-gray-50 rounded-lg p-3 flex items-center gap-3">
+      <button
+        onClick={() => navigate("/iq/inbox")}
+        className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-white border border-gray-200 hover:border-orange-300 transition-colors cursor-pointer w-[150px]"
+        title="Open Inbox"
+      >
+        <span className="relative flex-shrink-0 w-3.5 h-3.5 text-gray-500">
+          <InboxIcon />
+          <span className="absolute -top-0.5 -right-0.5">
+            <UnreadPulseDot size={8} ring srLabel="Unread messages" />
+          </span>
+        </span>
+        <span className="text-xs font-medium text-gray-700 flex-1 text-left">Inbox</span>
+      </button>
+      <p className="text-[12px] text-gray-500 leading-snug flex-1">
+        When agents reply, you'll see them light up here — open the{" "}
+        <span className="text-orange-500 font-medium">Inbox</span> in the left sidebar.
+      </p>
     </div>
   );
 }
@@ -319,6 +347,7 @@ export default function IqTasks() {
                   body={`Send today's outreach across Hot, Warm, Cold, and Unknown buckets — ${totalCampaigns} campaigns, ${totalEmails} emails total.`}
                   done={outreachFlag}
                   items={DAILY_OUTREACH_BUCKETS.map((b) => `${b.pendingToday} / ${b.totalDB} ${BUCKET_LABEL[b.id] ?? b.id}`)}
+                  footer={<InboxSample />}
                 />
 
                 <Priority

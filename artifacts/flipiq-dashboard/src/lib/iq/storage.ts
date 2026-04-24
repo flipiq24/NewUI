@@ -69,6 +69,12 @@ export function startNewIqDay(): IqState {
       }
     }
     toRemove.forEach((k) => localStorage.removeItem(k));
+    try {
+      localStorage.removeItem(INBOX_KEY);
+      window.dispatchEvent(new CustomEvent("iq:inbox-changed"));
+    } catch {
+      /* ignore */
+    }
   }
   return clearIqState();
 }
@@ -80,6 +86,84 @@ export function resetIqStateIfNewDay(): IqState {
   const fresh: IqState = { date: today };
   saveIqState(fresh);
   return fresh;
+}
+
+export type InboxChannel = "text" | "email";
+export type InboxMessage = {
+  id: string;
+  sender: string;
+  channel: InboxChannel;
+  preview: string;
+  ts: string;
+  unread: boolean;
+};
+
+const INBOX_KEY = "iq:inbox";
+
+const SEED_INBOX: InboxMessage[] = [
+  {
+    id: "m1",
+    sender: "Marcus Chen",
+    channel: "text",
+    preview: "Yes, I have a pocket listing in Highland Park — can talk this afternoon.",
+    ts: "9:42 AM",
+    unread: true,
+  },
+  {
+    id: "m2",
+    sender: "Priya Shah",
+    channel: "email",
+    preview: "Re: Off‑market opportunity — happy to share details, what price range?",
+    ts: "9:18 AM",
+    unread: true,
+  },
+  {
+    id: "m3",
+    sender: "Daniel Reyes",
+    channel: "text",
+    preview: "Not right now, but try me again next week.",
+    ts: "8:55 AM",
+    unread: true,
+  },
+];
+
+export function loadInbox(): InboxMessage[] {
+  if (typeof window === "undefined") return SEED_INBOX;
+  try {
+    const raw = localStorage.getItem(INBOX_KEY);
+    if (!raw) {
+      saveInbox(SEED_INBOX);
+      return SEED_INBOX;
+    }
+    return JSON.parse(raw) as InboxMessage[];
+  } catch {
+    return SEED_INBOX;
+  }
+}
+
+export function saveInbox(msgs: InboxMessage[]): void {
+  localStorage.setItem(INBOX_KEY, JSON.stringify(msgs));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("iq:inbox-changed"));
+  }
+}
+
+export function inboxUnreadCount(): number {
+  return loadInbox().filter((m) => m.unread).length;
+}
+
+export function markInboxRead(id: string): void {
+  const msgs = loadInbox().map((m) => (m.id === id ? { ...m, unread: false } : m));
+  saveInbox(msgs);
+}
+
+export function markAllInboxRead(): void {
+  const msgs = loadInbox().map((m) => ({ ...m, unread: false }));
+  saveInbox(msgs);
+}
+
+export function resetInbox(): void {
+  saveInbox(SEED_INBOX);
 }
 
 export function allTasksComplete(s: IqState): boolean {
