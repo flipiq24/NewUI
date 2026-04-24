@@ -22,7 +22,7 @@ export default function IqProgressStepper() {
   const [hover, setHover] = useState<{ idx: number; kind: "label" | "number" } | null>(null);
 
   return (
-    <div className="flex items-center justify-between pt-9 w-full px-6">
+    <div className="flex items-center justify-between pt-9 w-full max-w-xl mx-auto">
       {segments.map((seg, i) => {
         const isCurrent = i === currentIdx;
         const isPast = i < currentIdx;
