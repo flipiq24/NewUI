@@ -136,6 +136,10 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
 
       <div className="mt-auto px-3 pb-3 space-y-1">
         <button className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-xs font-medium text-gray-800">
+          <span className="flex-shrink-0 w-3 h-3 text-gray-500"><FolderIcon /></span>
+          My Deals
+        </button>
+        <button className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-xs font-medium text-gray-800">
           Add Property
           <span className="text-orange-500 font-bold">+</span>
         </button>
@@ -217,6 +221,10 @@ function DefaultSidebar({ location, onLogoClick }: { location: string; onLogoCli
       </div>
 
       <div className="mt-auto px-3 pb-3 space-y-1">
+        <button className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-xs font-medium text-gray-800">
+          <span className="flex-shrink-0 w-3 h-3 text-gray-500"><FolderIcon /></span>
+          My Deals
+        </button>
         <button className="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-xs font-medium text-gray-800">
           Add Property
           <span className="text-orange-500 font-bold">+</span>
