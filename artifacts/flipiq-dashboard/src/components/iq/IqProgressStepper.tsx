@@ -22,7 +22,7 @@ export default function IqProgressStepper() {
   const [hover, setHover] = useState<{ idx: number; kind: "label" | "number" } | null>(null);
 
   return (
-    <div className="flex items-center pt-16">
+    <div className="flex items-center pt-9">
       {segments.map((seg, i) => {
         const isCurrent = i === currentIdx;
         const isPast = i < currentIdx;
@@ -63,11 +63,11 @@ export default function IqProgressStepper() {
               )}
               {/* Label sits absolutely above the circle */}
               <div
-                className="absolute bottom-full mb-5 left-1/2 -translate-x-1/2 max-w-[210px]"
+                className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 max-w-[120px]"
                 onMouseEnter={() => setHover({ idx: i, kind: "label" })}
                 onMouseLeave={() => setHover(null)}
               >
-                <span className={`block text-[23px] tracking-tight truncate cursor-help ${labelClass}`}>
+                <span className={`block text-[13px] tracking-tight truncate cursor-help ${labelClass}`}>
                   {seg.label}
                 </span>
               </div>
@@ -80,10 +80,10 @@ export default function IqProgressStepper() {
                   onClick={() => { if (i <= maxReachableIdx) navigate(seg.route); }}
                   disabled={i > maxReachableIdx}
                   aria-label={`Go to ${seg.label}`}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center text-[21px] font-semibold transition-colors ${circleClass} ${i > maxReachableIdx ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-semibold transition-colors ${circleClass} ${i > maxReachableIdx ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
                 >
                   {seg.done ? (
-                    <svg className="w-6 h-6" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="3,8 7,12 13,4" />
                     </svg>
                   ) : (
@@ -95,7 +95,7 @@ export default function IqProgressStepper() {
             {/* Connector — separated from circles by a gap on each side */}
             {i < segments.length - 1 && (
               <div
-                className={`h-[3.5px] flex-1 min-w-[70px] max-w-[224px] mx-5 ${lineActive ? "bg-orange-500" : "bg-gray-200"}`}
+                className={`h-[2px] flex-1 min-w-[40px] max-w-[128px] mx-3 ${lineActive ? "bg-orange-500" : "bg-gray-200"}`}
               />
             )}
           </Fragment>
