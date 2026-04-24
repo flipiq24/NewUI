@@ -12,6 +12,9 @@ import { resetIqStateIfNewDay, saveIqState, loadIqState, allTasksComplete } from
 import { AGENTS as RESPONSE_AGENTS } from "@/pages/iq/IqCampaignResponses";
 import { isPropertyComplete, useChecklistVersion } from "@/lib/iq/dailyChecklist";
 import { InboxIcon, UnreadPulseDot } from "@/components/iq/InboxBits";
+import FlipiqLabel from "@/components/iq/FlipiqLabel";
+import FindOutMore from "@/components/iq/FindOutMore";
+import { FIND_OUT_MORE } from "@/lib/iq/findOutMoreContent";
 
 const LEVEL_ORDER: DealLevel[] = ["priority", "high", "mid", "low", "new"];
 const LEVEL_LABEL: Record<DealLevel, string> = {
@@ -82,7 +85,7 @@ function MorningCheckinPopup({ onDismiss }: { onDismiss: () => void }) {
             <div>
               <p className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-1.5">Morning Check-in</p>
               <h2 className="text-[15px] font-semibold text-gray-800 leading-snug">
-                Are you able to commit a full day and complete all your tasks?
+                Are you able to <strong>commit a full day</strong> and complete all your tasks?
               </h2>
             </div>
             <div className="flex gap-3">
@@ -124,7 +127,7 @@ function MorningCheckinPopup({ onDismiss }: { onDismiss: () => void }) {
             <div>
               <p className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-1.5">Today's Outreach</p>
               <h2 className="text-[15px] font-semibold text-gray-800 leading-snug">
-                Do you want me to send out your email campaigns now?
+                Do you want me to send out your <strong>email campaigns</strong> now?
               </h2>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
@@ -310,19 +313,16 @@ export default function IqTasks() {
 
             {/* AI message */}
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <img
-                  src={`${import.meta.env.BASE_URL}flipiq-icon.png`}
-                  alt="FlipiQ"
-                  className="w-6 h-6 object-contain"
-                />
-                <span className="text-[13px] font-semibold text-gray-700 leading-none">FlipiQ</span>
+              <div className="mb-3">
+                <FlipiqLabel size="md" />
               </div>
 
-              <p className="text-[14px] text-gray-800 leading-7 mb-6">
-                Here are your tasks today, Josh. Work through them in priority order — hit{" "}
+              <p className="text-[14px] text-gray-800 leading-7 mb-3">
+                Here are your <strong>tasks today</strong>, Josh. Work through them in priority order — hit{" "}
                 <span className="text-orange-500 font-medium">Get Started</span> when you're ready.
               </p>
+
+              <FindOutMore steps={FIND_OUT_MORE.TODAYS_PLAN.steps} className="mb-6" />
 
               <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">
                 Today's Tasks:

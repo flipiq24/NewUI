@@ -1,5 +1,6 @@
 import { useState } from "react";
 import IqProgressStepper from "./IqProgressStepper";
+import FlipiqLabel from "./FlipiqLabel";
 
 interface IqTopBarProps {
   breadcrumb?: string;
@@ -35,7 +36,9 @@ export default function IqTopBar({ breadcrumb, nextTask, onNext, title, centerCo
     <div className="min-h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0 py-3 gap-6">
       <div className="flex items-center gap-3">
         {title && (
-          <span className="text-base font-semibold text-gray-700">{title}</span>
+          title.startsWith("FlipiQ")
+            ? <FlipiqLabel size="lg" suffix={title.slice("FlipiQ".length).trim() || undefined} />
+            : <span className="text-base font-semibold text-gray-700">{title}</span>
         )}
         {breadcrumb && (() => {
           const idx = breadcrumb.lastIndexOf(">");

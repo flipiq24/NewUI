@@ -7,6 +7,7 @@ import IqChatPage from "@/components/iq/IqChatPage";
 import { DAILY_OUTREACH_BUCKETS } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 import { useStartGate } from "@/components/iq/useStartGate";
+import { FIND_OUT_MORE } from "@/lib/iq/findOutMoreContent";
 
 const SMS_TEMPLATES = ["Text - direct to agent test", "Text - follow up #1", "Text - follow up #2"];
 const EMAIL_TEMPLATES = ["Email Direct to Agent - Weekly Campaigns", "Email - Monthly Update", "Email - Market Report"];
@@ -76,7 +77,7 @@ export default function IqDailyOutreach() {
           onStart={start}
           briefingMessage={
             <>
-              Josh, you have a total of <span className="text-orange-500 font-semibold">{totalAgents}</span> Agent relationships to send campaigns to today across Hot, Warm, Cold and Unknown buckets. Pick your audience, choose a template, then send.
+              Josh, you have a total of <span className="text-orange-500 font-semibold">{totalAgents}</span> Agent relationships to send campaigns to today across <strong>Hot, Warm, Cold and Unknown buckets</strong>. Pick your audience, choose a template, then send.
             </>
           }
           briefingItems={DAILY_OUTREACH_BUCKETS.map((b) => ({
@@ -87,9 +88,10 @@ export default function IqDailyOutreach() {
           onNextTask={handleNext}
           instructions={
             <>
-              I recommend you send <span className="font-semibold">SMS + Email</span> to every group below — Hot, Warm, Cold, and Unknown — since none of them have been touched in over a month. Check off the audiences you want included today, pick a template for each channel, then hit Send Campaign.
+              I recommend you send <span className="font-semibold">SMS + Email</span> to every group below — <strong>Hot, Warm, Cold, and Unknown</strong> — since none of them have been touched in over a month. Check off the audiences you want included today, pick a template for each channel, then hit Send Campaign.
             </>
           }
+          detailSteps={FIND_OUT_MORE.DAILY_OUTREACH.steps}
         >
           <div className="flex flex-col gap-8">
 

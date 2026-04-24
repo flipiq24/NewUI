@@ -6,6 +6,7 @@ import IqTopBar from "@/components/iq/IqTopBar";
 import IqChatPage from "@/components/iq/IqChatPage";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 import { useStartGate } from "@/components/iq/useStartGate";
+import { FIND_OUT_MORE } from "@/lib/iq/findOutMoreContent";
 
 type Sentiment = "positive" | "neutral" | "negative";
 type Relationship = "Priority" | "Hot" | "Warm" | "Cold" | "Unknown" | "DO NOT CONTACT";
@@ -504,7 +505,7 @@ export default function IqCampaignResponses() {
           onStart={start}
           briefingMessage={
             <>
-              Josh, <span className="text-orange-500 font-semibold">{AGENTS.length}</span> agents responded to your text and email campaigns. We'll work them in three groups — <span className="font-semibold">Positive</span>, <span className="font-semibold">Neutral</span>, then <span className="font-semibold">Negative</span> — so each gets the right follow-up flow.
+              Josh, <span className="text-orange-500 font-semibold">{AGENTS.length}</span> agents responded to your text and email campaigns. We'll work them in three groups — <strong>Positive responses</strong>, <strong>Neutral responses</strong>, then <strong>Negative responses</strong> — so each gets the right follow-up flow.
             </>
           }
           briefingItems={SECTIONS.map((s) => ({
@@ -515,9 +516,18 @@ export default function IqCampaignResponses() {
           onNextTask={handleNext}
           instructions={
             <>
-              <span className="font-semibold">Step {stepIdx + 1} of {SECTIONS.length} — {currentSec.tail}.</span>{" "}
+              <span className="font-semibold">Step {stepIdx + 1} of {SECTIONS.length} — <strong>{currentSec.tail}</strong>.</span>{" "}
               {currentSec.blurb} Select the agents you want to action, choose a bulk follow-up, then hit Next Task.
             </>
+          }
+          detailSteps={
+            !started
+              ? FIND_OUT_MORE.CAMPAIGN_RESPONSES_OVERVIEW.steps
+              : currentSec.sentiment === "positive"
+                ? FIND_OUT_MORE.POSITIVE_RESPONSES.steps
+                : currentSec.sentiment === "neutral"
+                  ? FIND_OUT_MORE.NEUTRAL_RESPONSES.steps
+                  : FIND_OUT_MORE.NEGATIVE_RESPONSES.steps
           }
         >
           <div className="flex flex-col gap-10">

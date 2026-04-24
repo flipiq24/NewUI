@@ -8,6 +8,7 @@ import IqPropertyIntelligence from "@/components/iq/IqPropertyIntelligence";
 import { NEW_RELATIONSHIPS_DEALS } from "@/lib/iq/mockData";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 import { useStartGate } from "@/components/iq/useStartGate";
+import { FIND_OUT_MORE } from "@/lib/iq/findOutMoreContent";
 
 export default function IqNewRelationships() {
   const [, navigate] = useLocation();
@@ -65,7 +66,7 @@ export default function IqNewRelationships() {
           onStart={start}
           briefingMessage={
             <>
-              Josh, great job following up with your properties and sending campaigns. Now it's time to chase <span className="text-orange-500 font-semibold">{total}</span> high-propensity-to-sell properties with agents you already work with.
+              Josh, great job following up with your properties and sending campaigns. Now it's time to chase <span className="text-orange-500 font-semibold">{total}</span> <strong>high-propensity-to-sell properties</strong> with agents you already work with.
             </>
           }
           briefingItems={[
@@ -75,9 +76,10 @@ export default function IqNewRelationships() {
           onNextTask={handleTopNext}
           instructions={
             <>
-              Look at the Propensity to Sell score in the top middle of the page and read the iQ Property Intelligence for instructions. Click on the address to enter the property and start making calls.
+              Look at the <strong>Propensity to Sell</strong> score in the top middle of the page and read the iQ Property Intelligence for instructions. Click on the address to enter the property and start making calls.
             </>
           }
+          detailSteps={FIND_OUT_MORE.NEW_RELATIONSHIPS.steps}
         >
           {/* Counter bar */}
           <div className="grid grid-cols-3 items-center bg-white border border-gray-200 rounded-lg px-4 py-2.5">

@@ -6,6 +6,7 @@ import IqChatPage from "@/components/iq/IqChatPage";
 import AgentRecordCard from "@/components/iq/AgentRecordCard";
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 import { useStartGate } from "@/components/iq/useStartGate";
+import { FIND_OUT_MORE } from "@/lib/iq/findOutMoreContent";
 
 const TOTAL_AGENTS = 1;
 const SHOWN_QUEUE = 9;
@@ -51,7 +52,7 @@ export default function IqPriorityAgents() {
           onStart={start}
           briefingMessage={
             <>
-              Josh, these are your <span className="text-orange-500 font-semibold">{SHOWN_QUEUE}</span> highest-priority agent relationships today. Call each one, follow the prompts under their record, and update their status as you go.
+              Josh, these are your <span className="text-orange-500 font-semibold">{SHOWN_QUEUE}</span> <strong>highest-priority agent relationships</strong> today. Call each one, follow the prompts under their record, and update their status as you go.
             </>
           }
           briefingItems={[
@@ -62,9 +63,10 @@ export default function IqPriorityAgents() {
           onNextTask={handleTopNext}
           instructions={
             <>
-              Follow the next steps right below the agent's record information and click each of the checkboxes to get moving. If the agent doesn't respond, click Follow Up, make notes, then click Next Agent for the next phone call.
+              Follow the next steps right below the <strong>agent's record</strong> information and click each of the checkboxes to get moving. If the agent doesn't respond, click Follow Up, make notes, then click Next Agent for the next phone call.
             </>
           }
+          detailSteps={FIND_OUT_MORE.PRIORITY_AGENTS.steps}
         >
           {/* Pagination bar */}
           <div className="grid grid-cols-3 items-center bg-white border border-gray-200 rounded-lg px-4 py-2.5">

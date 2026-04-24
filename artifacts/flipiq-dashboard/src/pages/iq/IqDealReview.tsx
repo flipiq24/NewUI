@@ -9,6 +9,9 @@ import { DEAL_REVIEW_PROPERTIES, type DealLevel, type NotificationKind } from "@
 import { resetIqStateIfNewDay, saveIqState } from "@/lib/iq/storage";
 import { useStartGate } from "@/components/iq/useStartGate";
 import { isPropertyComplete, setPropertyComplete, useChecklistVersion } from "@/lib/iq/dailyChecklist";
+import FlipiqLabel from "@/components/iq/FlipiqLabel";
+import FindOutMore from "@/components/iq/FindOutMore";
+import { FIND_OUT_MORE } from "@/lib/iq/findOutMoreContent";
 
 const segments = [
   {
@@ -19,7 +22,7 @@ const segments = [
     textColor: "text-green-800",
     subtitle: (count: number) => (
       <>
-        You have <span className="text-orange-500 font-semibold">{count}</span> <span className="text-red-600 font-semibold">High Priority</span> Active &amp; Off Market deal{count === 1 ? "" : "s"} at the top of your FlipIQ priority list. MUST call first. Follow up with text and email after the phone call is made.
+        You have <span className="text-orange-500 font-semibold">{count}</span> <span className="text-red-600 font-semibold">High Priority</span> <strong>Active &amp; Off Market deal{count === 1 ? "" : "s"}</strong> at the top of your FlipIQ priority list. MUST call first. Follow up with text and email after the phone call is made.
       </>
     ),
   },
@@ -31,7 +34,7 @@ const segments = [
     textColor: "text-amber-800",
     subtitle: (count: number) => (
       <>
-        You have <span className="text-orange-500 font-semibold">{count}</span> <span className="text-red-600 font-semibold">High Priority</span> Pending / Backup / Hold deal{count === 1 ? "" : "s"} — they're in contract. Call the agent, find out if the buyer is performing, and stay close until it's confirmed.
+        You have <span className="text-orange-500 font-semibold">{count}</span> <span className="text-red-600 font-semibold">High Priority</span> <strong>Pending / Backup / Hold deal{count === 1 ? "" : "s"}</strong> — they're in contract. Call the agent, find out if the buyer is performing, and stay close until it's confirmed.
       </>
     ),
   },
@@ -43,11 +46,17 @@ const segments = [
     textColor: "text-red-800",
     subtitle: (count: number) => (
       <>
-        You have <span className="text-orange-500 font-semibold">{count}</span> <span className="text-red-600 font-semibold">High Priority</span> Closed / Expired / Canceled deal{count === 1 ? "" : "s"} — the property is no longer available, and that's your opening. Find out who the buyer was, whether it sold for more or less than your offer, update the relationship, and ask if they have any other properties coming up.
+        You have <span className="text-orange-500 font-semibold">{count}</span> <span className="text-red-600 font-semibold">High Priority</span> <strong>Closed / Expired / Canceled deal{count === 1 ? "" : "s"}</strong> — the property is no longer available, and that's your opening. Find out who the buyer was, whether it sold for more or less than your offer, update the relationship, and ask if they have any other properties coming up.
       </>
     ),
   },
 ];
+
+const SEGMENT_FIND_OUT_MORE: Record<typeof segments[number]["key"], string[]> = {
+  ACTIVE_OFF_MARKET: FIND_OUT_MORE.ACTIVE_OFF_MARKET.steps,
+  PENDING_BACKUP_HOLD: FIND_OUT_MORE.PENDING_BACKUP_HOLD.steps,
+  CLOSED_EXPIRED_CANCELED: FIND_OUT_MORE.CLOSED_EXPIRED_CANCELED.steps,
+};
 
 const segmentNames: Record<typeof segments[number]["key"], string> = {
   ACTIVE_OFF_MARKET: "Active & Off Market",
@@ -224,17 +233,12 @@ export default function IqDealReview() {
 
               {/* AI message */}
               <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <img
-                    src={`${import.meta.env.BASE_URL}flipiq-icon.png`}
-                    alt="FlipiQ"
-                    className="w-6 h-6 object-contain"
-                  />
-                  <span className="text-[13px] font-semibold text-gray-700 leading-none">FlipiQ</span>
+                <div className="mb-3">
+                  <FlipiqLabel size="md" />
                 </div>
                 <div>
                   <p className="text-[14px] text-gray-800 leading-7 mb-5">
-                    You have <span className="text-orange-500 font-semibold">9</span> <span className="text-red-600 font-semibold">High Priority</span> deals at the top of your FlipIQ priority list — Active &amp; Off Market, Pending / Backup / Hold, and Closed / Expired / Canceled. Call the agent on each one. Work through each group in order and take action on every deal. Hit <span className="text-orange-500 font-medium">Get Started</span> when you're ready.
+                    You have <span className="text-orange-500 font-semibold">9</span> <span className="text-red-600 font-semibold">High Priority</span> deals at the top of your FlipIQ priority list — <strong>Active &amp; Off Market</strong>, <strong>Pending / Backup / Hold</strong>, and <strong>Closed / Expired / Canceled</strong>. Call the agent on each one. Work through each group in order and take action on every deal. Hit <span className="text-orange-500 font-medium">Get Started</span> when you're ready.
                   </p>
                   <div className="space-y-1.5 mb-6">
                     {[
@@ -248,6 +252,7 @@ export default function IqDealReview() {
                       </div>
                     ))}
                   </div>
+                  <FindOutMore steps={FIND_OUT_MORE.ACTIVE_DEALS_OVERVIEW.steps} className="mb-6" />
                   <div className="flex justify-end">
                     <button
                       onClick={start}
@@ -303,9 +308,13 @@ export default function IqDealReview() {
           <div className="flex-1 overflow-y-auto bg-white px-6 py-8">
             <div className="w-full flex flex-col gap-6">
               {/* Per-segment instructions (inline, no second gate) */}
-              <p className="text-[13px] text-gray-600 leading-6 -mb-2">
-                {currentSeg.subtitle(segmentCounts[currentSeg.key] ?? 0)}
-              </p>
+              <div className="flex flex-col gap-2 -mb-2">
+                <FlipiqLabel size="md" />
+                <p className="text-[13px] text-gray-600 leading-6">
+                  {currentSeg.subtitle(segmentCounts[currentSeg.key] ?? 0)}
+                </p>
+                <FindOutMore steps={SEGMENT_FIND_OUT_MORE[currentSeg.key]} className="mt-1" />
+              </div>
 
               {/* Section heading row: Select All (left) · Next Task (right) */}
               <div>
