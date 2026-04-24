@@ -95,7 +95,7 @@ export default function IqProgressStepper() {
             {/* Connector — separated from circles by a gap on each side */}
             {i < segments.length - 1 && (
               <div
-                className={`h-[2px] flex-1 min-w-[40px] max-w-[128px] mx-3 ${lineActive ? "bg-orange-500" : "bg-gray-200"}`}
+                className={`h-[2px] flex-1 min-w-[70px] max-w-[224px] mx-3 ${lineActive ? "bg-orange-500" : "bg-gray-200"}`}
               />
             )}
           </Fragment>
