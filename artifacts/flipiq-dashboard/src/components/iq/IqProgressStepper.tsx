@@ -22,7 +22,7 @@ export default function IqProgressStepper() {
   const [hover, setHover] = useState<{ idx: number; kind: "label" | "number" } | null>(null);
 
   return (
-    <div className="flex items-center justify-center pt-9 mx-auto">
+    <div className="flex items-center justify-between pt-9 w-full px-6">
       {segments.map((seg, i) => {
         const isCurrent = i === currentIdx;
         const isPast = i < currentIdx;
@@ -95,7 +95,7 @@ export default function IqProgressStepper() {
             {/* Connector — separated from circles by a gap on each side */}
             {i < segments.length - 1 && (
               <div
-                className={`h-[2px] w-16 mx-3 ${lineActive ? "bg-orange-500" : "bg-gray-200"}`}
+                className={`h-[2px] flex-1 mx-3 ${lineActive ? "bg-orange-500" : "bg-gray-200"}`}
               />
             )}
           </Fragment>
