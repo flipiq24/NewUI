@@ -89,13 +89,29 @@ export function resetIqStateIfNewDay(): IqState {
 }
 
 export type InboxChannel = "text" | "email";
+export type ThreadDirection = "in" | "out";
+export type ThreadMessage = {
+  id: string;
+  direction: ThreadDirection;
+  body: string;
+  ts: string;
+  subject?: string;
+};
 export type InboxMessage = {
   id: string;
+  threadId: string;
+  agentId: string;
+  agentRoute: string;
   sender: string;
+  senderRole?: string;
+  senderPhone?: string;
+  senderEmail?: string;
   channel: InboxChannel;
+  subject?: string;
   preview: string;
   ts: string;
   unread: boolean;
+  messages: ThreadMessage[];
 };
 
 const INBOX_KEY = "iq:inbox";
@@ -103,27 +119,90 @@ const INBOX_KEY = "iq:inbox";
 const SEED_INBOX: InboxMessage[] = [
   {
     id: "m1",
+    threadId: "t-marcus-chen",
+    agentId: "marcus-chen",
+    agentRoute: "/iq/priority-agents?agent=marcus-chen",
     sender: "Marcus Chen",
+    senderRole: "Compass · Highland Park",
+    senderPhone: "(323) 555-0142",
+    senderEmail: "marcus.chen@compass.com",
     channel: "text",
     preview: "Yes, I have a pocket listing in Highland Park — can talk this afternoon.",
     ts: "9:42 AM",
     unread: true,
+    messages: [
+      {
+        id: "m1-a",
+        direction: "out",
+        body: "Hey Marcus — Josh at FlipIQ. Any pocket listings in Highland Park you're sitting on? We close cash, 10 days, no contingencies.",
+        ts: "Yesterday 4:12 PM",
+      },
+      {
+        id: "m1-b",
+        direction: "in",
+        body: "Yes, I have a pocket listing in Highland Park — can talk this afternoon.",
+        ts: "9:42 AM",
+      },
+    ],
   },
   {
     id: "m2",
+    threadId: "t-priya-shah",
+    agentId: "priya-shah",
+    agentRoute: "/iq/priority-agents?agent=priya-shah",
     sender: "Priya Shah",
+    senderRole: "Sotheby's · Pasadena",
+    senderPhone: "(626) 555-0188",
+    senderEmail: "priya.shah@sothebys.com",
     channel: "email",
-    preview: "Re: Off‑market opportunity — happy to share details, what price range?",
+    subject: "Off-market opportunity",
+    preview: "Re: Off-market opportunity — happy to share details, what price range?",
     ts: "9:18 AM",
     unread: true,
+    messages: [
+      {
+        id: "m2-a",
+        direction: "out",
+        body: "Hi Priya,\n\nFollowing up on our last call — wanted to see if you're working any off-market listings in Pasadena or San Marino. We're an active cash buyer and can move quickly.\n\nThanks,\nJosh",
+        ts: "Yesterday 4:18 PM",
+        subject: "Off-market opportunity",
+      },
+      {
+        id: "m2-b",
+        direction: "in",
+        body: "Hi Josh,\n\nHappy to share details — what price range are you looking at right now? I have one quietly coming up in San Marino that may be a fit.\n\nPriya",
+        ts: "9:18 AM",
+        subject: "Re: Off-market opportunity",
+      },
+    ],
   },
   {
     id: "m3",
+    threadId: "t-daniel-reyes",
+    agentId: "daniel-reyes",
+    agentRoute: "/iq/priority-agents?agent=daniel-reyes",
     sender: "Daniel Reyes",
+    senderRole: "Keller Williams · El Sereno",
+    senderPhone: "(213) 555-0177",
+    senderEmail: "daniel.reyes@kw.com",
     channel: "text",
     preview: "Not right now, but try me again next week.",
     ts: "8:55 AM",
     unread: true,
+    messages: [
+      {
+        id: "m3-a",
+        direction: "out",
+        body: "Hi Daniel — Josh from FlipIQ. Anything pencilling in El Sereno or Lincoln Heights that needs a cash buyer?",
+        ts: "8:30 AM",
+      },
+      {
+        id: "m3-b",
+        direction: "in",
+        body: "Not right now, but try me again next week.",
+        ts: "8:55 AM",
+      },
+    ],
   },
 ];
 
@@ -135,7 +214,22 @@ export function loadInbox(): InboxMessage[] {
       saveInbox(SEED_INBOX);
       return SEED_INBOX;
     }
-    return JSON.parse(raw) as InboxMessage[];
+    const parsed = JSON.parse(raw) as unknown;
+    if (
+      !Array.isArray(parsed) ||
+      parsed.some(
+        (m) =>
+          !m ||
+          typeof m !== "object" ||
+          !("threadId" in (m as object)) ||
+          !("agentRoute" in (m as object)) ||
+          !Array.isArray((m as InboxMessage).messages)
+      )
+    ) {
+      saveInbox(SEED_INBOX);
+      return SEED_INBOX;
+    }
+    return parsed as InboxMessage[];
   } catch {
     return SEED_INBOX;
   }
@@ -155,6 +249,52 @@ export function inboxUnreadCount(): number {
 export function markInboxRead(id: string): void {
   const msgs = loadInbox().map((m) => (m.id === id ? { ...m, unread: false } : m));
   saveInbox(msgs);
+}
+
+function nowTimeLabel(): string {
+  const d = new Date();
+  let h = d.getHours();
+  const m = d.getMinutes();
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return `${h}:${String(m).padStart(2, "0")} ${ampm}`;
+}
+
+export function appendThreadReply(
+  threadId: string,
+  body: string,
+  subject?: string
+): InboxMessage | null {
+  const trimmed = body.trim();
+  if (!trimmed) return null;
+
+  let updated: InboxMessage | null = null;
+  const msgs = loadInbox().map((m) => {
+    if (m.threadId !== threadId) return m;
+    const lastSubject =
+      subject ??
+      [...m.messages].reverse().find((x) => x.subject)?.subject ??
+      m.subject;
+    const newEntry: ThreadMessage = {
+      id: `${m.threadId}-${m.messages.length + 1}-${Date.now()}`,
+      direction: "out",
+      body: trimmed,
+      ts: nowTimeLabel(),
+      ...(m.channel === "email" && lastSubject ? { subject: lastSubject } : {}),
+    };
+    const previewBody = trimmed.replace(/\s+/g, " ");
+    updated = {
+      ...m,
+      unread: false,
+      messages: [...m.messages, newEntry],
+      subject: m.channel === "email" ? lastSubject ?? m.subject : m.subject,
+      preview: `You: ${previewBody}`,
+      ts: newEntry.ts,
+    };
+    return updated;
+  });
+  if (updated) saveInbox(msgs);
+  return updated;
 }
 
 export function markAllInboxRead(): void {
