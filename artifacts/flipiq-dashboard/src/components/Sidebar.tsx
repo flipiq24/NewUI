@@ -1,7 +1,7 @@
 import { Settings, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, Link } from "wouter";
-import { resetIqStateIfNewDay, startNewIqDay, inboxUnreadCount } from "@/lib/iq/storage";
+import { resetIqStateIfNewDay, startNewIqDay, inboxUnreadCount, loadInbox } from "@/lib/iq/storage";
 import { InboxIcon, UnreadPulseDot } from "@/components/iq/InboxBits";
 
 export default function Sidebar() {
@@ -35,14 +35,19 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
   const inboxActive = location === "/iq/inbox";
 
   const [unread, setUnread] = useState(() => inboxUnreadCount());
+  const [inboxTotal, setInboxTotal] = useState(() => loadInbox().length);
   useEffect(() => {
     function refresh() {
       setUnread(inboxUnreadCount());
+      setInboxTotal(loadInbox().length);
     }
     refresh();
     window.addEventListener("iq:inbox-changed", refresh);
     return () => window.removeEventListener("iq:inbox-changed", refresh);
   }, [location]);
+
+  const showInbox =
+    (inboxActive || !!state.dealReviewComplete) && (inboxActive || inboxTotal > 0);
 
   return (
     <div className="w-[192px] bg-white border-r border-gray-200 flex flex-col h-full flex-shrink-0">
@@ -66,16 +71,6 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
             done={!!state.morningCheckin && !todaysPlanActive}
           />
         </Link>
-        {(inboxActive || !!state.dealReviewComplete) && (
-          <Link href="/iq/inbox">
-            <IqNavItem
-              icon={<InboxIcon />}
-              label="Inbox"
-              active={inboxActive}
-              unreadDot={unread > 0}
-            />
-          </Link>
-        )}
         {(activeDealsActive || !!state.dealReviewComplete) && (
           <Link href="/iq/deal-review">
             <IqNavItem
@@ -117,6 +112,20 @@ function IqSidebar({ location, onLogoClick }: { location: string; onLogoClick: (
           </Link>
         )}
       </div>
+
+      {showInbox && (
+        <div className="px-3 pb-2 mt-10">
+          <p className="text-[10px] font-medium text-gray-300 uppercase tracking-wider px-2 py-1">Communications</p>
+          <Link href="/iq/inbox">
+            <IqNavItem
+              icon={<InboxIcon />}
+              label="Inbox"
+              active={inboxActive}
+              unreadDot={unread > 0}
+            />
+          </Link>
+        </div>
+      )}
 
       {welcomeBackActive && (
         <div className="px-3 pb-2 mt-2">
