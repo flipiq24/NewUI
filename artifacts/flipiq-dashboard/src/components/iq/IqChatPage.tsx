@@ -39,10 +39,11 @@ export default function IqChatPage({
           <div className="w-full flex flex-col gap-6">
             <FlipiqLabel size="md" />
             <div>
-              <p className="text-[14px] text-gray-800 leading-7 mb-5">
+              <div className="text-[14px] text-gray-800 leading-7 mb-5">
                 {briefingMessage}{" "}
-                Hit <span className="text-orange-500 font-medium">Get Started</span> when you're ready.
-              </p>
+                Hit <span className="text-orange-500 font-medium">Get Started</span> when you're ready.{" "}
+                <FindOutMore inline steps={detailSteps} videoSrc={videoSrc} />
+              </div>
               {briefingItems && briefingItems.length > 0 && (
                 <div className="space-y-1.5 mb-6">
                   {briefingItems.map((item, i) => (
@@ -58,7 +59,6 @@ export default function IqChatPage({
                   ))}
                 </div>
               )}
-              <FindOutMore steps={detailSteps} videoSrc={videoSrc} className="mb-6" />
               <div className="flex justify-end">
                 <button
                   onClick={onStart}
@@ -93,8 +93,10 @@ export default function IqChatPage({
         <div className="w-full flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <FlipiqLabel size="md" />
-            <p className="text-[14px] text-gray-800 leading-7">{instructions}</p>
-            <FindOutMore steps={detailSteps} videoSrc={videoSrc} className="mt-1" />
+            <div className="text-[14px] text-gray-800 leading-7">
+              {instructions}{" "}
+              <FindOutMore inline steps={detailSteps} videoSrc={videoSrc} />
+            </div>
           </div>
 
           <div>

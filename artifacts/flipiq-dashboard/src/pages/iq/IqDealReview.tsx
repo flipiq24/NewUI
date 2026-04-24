@@ -237,9 +237,10 @@ export default function IqDealReview() {
                   <FlipiqLabel size="md" />
                 </div>
                 <div>
-                  <p className="text-[14px] text-gray-800 leading-7 mb-5">
-                    You have <span className="text-orange-500 font-semibold">9</span> <span className="text-red-600 font-semibold">High Priority</span> deals at the top of your FlipIQ priority list — <strong>Active &amp; Off Market</strong>, <strong>Pending / Backup / Hold</strong>, and <strong>Closed / Expired / Canceled</strong>. Call the agent on each one. Work through each group in order and take action on every deal. Hit <span className="text-orange-500 font-medium">Get Started</span> when you're ready.
-                  </p>
+                  <div className="text-[14px] text-gray-800 leading-7 mb-5">
+                    You have <span className="text-orange-500 font-semibold">9</span> <span className="text-red-600 font-semibold">High Priority</span> deals at the top of your FlipIQ priority list — <strong>Active &amp; Off Market</strong>, <strong>Pending / Backup / Hold</strong>, and <strong>Closed / Expired / Canceled</strong>. Call the agent on each one. Work through each group in order and take action on every deal. Hit <span className="text-orange-500 font-medium">Get Started</span> when you're ready.{" "}
+                    <FindOutMore inline steps={FIND_OUT_MORE.ACTIVE_DEALS_OVERVIEW.steps} />
+                  </div>
                   <div className="space-y-1.5 mb-6">
                     {[
                       { label: "Active & Off Market", count: segmentCounts.ACTIVE_OFF_MARKET },
@@ -252,7 +253,6 @@ export default function IqDealReview() {
                       </div>
                     ))}
                   </div>
-                  <FindOutMore steps={FIND_OUT_MORE.ACTIVE_DEALS_OVERVIEW.steps} className="mb-6" />
                   <div className="flex justify-end">
                     <button
                       onClick={start}
@@ -310,10 +310,10 @@ export default function IqDealReview() {
               {/* Per-segment instructions (inline, no second gate) */}
               <div className="flex flex-col gap-2 -mb-2">
                 <FlipiqLabel size="md" />
-                <p className="text-[13px] text-gray-600 leading-6">
-                  {currentSeg.subtitle(segmentCounts[currentSeg.key] ?? 0)}
-                </p>
-                <FindOutMore steps={SEGMENT_FIND_OUT_MORE[currentSeg.key]} className="mt-1" />
+                <div className="text-[13px] text-gray-600 leading-6">
+                  {currentSeg.subtitle(segmentCounts[currentSeg.key] ?? 0)}{" "}
+                  <FindOutMore inline steps={SEGMENT_FIND_OUT_MORE[currentSeg.key]} />
+                </div>
               </div>
 
               {/* Section heading row: Select All (left) · Next Task (right) */}

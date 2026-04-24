@@ -317,12 +317,11 @@ export default function IqTasks() {
                 <FlipiqLabel size="md" />
               </div>
 
-              <p className="text-[14px] text-gray-800 leading-7 mb-3">
+              <div className="text-[14px] text-gray-800 leading-7 mb-6">
                 Here are your <strong>tasks today</strong>, Josh. Work through them in priority order — hit{" "}
-                <span className="text-orange-500 font-medium">Get Started</span> when you're ready.
-              </p>
-
-              <FindOutMore steps={FIND_OUT_MORE.TODAYS_PLAN.steps} className="mb-6" />
+                <span className="text-orange-500 font-medium">Get Started</span> when you're ready.{" "}
+                <FindOutMore inline steps={FIND_OUT_MORE.TODAYS_PLAN.steps} />
+              </div>
 
               <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">
                 Today's Tasks:
