@@ -316,7 +316,7 @@ export default function IqDealReview() {
                         type="checkbox"
                         checked={allSelected}
                         onChange={(e) => handleSelectAll(e.target.checked)}
-                        className="w-3.5 h-3.5 rounded border-gray-300 accent-orange-500 text-orange-500 focus:ring-orange-500 cursor-pointer"
+                        className="w-3.5 h-3.5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer"
                       />
                       <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider group-hover:text-gray-700">
                         Select All

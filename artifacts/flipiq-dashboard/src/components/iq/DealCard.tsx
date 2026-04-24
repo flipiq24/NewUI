@@ -244,7 +244,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
           type="checkbox"
           checked={done.call}
           onChange={() => toggle("call")}
-          className="w-3.5 h-3.5 rounded border-gray-300 accent-orange-500 text-orange-500 focus:ring-orange-500 cursor-pointer"
+          className="w-3.5 h-3.5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer"
         />
         <div className="relative">
           <button
