@@ -77,9 +77,18 @@ const AGENT_DOT: Record<DealDetail["agent"], string> = {
   none: "bg-[#B4B2A9]",
 };
 const KW_DOT: Record<DealDetail["kw"], string> = {
-  high: "bg-[#639922]",
-  mid: "bg-[#BA7517]",
-  low: "bg-[#B4B2A9]",
+  high: "bg-[#E24B4A]",
+  mid:  "bg-[#BA7517]",
+  low:  "bg-[#B4B2A9]",
+};
+/**
+ * Label color for "Keywords: High / Mid / Low" so the WORD itself reflects
+ * the heat — high deserves the same urgency as Pain. Mirrors PAIN_TEXT.
+ */
+const KW_TEXT: Record<DealDetail["kw"], string> = {
+  high: "text-[#E24B4A] font-semibold",
+  mid:  "text-[#BA7517]",
+  low:  "text-[#B4B2A9]",
 };
 const SALES_TYPE_LABELS: Record<string, string> = {
   STD: "Standard",
@@ -438,10 +447,12 @@ export default function DealCard({ property }: { property: DealProperty }) {
             />
           </span>
           <span className="shrink-0 text-gray-300">·</span>
-          {/* Keywords — right after sales type (it's property data) */}
+          {/* Keywords — right after sales type (it's property data).
+              Label color mirrors the dot via KW_TEXT — high = red,
+              mid = amber, low = gray. */}
           <span className="shrink-0 relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
-            Keywords: {detail.kwLabel}
+            <span className={KW_TEXT[detail.kw]}>Keywords: {detail.kwLabel}</span>
             <TipPanel title="Listing Remarks" wide>
               <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1.5 mb-1">Public Comments</div>
               <KwHtml html={detail.pubCmt} />
@@ -506,8 +517,23 @@ export default function DealCard({ property }: { property: DealProperty }) {
             </TipPanel>
           </span>
           <span className="text-gray-300">·</span>
+          {/* ISC — Investor Sourced Count.
+              0 = colorless gray (agent has never sourced a deal — nothing to
+              click into). Any positive count renders the number in the
+              hyperlink blue (#2F86D6) to signal it's drillable history. */}
           <span className="relative group cursor-help inline-flex items-center gap-1 text-[12px] text-gray-500 hover:text-gray-900">
-            <span>ISC: <span className="font-medium text-gray-700">{detail.isc ?? 19}</span></span>
+            <span>
+              ISC:{" "}
+              <span
+                className={
+                  (detail.isc ?? 19) > 0
+                    ? "font-medium text-[#2F86D6]"
+                    : "font-medium text-gray-400"
+                }
+              >
+                {detail.isc ?? 19}
+              </span>
+            </span>
             <TipPanel
               title="Investor Sourced Count"
               rows={[

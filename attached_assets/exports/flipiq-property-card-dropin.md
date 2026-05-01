@@ -3,10 +3,10 @@
 A single self-contained React + TypeScript component that reproduces the
 property row in the screenshot:
 
-> ☐  📞 **MID** **No response — send offer**  📞● 💬● ✉●  **Critical** **Reminder**     15% Outreach Sent ▾
->                                                                                          Opened 04/22 · Called —   ← red text (cold)
-> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: Mid · Source: MLS — Active
-> 💬  **525k** · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: 19 · **7A** / 3P / 0B / 54S   ← `7A` is orange when > 0
+> ☐  📞 **MID** **No response — send offer**  📞● 💬● ✉●  **Critical**            15% Outreach Sent ▾
+>                                                                                       Opened 04/22 · Called —   ← red text (cold)
+> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · ● **Keywords: High** · Source: MLS — Active   ← `Keywords: High` renders red
+> 💬  **525k** · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: **11** · **5A** / 8P / 2B / 41S   ← `ISC` blue when > 0, gray when 0; `5A` orange when > 0
 
 Every chip / icon / value has a hover tooltip:
 - **Next Step** — task / who / what / how / context
@@ -305,9 +305,18 @@ const AGENT_DOT: Record<DealDetail["agent"], string> = {
   none:             "bg-[#B4B2A9]",
 };
 const KW_DOT: Record<DealDetail["kw"], string> = {
-  high: "bg-[#639922]",
+  high: "bg-[#E24B4A]",
   mid:  "bg-[#BA7517]",
   low:  "bg-[#B4B2A9]",
+};
+/**
+ * Label color for "Keywords: High / Mid / Low" so the WORD itself reflects
+ * the heat — high deserves the same urgency as Pain. Mirrors PAIN_TEXT.
+ */
+const KW_TEXT: Record<DealDetail["kw"], string> = {
+  high: "text-[#E24B4A] font-semibold",
+  mid:  "text-[#BA7517]",
+  low:  "text-[#B4B2A9]",
 };
 
 const SALES_TYPE_LABELS: Record<string, string> = {
@@ -642,10 +651,12 @@ export default function DealCard({
             />
           </span>
           <span className="shrink-0 text-gray-300">·</span>
-          {/* Keywords — right after sales type (it's property data) */}
+          {/* Keywords — right after sales type (it's property data).
+              Label color mirrors the dot via KW_TEXT — high = red,
+              mid = amber, low = gray. */}
           <span className="shrink-0 relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
-            Keywords: {detail.kwLabel}
+            <span className={KW_TEXT[detail.kw]}>Keywords: {detail.kwLabel}</span>
             <TipPanel title="Listing Remarks" wide>
               <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1.5 mb-1">Public Comments</div>
               <KwHtml html={detail.pubCmt} />
@@ -708,9 +719,23 @@ export default function DealCard({
             </TipPanel>
           </span>
           <span className="text-gray-300">·</span>
-          {/* ISC — Investor Sourced Count (own tooltip) */}
+          {/* ISC — Investor Sourced Count.
+              0 = colorless gray (agent has never sourced a deal — nothing to
+              click into). Any positive count renders the number in the
+              hyperlink blue (#2F86D6) to signal it's drillable history. */}
           <span className="relative group cursor-help inline-flex items-center gap-1 text-[12px] text-gray-500 hover:text-gray-900">
-            <span>ISC: <span className="font-medium text-gray-700">{detail.isc ?? 19}</span></span>
+            <span>
+              ISC:{" "}
+              <span
+                className={
+                  (detail.isc ?? 19) > 0
+                    ? "font-medium text-[#2F86D6]"
+                    : "font-medium text-gray-400"
+                }
+              >
+                {detail.isc ?? 19}
+              </span>
+            </span>
             <TipPanel
               title="Investor Sourced Count"
               rows={[
@@ -806,13 +831,143 @@ export default function DealCard({
 
 ## 3. Sample data + usage (matches the screenshot)
 
+The sample renders **three cards stacked** so you can see every color rule
+in one screen:
+
+| # | Pain | Keywords | ISC | Track Record   | Notes                                                    |
+|---|------|----------|-----|----------------|----------------------------------------------------------|
+| 1 | Low  | Low      | 24  | **12A** /4P/1B/87S | gray pain · gray keywords · **blue ISC** · 12A in orange |
+| 2 | High | Mid      | 0   | 0A /2P/5B/33S      | **red pain chip + label** · amber keywords · gray 0 ISC · 0A NOT orange |
+| 3 | Mid  | High     | 11  | **5A** /8P/2B/41S  | amber pain · **red keywords** · blue ISC · 5A in orange  |
+
 Create `src/App.tsx`:
 
 ```tsx
 import DealCard, { type DealProperty, type DealDetail } from "./DealCard";
 
-const property: DealProperty = {
+/* ------------------------------------------------------------------ *
+ * Card 1 — LOW pain · LOW keywords · ISC 24 (blue) · 12A (orange)
+ * ------------------------------------------------------------------ */
+const property1: DealProperty = {
   id: 1,
+  address: "73750 Desert Vista Court, Palm Desert, CA 92260",
+  type: "STD",
+  propertyType: "Condo",
+  price: "$399,000",
+  source: "MLS — Active",
+  sourceStatus: "Active",
+  offerPct: 60,
+  offerLabel: "In Negotiations",
+  nextSteps: "Adjust terms",
+  negotiator: "Josh Santos",
+  assignedUser: "Josh Santos",
+  lastOpenDate: "04/30",
+  lastCalledDate: "04/29",
+  callResponse: "positive",
+  emailResponse: "positive",
+  notifications: ["critical"],
+};
+const detail1: DealDetail = {
+  taskNote: "Agent countered at $425k. Close the gap.",
+  taskWho:  "Listing agent — Maria Reyes (Coldwell Banker)",
+  taskWhat: "Counter their $425k ask and lock in revised terms.",
+  taskHow:  "Call the agent, anchor at $399k, offer 7-day close + cash-equivalent EMD, then send updated PSA by EOD.",
+
+  prop: [["Type","Condo · STD"],["Beds / Baths","3 / 2"],["Garage","2 car"],["Sq Ft / Lot","1,248 / 2,613"],["Built","1976"],["Pool","In-ground, Gunite"],["DOM / CDOM","108 / 108"]],
+
+  arv: "$520,000", arvPct: "77% ARV",
+  priceHist: [["Original list","$449,000"],["Drop 03/15/26","$425,000 (-5.3%)"],["Drop 04/02/26","$399,000 (-6.1%)"]],
+  priceTotal: "-$50,000 (-11.1%)",
+
+  pain: "low", painLabel: "Low",
+  painSig: [["Flagged","No pain"],["Ownership","Absentee"],["Equity","High (>50%)"],["Entity","Corp / Trust"],["Propensity","6 / 10"]],
+
+  agent: "responsive", agentLabel: "Responsive",
+  agentComms: [["Text 04/22","Replied 2h"],["Email 04/20","Opened"],["Call 01/30","Answered"],["Text 01/15","Replied"],["Email 01/10","Replied"]],
+  agentRate: "80%",
+
+  kw: "low", kwLabel: "Low",
+  pubCmt: "Stunning Palm Desert condo in prestigious gated community. Pool and spa access, turnkey with tasteful upgrades throughout.",
+  agtCmt: "Quick close preferred. Seller reviewing all offers this week.",
+
+  opened: "04/30", called: "04/29",
+  firstOpened: "12/12/25", totalOpens: 14,
+  firstCalled: "12/15/25", totalCommsCount: 9, totalCalls: 3, totalTexts: 3, totalEmails: 3,
+
+  pct: "60%", status: "In Negotiations", statusType: "neg",
+  source: "MLS — Active", negotiator: "Josh Santos", assigned: "Josh Santos",
+
+  // Agent deal track record — colorful, hot agent, drillable history.
+  isc: 24,
+  activeYears: "4yr",
+  trackActive: 12, trackPending: 4, trackBackup: 1, trackSold: 87,
+  trackTotal: 104,
+};
+
+/* ------------------------------------------------------------------ *
+ * Card 2 — HIGH pain · MID keywords · ISC 0 (gray) · 0A (NOT orange)
+ * ------------------------------------------------------------------ */
+const property2: DealProperty = {
+  id: 2,
+  address: "9283 Atsina Road, Phelan, CA 92371",
+  type: "REO",
+  propertyType: "Manuf 433",
+  price: "$335,800",
+  source: "MLS — Pending",
+  sourceStatus: "Pending",
+  offerPct: 50,
+  offerLabel: "Contract Submitted",
+  nextSteps: "Prepare backup offer",
+  negotiator: "Josh Santos",
+  assignedUser: "Not Assigned",
+  lastOpenDate: "04/26",
+  lastCalledDate: "04/24",
+  callResponse: "negative",
+  emailResponse: "negative",
+  notifications: ["critical", "reminder"],
+};
+const detail2: DealDetail = {
+  taskNote: "Primary buyer in escrow with 3% EMD. Submit backup at same number.",
+  taskWho:  "Listing agent — Tom Bauer (REO desk)",
+  taskWhat: "Get into backup position behind the primary buyer.",
+  taskHow:  "Call the agent, confirm primary's EMD + contingency dates, then submit a backup offer at $335,800 cash, AS-IS, 7-day close.",
+
+  prop: [["Type","Manuf 433 · REO"],["Beds / Baths","3 / 2"],["Garage","2 car"],["Sq Ft / Lot","1,576 / 95,396"],["Built","1986"],["Pool","None"],["DOM / CDOM","54 / 108"]],
+
+  arv: "$420,000", arvPct: "80% ARV",
+  priceHist: [["Original list","$369,900"],["Drop 02/10/26","$349,900 (-5.4%)"],["Drop 03/28/26","$335,800 (-4.0%)"]],
+  priceTotal: "-$34,100 (-9.2%)",
+
+  pain: "high", painLabel: "High",
+  painSig: [["Flagged","Pre-foreclosure NOD"],["Equity","Low (<20%)"],["Mortgage","Behind 90+ days"],["Transfer","Recent (<2 yrs)"],["Propensity","9 / 10"]],
+
+  agent: "not-responsive", agentLabel: "Not Responsive",
+  agentComms: [["Call 12/30","No answer"],["Text 12/28","No reply"],["Email 12/26","Opened, no reply"],["Text 12/20","Unread"],["Call 12/15","Voicemail"]],
+  agentRate: "0%",
+
+  kw: "mid", kwLabel: "Mid",
+  pubCmt: "REO property, lender-owned. Submit clean offers with POF. Property sold subject to lender approval.",
+  agtCmt: '<span class="kw">AS-IS</span> cash preferred. 7-day close. No contingencies.',
+
+  opened: "04/26", called: "04/24",
+  firstOpened: "11/20/25", totalOpens: 8,
+  firstCalled: "12/01/25", totalCommsCount: 5, totalCalls: 2, totalTexts: 2, totalEmails: 1,
+
+  pct: "50%", status: "Contract Submitted", statusType: "neg",
+  source: "MLS — Pending", negotiator: "Josh Santos", assigned: "Not Assigned",
+
+  // Brand-new agent — 0 ISC renders gray, 0A renders WITHOUT orange.
+  isc: 0,
+  activeYears: "<1yr",
+  trackActive: 0, trackPending: 2, trackBackup: 5, trackSold: 33,
+  trackTotal: 40,
+};
+
+/* ------------------------------------------------------------------ *
+ * Card 3 — MID pain · HIGH keywords (RED) · ISC 11 (blue) · 5A (orange)
+ * ------------------------------------------------------------------ */
+const property3: DealProperty = {
+  id: 3,
   address: "1842 Camino Del Sol, Riverside, CA 92506",
   type: "STD",
   propertyType: "SFR",
@@ -828,94 +983,66 @@ const property: DealProperty = {
   lastCalledDate: "—",
   callResponse: "negative",
   emailResponse: "negative",
-  notifications: ["critical", "reminder"], // → red "Critical" + blue "Reminder" inline on Row 1
+  notifications: ["critical"],
 };
+const detail3: DealDetail = {
+  taskNote: "3 days of automated outreach with zero reply. Send the offer anyway.",
+  taskWho:  "Listing agent — Diana Hartwell (Re/Max Riverside)",
+  taskWhat: "Angela sent texts and emails for 3 days straight with no response.",
+  taskHow:  "Confirm the agent didn't call you on your cell phone, then follow the process and send the offer.",
 
-const detail: DealDetail = {
-  taskNote: "Agent has gone dark. Send your standard cash offer at 77% ARV.",
-  taskWho:  "Listing agent — Maria Lopez",
-  taskWhat: "Send written offer (DocuSign) and notify via text + email.",
-  taskHow:  "Use template OFFER-CASH-77 with 14-day close.",
+  prop: [["Type","Single Family · STD"],["Beds / Baths","4 / 3"],["Garage","2 car"],["Sq Ft / Lot","2,114 / 8,712"],["Built","1992"],["Pool","None"],["DOM / CDOM","62 / 62"]],
 
-  prop: [
-    ["Type",        "SFR · STD"],
-    ["Beds / Baths","3 / 2"],
-    ["Sqft",        "1,640"],
-    ["Year",        "1968"],
-    ["Lot",         "7,200 sqft"],
-  ],
+  arv: "$685,000", arvPct: "77% ARV",
+  priceHist: [["Original list","$549,000"],["Drop 03/20/26","$525,000 (-4.4%)"]],
+  priceTotal: "-$24,000 (-4.4%)",
 
-  arv:    "$680,000",
-  arvPct: "77% ARV",
+  pain: "mid", painLabel: "Mid",
+  painSig: [["Flagged","Open liens"],["Liens","Mechanic's lien"],["Debt","High (LTV >80%)"],["Mortgage","Adjustable rate"],["Propensity","6 / 10"]],
 
-  priceHist: [
-    ["Original list", "$549,900"],
-    ["10/01",         "$535,000"],
-    ["10/18",         "$525,000"],
-  ],
-  priceTotal: "-$24,900",
-
-  pain:      "mid",
-  painLabel: "Mid",
-  painSig: [
-    ["DOM",          "47"],
-    ["Price drops",  "2"],
-    ["Showings/wk",  "1.2"],
-  ],
-
-  agent:      "not-responsive",
-  agentLabel: "Not Responsive",
-  agentComms: [
-    ["04/19", "Call — no answer, no VM"],
-    ["04/20", "Text — delivered, no reply"],
-    ["04/22", "Email — opened, no reply"],
-  ],
+  agent: "not-responsive", agentLabel: "Not Responsive",
+  agentComms: [["Text 04/22","No reply (Angela)"],["Email 04/22","Opened, no reply (Angela)"],["Text 04/21","No reply (Angela)"],["Email 04/20","No reply (Angela)"],["Text 04/20","No reply (Angela)"]],
   agentRate: "0%",
 
-  kw:       "mid",
-  kwLabel:  "Mid",
-  pubCmt:   `Charming home in established neighborhood. <span class="kw">Motivated seller</span>, bring all offers.`,
-  agtCmt:   `<span class="kw">Vacant</span>, lockbox on front door. Go direct.`,
+  // HIGH keywords — dot AND label render red (#E24B4A) via KW_TEXT.
+  kw: "high", kwLabel: "High",
+  pubCmt: 'Riverside two-story on a quiet cul-de-sac. <span class="kw">MOTIVATED SELLER</span> — bring all offers. Original owner, some deferred maintenance, priced to move.',
+  agtCmt: '<span class="kw">AS-IS CASH ONLY</span>. <span class="kw">SELLER MUST SELL</span> — relocating out of state. Submit with POF and 7-day close.',
 
-  opened:          "04/22",
-  called:          "—",
-  firstOpened:     "04/12",
-  totalOpens:      6,
-  firstCalled:     "—",
-  totalCommsCount: 4,
-  totalCalls:      1,
-  totalTexts:      1,
-  totalEmails:     2,
+  opened: "04/22", called: "—",
+  firstOpened: "02/20/26", totalOpens: 9,
+  firstCalled: "—", totalCommsCount: 6, totalCalls: 0, totalTexts: 3, totalEmails: 3,
 
-  pct:        "15%",
-  status:     "Outreach Sent",
-  statusType: "init",
-  source:     "MLS — Active",
-  negotiator: "Josh Santos",
-  assigned:   "Josh Santos",
+  pct: "15%", status: "Outreach Sent", statusType: "init",
+  source: "MLS — Active", negotiator: "Josh Santos", assigned: "Josh Santos",
 
-  // Agent deal track record (ISC · Active Nyr · A/P/B/S)
-  isc:          19,
-  activeYears:  "2yr",
-  trackActive:  7,
-  trackPending: 3,
-  trackBackup:  0,
-  trackSold:    54,
-  trackTotal:   57,
+  isc: 11,
+  activeYears: "2yr",
+  trackActive: 5, trackPending: 8, trackBackup: 2, trackSold: 41,
+  trackTotal: 56,
 };
+
+const SAMPLE_CARDS = [
+  { property: property1, detail: detail1 },
+  { property: property2, detail: detail2 },
+  { property: property3, detail: detail3 },
+];
 
 export default function App() {
   return (
     <div className="min-h-screen bg-white p-8">
-      <div className="max-w-5xl mx-auto border border-gray-200 rounded-lg">
-        <DealCard property={property} detail={detail} />
+      <div className="max-w-5xl mx-auto border border-gray-200 rounded-lg divide-y divide-gray-200">
+        {SAMPLE_CARDS.map(({ property, detail }) => (
+          <DealCard key={property.id} property={property} detail={detail} />
+        ))}
       </div>
     </div>
   );
 }
 ```
 
-Run `npm run dev` and you should see the row exactly as in the screenshot.
+Run `npm run dev` and you should see all three cards stacked, each
+demonstrating a different combination of color rules.
 
 ---
 
@@ -946,14 +1073,14 @@ The tooltip content sources:
 | 1   | Inline flag `Critical` / `Reminder`  | none — plain word       | rendered when `notifications` includes `"critical"` (red) or `"reminder"` (blue)       |
 | 2 (property) | Address                       | `Property`              | `prop` rows                                                                            |
 | 2 (property) | Sales-type code (e.g. `STD`)  | `Sales Type`            | code + full label, property type                                                       |
-| 2 (property) | `● Keywords: Mid` (next to STD) | `Listing Remarks`     | `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills                         |
+| 2 (property) | `● Keywords: Mid` (next to STD) | `Listing Remarks`     | dot color from `KW_DOT[detail.kw]`, label color from `KW_TEXT[detail.kw]` (high = **red #E24B4A semibold**, mid = amber #BA7517, low = gray #B4B2A9). Tooltip: `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills |
 | 2 (property) | `Source: MLS — Active`        | `Source`                | source / status / negotiator / assigned                                                |
 | 3 (deal)     | `525k` (semibold, gray-900, no `$`) | `Price History`   | `priceHist` + `priceTotal`. Rendered via `compactPrice(property.price)` — drops `$`, collapses zeros to `k` / `m` |
 | 3 (deal)     | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
 | 3 (deal)     | `● Pain: Mid` (after ARV)     | `Seller Pain`           | dot color from `PAIN_DOT[detail.pain]`, label from `detail.painLabel`, tooltip rows from `detail.painSig`. Mirrors the Row 1 chip — Row 1 is the at-a-glance signal, this is the inline data label. |
 | 3 (deal)     | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
-| 3 (deal)     | `ISC: 19`                     | `Investor Sourced Count` | `isc` + plain-English meaning ("Number of deals this agent has sourced to investors.") |
-| 3 (deal)     | `7A/3P/0B/54S` (`7A` orange when > 0) | `Deal Track Record` | `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable). The Active count is wrapped in `<span class="text-[#D67432] font-semibold">` whenever `trackActive > 0` — open deals are the only piece needing immediate attention. |
+| 3 (deal)     | `ISC: 19`                     | `Investor Sourced Count` | `isc` + plain-English meaning. **Color:** `0` renders the number gray (`text-gray-400`) — agent has never sourced a deal, nothing to drill into. Any positive count renders the number in hyperlink blue (`text-[#2F86D6]`) to signal it's drillable history. |
+| 3 (deal)     | `7A/3P/0B/54S` (`7A` orange when > 0) | `Deal Track Record` | `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable). The Active count is wrapped in `<span class="text-[#D67432] font-semibold">` whenever `trackActive > 0` — open deals are the only piece needing immediate attention. When `trackActive === 0`, the `0A` renders in the same plain gray as the rest of the row. |
 | Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / negotiator / assigned                            |
 | Right | `Opened 04/22` (plain colored text — green / yellow / red) | `Open History` (right-aligned) | first / last / total opens. Color via `gradeFreshness(detail.opened)` — green ≤3d, yellow 4–7d, red >7d / `—`. **No pill, no box.** |
 | Right | `Called —` (plain colored text — green / yellow / red)     | `Communication History` (right-aligned) | first / last + per-channel calls/texts/emails. Same `gradeFreshness()` rule on `detail.called`. **No pill, no box.** |
@@ -966,14 +1093,23 @@ The tooltip content sources:
 
 | Status     | Color      |
 |------------|------------|
-| Positive / Responsive / High keywords | `#639922` (green) |
+| Positive / Responsive                 | `#639922` (green) |
 | Mid pain / Mid keywords               | `#BA7517` (amber) |
 | Neutral / Low / None                  | `#B4B2A9` (gray)  |
-| Negative / Not responsive / High pain / `Critical` flag | `#E24B4A` (red) |
-| `Reminder` flag                       | `#2F86D6` (blue)  |
+| Negative / Not responsive / **High pain** / **High keywords** / `Critical` flag | `#E24B4A` (red) |
+| `Reminder` flag / **ISC > 0** (drillable hyperlink) | `#2F86D6` (blue)  |
+| **ISC = 0** / **0A track-record** (no activity) | `text-gray-400` (colorless) |
+| Track Record `xA` highlight when `> 0` | `#D67432` (orange, semibold) |
 | Freshness text — fresh (≤3d)          | `#476B14` (dark green)  |
 | Freshness text — stale (4–7d)         | `#8B6210` (dark yellow) |
 | Freshness text — cold (>7d, `—`, `N/A`) | `#A33232` (dark red)  |
+
+**Key rules to keep all three cards consistent:**
+- `Keywords: High` → red dot **and** red semibold label (`KW_TEXT.high`).
+- `Keywords: Mid` → amber dot + amber label.
+- `Keywords: Low` → gray dot + gray label.
+- `ISC: 0` → number is gray (`text-gray-400`); `ISC > 0` → number is hyperlink blue (`text-[#2F86D6]`).
+- `xA` in `xA / yP / zB / wS` → orange `#D67432` + semibold when `trackActive > 0`; plain gray when `0A`.
 
 To add more sentiment dots, just push to the `channels` array inside
 `ChannelChips` or extend the `*_DOT` maps. To add new inline flag
