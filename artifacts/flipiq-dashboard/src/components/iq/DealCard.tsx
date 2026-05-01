@@ -346,7 +346,8 @@ export default function DealCard({ property }: { property: DealProperty }) {
           </button>
           <DrillMenu open={menuOpen} onClose={() => setMenuOpen(false)} onCall={triggerCall} />
         </div>
-        <div className="relative group mt-1">
+        {/* Chat icon — sits directly under the 3-dots kebab in the left rail. */}
+        <div className="relative group">
           <button type="button" className="text-gray-400 hover:text-gray-700 cursor-pointer">
             {ICON.chat}
           </button>
