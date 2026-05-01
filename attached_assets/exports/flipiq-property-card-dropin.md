@@ -5,8 +5,8 @@ property row in the screenshot:
 
 > ☐  📞 **No response — send offer**  📞● 💬● ✉●  **Critical** **Reminder**            15% Outreach Sent ▾
 >                                                                                          Opened 04/22 · Called —
-> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: Mid · Source: MLS — Active · ● Pain: Mid · **$525,000** · 77% ARV
-> 💬  ● Agent: Not Responsive · ISC: 19 · 7A / 3P / 0B / 54S
+> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: Mid · Source: MLS — Active · **$525,000** · 77% ARV
+> 💬  ● Pain: Mid · ● Agent: Not Responsive · ISC: 19 · 7A / 3P / 0B / 54S
 
 Every chip / icon / value has a hover tooltip:
 - **Next Step** — task / who / what / how / context
@@ -39,18 +39,29 @@ Detailed Analysis).
    `60% In Negotiations ▾` on top, then a small muted
    `Opened 04/22 · Called —` underneath. Same mental beat: where am
    I, when was I last here.
-3. **Meta block — two forced lines** (separate `<div>`s, no wrap):
-   The information is grouped by *what mental question it answers* so
-   the rep's eye scans top-to-bottom in priority order.
-   - **Line 1 — property (what is it + what's the math):** Address →
+3. **Meta block — two forced lines** (separate `<div>`s).
+   Grouped by *what mental question it answers* so the rep's eye scans
+   top-to-bottom in priority order.
+   - **Line 1 — property (asset facts + deal math):** Address →
      world-icon → sales type → **Keywords** (next to sales type —
-     keywords are *property* data) → Source/status → Pain → **Price**
+     keywords are *property* data) → Source/status → **Price**
      (semibold, gray-900) → ARV %. Price/ARV live with the property
-     because they *are* a property attribute (the deal math).
-   - **Line 2 — agent (who's gating it):** Agent responsiveness → ISC →
-     Deal Track Record (A/P/B/S). "Active Nyr" is intentionally omitted
-     — tenure isn't actionable; the A/P/B/S breakdown already conveys
-     experience.
+     because they *are* a property attribute (the deal math). This row
+     is **`flex-nowrap` + `whitespace-nowrap`** with the address as the
+     only `min-w-0 truncate` child — every other chip is `shrink-0`.
+     Result: the property row is **always exactly one visual line**;
+     the address truncates with `…` on narrow viewports (full address
+     still in the hover tooltip) instead of letting `77% ARV` orphan
+     to a 4th line.
+   - **Line 2 — humans (who you're dealing with):** ● **Pain** (seller
+     motivation) → ● **Agent** (responsiveness / gatekeeper) → ISC →
+     Deal Track Record (A/P/B/S). Pain lives here, not on the property
+     line, because it's a *human* signal — same family as agent
+     responsiveness. Keeping it here also guarantees Pain appears in
+     the *same position on every card* (the property row is variable
+     width, so anything tacked on the end of it shifted around). "Active
+     Nyr" is intentionally omitted — tenure isn't actionable; A/P/B/S
+     already conveys experience.
    `Opened` and `Called` are deliberately *not* here — they're
    recency data and live with the offer status on the right.
 
@@ -529,17 +540,21 @@ export default function DealCard({
           )}
         </div>
 
-        {/* Line 1 — property identity (no price/ARV) */}
-        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
-          <span className="relative group cursor-help">
+        {/* Line 1 — property (asset facts + deal math).
+            flex-nowrap + whitespace-nowrap + min-w-0 truncate on the address
+            keep this row on EXACTLY one visual line — the address gets `…`
+            on narrow viewports (full text in the hover tooltip) instead of
+            `77% ARV` orphaning to a 4th line. */}
+        <div className="flex items-center flex-nowrap min-w-0 gap-x-2 text-[13px] text-gray-700 leading-6 whitespace-nowrap">
+          <span className="relative group cursor-help min-w-0 truncate">
             <span className="group-hover:text-gray-900">{property.address}</span>
             <TipPanel title="Property" rows={detail.prop} />
           </span>
-          <button type="button" className="text-gray-400 hover:text-orange-500 cursor-pointer">
+          <button type="button" className="shrink-0 text-gray-400 hover:text-orange-500 cursor-pointer">
             {ICON.globe}
           </button>
-          <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help text-gray-700 font-medium hover:text-gray-900">
+          <span className="shrink-0 text-gray-300">·</span>
+          <span className="shrink-0 relative group cursor-help text-gray-700 font-medium hover:text-gray-900">
             {property.type}
             <TipPanel
               title="Sales Type"
@@ -549,9 +564,9 @@ export default function DealCard({
               ]}
             />
           </span>
-          <span className="text-gray-300">·</span>
+          <span className="shrink-0 text-gray-300">·</span>
           {/* Keywords — right after sales type (it's property data) */}
-          <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
+          <span className="shrink-0 relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
             Keywords: {detail.kwLabel}
             <TipPanel title="Listing Remarks" wide>
@@ -561,8 +576,8 @@ export default function DealCard({
               <KwHtml html={detail.agtCmt} />
             </TipPanel>
           </span>
-          <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help text-gray-500 hover:text-gray-900">
+          <span className="shrink-0 text-gray-300">·</span>
+          <span className="shrink-0 relative group cursor-help text-gray-500 hover:text-gray-900">
             Source:{" "}
             <span className="text-gray-700 font-medium">
               {property.source.replace(/\s*—\s*.*$/, "")}
@@ -581,27 +596,29 @@ export default function DealCard({
               ]}
             />
           </span>
-          <span className="text-gray-300">·</span>
+          <span className="shrink-0 text-gray-300">·</span>
+          {/* Price / ARV live on the property line — they ARE property attributes (deal math) */}
+          <span className="shrink-0 relative group cursor-help font-semibold text-gray-900">
+            {property.price}
+            <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />
+          </span>
+          <span className="shrink-0 text-gray-300">·</span>
+          <span className="shrink-0 relative group cursor-help font-medium text-gray-700">
+            {detail.arvPct}
+            <TipPanel title="ARV" rows={[["Asking", property.price], ["ARV", detail.arv], ["Asking vs ARV", detail.arvPct]]} />
+          </span>
+        </div>
+
+        {/* Line 2 — humans (seller motivation + agent gatekeeper).
+            Pain lives here, NOT on the property row, so its position is
+            consistent across cards (the property row is variable width). */}
+        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
           <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
             Pain: {detail.painLabel}
             <TipPanel title="Seller Pain" rows={detail.painSig} />
           </span>
           <span className="text-gray-300">·</span>
-          {/* Price / ARV live on the property line — they ARE property attributes (deal math) */}
-          <span className="relative group cursor-help font-semibold text-gray-900">
-            {property.price}
-            <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />
-          </span>
-          <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help font-medium text-gray-700">
-            {detail.arvPct}
-            <TipPanel title="ARV" rows={[["Asking", property.price], ["ARV", detail.arv], ["Asking vs ARV", detail.arvPct]]} />
-          </span>
-        </div>
-
-        {/* Line 2 — agent (who's gating the deal) */}
-        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
           <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${AGENT_DOT[detail.agent]}`} />
             Agent: {detail.agentLabel}
@@ -846,12 +863,12 @@ The tooltip content sources:
 | 2 (property) | Sales-type code (e.g. `STD`)  | `Sales Type`            | code + full label, property type                                                       |
 | 2 (property) | `● Keywords: Mid` (next to STD) | `Listing Remarks`     | `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills                         |
 | 2 (property) | `Source: MLS — Active`        | `Source`                | source / status / negotiator / assigned                                                |
-| 2 (property) | `● Pain: Mid`                 | `Seller Pain`           | `painSig` (DOM, drops, equity, propensity, …)                                          |
 | 2 (property) | `$525,000` (semibold, gray-900) | `Price History`       | `priceHist` + `priceTotal` — price is a property attribute (deal math)                 |
 | 2 (property) | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
-| 3 (agent)    | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
-| 3 (agent)    | `ISC: 19`                     | `Investor Sourced Count` | `isc` + plain-English meaning ("Number of deals this agent has sourced to investors.") |
-| 3 (agent)    | `7A/3P/0B/54S`                | `Deal Track Record`     | `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable) |
+| 3 (humans)   | `● Pain: Mid`                 | `Seller Pain`           | `painSig` (DOM, drops, equity, propensity, …) — seller motivation, lives with humans   |
+| 3 (humans)   | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
+| 3 (humans)   | `ISC: 19`                     | `Investor Sourced Count` | `isc` + plain-English meaning ("Number of deals this agent has sourced to investors.") |
+| 3 (humans)   | `7A/3P/0B/54S`                | `Deal Track Record`     | `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable) |
 | Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / negotiator / assigned                            |
 | Right | `Opened 04/22` (under offer status) | `Open History` (right-aligned) | first / last / total opens                                                  |
 | Right | `Called —` (under offer status)    | `Communication History` (right-aligned) | first / last + per-channel calls/texts/emails                          |
