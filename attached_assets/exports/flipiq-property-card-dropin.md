@@ -4,7 +4,9 @@ A single self-contained React + TypeScript component that reproduces the
 property row in the screenshot:
 
 > ☐  📞 **No response — send offer**  📞● 💬● ✉●  **Critical** **Reminder**            15% Outreach Sent ▾
-> ⋮💬 1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: Mid · Source: MLS — Active · $525,000 · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: 19 · Active 2yr · 7A / 3P / 0B / 54S · Opened 04/22 · Called —
+>                                                                                          Opened 04/22 · Called —
+> ⋮💬 1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: Mid · Source: MLS — Active · $525,000 · 77% ARV · ● Pain: Mid
+>      ● Agent: Not Responsive · ISC: 19 · Active 2yr · 7A / 3P / 0B / 54S
 
 Every chip / icon / value has a hover tooltip:
 - **Next Step** — task / who / what / how / context
@@ -25,19 +27,25 @@ Every chip / icon / value has a hover tooltip:
 The kebab opens a 3-column drill menu (Communication, Quick Links,
 Detailed Analysis).
 
-**Layout / UX ordering** (2 visual lines below the CTA, not 3):
+**Layout / UX ordering** — built for an acquisition rep's scan path:
+*"do I act now → is the property worth my time → who's the agent → where is the deal"*.
 
-1. **Row 1 (the action):** Call CTA → next-step text → channel chips
+1. **Row 1 — action (left):** Call CTA → next-step text → channel chips
    (call/text/email + sentiment dot, *after* the response) → optional
    inline flags `Critical` (red) / `Reminder` (blue) as plain words —
    no pill, no box.
-2. **Row 2 (everything else, wraps to 2 visual lines):** Address →
-   world-icon → sales type → **Keywords** (next to sales type — keywords
-   are *property* data) → Source/status → asking price → ARV % → Pain →
-   Agent responsiveness → ISC / Active years / Deal Track Record →
-   Opened → Called. Reads left → right: where → what type → how the
-   listing reads → where it came from → what it costs → motivation →
-   who the agent is → their volume → comms recency.
+2. **Right column — status + recency (right-aligned, stacked):**
+   `60% In Negotiations ▾` on top, then a small muted
+   `Opened 04/22 · Called —` underneath. Same mental beat: where am
+   I, when was I last here.
+3. **Meta wrap row (everything else, naturally splits to 2 visual lines):**
+   - **Line A — property:** Address → world-icon → sales type →
+     **Keywords** (next to sales type — keywords are *property* data) →
+     Source/status → asking price → ARV % → Pain.
+   - **Line B — agent:** Agent responsiveness → ISC / Active years /
+     Deal Track Record (A/P/B/S).
+   `Opened` and `Called` are deliberately *not* here — they're
+   recency data and live with the offer status on the right.
 
 The whole thing has **zero project-specific imports**. Just React,
 TypeScript, and Tailwind. Drop it into any Replit React project.
@@ -614,22 +622,6 @@ export default function DealCard({
               ]}
             />
           </span>
-          <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help text-[12px] text-gray-500 hover:text-gray-900">
-            Opened <span className="font-medium text-gray-700">{detail.opened}</span>
-            <TipPanel title="Open History" rows={[["First opened", detail.firstOpened], ["Last opened", detail.opened], ["Total opens", String(detail.totalOpens)]]} />
-          </span>
-          <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help text-[12px] text-gray-500 hover:text-gray-900">
-            Called <span className="font-medium text-gray-700">{detail.called}</span>
-            <TipPanel title="Communication History" rows={[["First call", detail.firstCalled], ["Last call", detail.called], ["Total comms", String(detail.totalCommsCount)]]}>
-              <div className="mt-1.5 pt-1.5 border-t border-gray-200">
-                <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Calls</span><span className="text-gray-900 font-medium">{detail.totalCalls}</span></div>
-                <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Texts</span><span className="text-gray-900 font-medium">{detail.totalTexts}</span></div>
-                <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Emails</span><span className="text-gray-900 font-medium">{detail.totalEmails}</span></div>
-              </div>
-            </TipPanel>
-          </span>
         </div>
 
         {/* Post-call nudge */}
@@ -644,9 +636,9 @@ export default function DealCard({
         )}
       </div>
 
-      {/* Status */}
-      <div className="flex items-start pt-1">
-        <span className={`relative group cursor-pointer inline-flex items-center gap-1 text-[12px] font-medium whitespace-nowrap hover:text-gray-900 ${STATUS_PILL[detail.statusType]}`}>
+      {/* Status + recency (last touched) — the right-side "where am I" column */}
+      <div className="flex flex-col items-end pt-1 gap-0.5 whitespace-nowrap">
+        <span className={`relative group cursor-pointer inline-flex items-center gap-1 text-[12px] font-medium hover:text-gray-900 ${STATUS_PILL[detail.statusType]}`}>
           <span className="font-semibold">{detail.pct}</span>
           <span>{detail.status}</span>
           {ICON.caret}
@@ -661,6 +653,29 @@ export default function DealCard({
             ]}
           />
         </span>
+        <div className="inline-flex items-center gap-1.5 text-[11.5px] text-gray-500">
+          <span className="relative group cursor-help hover:text-gray-900">
+            Opened <span className="font-medium text-gray-700">{detail.opened}</span>
+            <TipPanel
+              title="Open History" align="right"
+              rows={[["First opened", detail.firstOpened], ["Last opened", detail.opened], ["Total opens", String(detail.totalOpens)]]}
+            />
+          </span>
+          <span className="text-gray-300">·</span>
+          <span className="relative group cursor-help hover:text-gray-900">
+            Called <span className="font-medium text-gray-700">{detail.called}</span>
+            <TipPanel
+              title="Communication History" align="right"
+              rows={[["First call", detail.firstCalled], ["Last call", detail.called], ["Total comms", String(detail.totalCommsCount)]]}
+            >
+              <div className="mt-1.5 pt-1.5 border-t border-gray-200">
+                <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Calls</span><span className="text-gray-900 font-medium">{detail.totalCalls}</span></div>
+                <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Texts</span><span className="text-gray-900 font-medium">{detail.totalTexts}</span></div>
+                <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Emails</span><span className="text-gray-900 font-medium">{detail.totalEmails}</span></div>
+              </div>
+            </TipPanel>
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -817,9 +832,9 @@ The tooltip content sources:
 | 2   | `● Pain: Mid`                        | `Seller Pain`           | `painSig` (DOM, drops, equity, propensity, …)                                          |
 | 2   | `● Agent: Not Responsive`            | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
 | 2   | `ISC: 19 · Active 2yr · 7A/3P/0B/54S`| `Deal Track Record`     | `isc`, `activeYears`, `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` |
-| 2   | `Opened 04/22`                       | `Open History`          | first / last / total opens                                                             |
-| 2   | `Called —`                           | `Communication History` | first / last + per-channel calls/texts/emails                                          |
 | Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / negotiator / assigned                            |
+| Right | `Opened 04/22` (under offer status) | `Open History` (right-aligned) | first / last / total opens                                                  |
+| Right | `Called —` (under offer status)    | `Communication History` (right-aligned) | first / last + per-channel calls/texts/emails                          |
 | Kebab (⋮) | (click to open)                | drill menu              | 3 cols: Communication / Quick Links / Detailed Analysis + footer "Auto Tracker"        |
 | 💬 chat icon                          | inline tooltip          | "View conversations"                                                                   |
 

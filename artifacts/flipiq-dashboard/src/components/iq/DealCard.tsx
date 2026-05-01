@@ -456,22 +456,6 @@ export default function DealCard({ property }: { property: DealProperty }) {
               ]}
             />
           </span>
-          <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help text-[12px] text-gray-500 hover:text-gray-900">
-            Opened <span className="font-medium text-gray-700">{detail.opened}</span>
-            <TipPanel title="Open History" rows={[["First opened", detail.firstOpened], ["Last opened", detail.opened], ["Total opens", String(detail.totalOpens)]]} />
-          </span>
-          <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help text-[12px] text-gray-500 hover:text-gray-900">
-            Called <span className="font-medium text-gray-700">{detail.called}</span>
-            <TipPanel title="Communication History" rows={[["First call", detail.firstCalled], ["Last call", detail.called], ["Total comms", String(detail.totalCommsCount)]]}>
-              <div className="mt-1.5 pt-1.5 border-t border-gray-200">
-                <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Calls</span><span className="text-gray-900 font-medium">{detail.totalCalls}</span></div>
-                <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Texts</span><span className="text-gray-900 font-medium">{detail.totalTexts}</span></div>
-                <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Emails</span><span className="text-gray-900 font-medium">{detail.totalEmails}</span></div>
-              </div>
-            </TipPanel>
-          </span>
         </div>
 
         {/* Post-call nudge */}
@@ -498,9 +482,9 @@ export default function DealCard({ property }: { property: DealProperty }) {
         )}
       </div>
 
-      {/* Status */}
-      <div className="flex items-start pt-1">
-        <span className={`relative group cursor-pointer inline-flex items-center gap-1 text-[12px] font-medium whitespace-nowrap hover:text-gray-900 ${STATUS_PILL[detail.statusType]}`}>
+      {/* Status + recency (last touched) */}
+      <div className="flex flex-col items-end pt-1 gap-0.5 whitespace-nowrap">
+        <span className={`relative group cursor-pointer inline-flex items-center gap-1 text-[12px] font-medium hover:text-gray-900 ${STATUS_PILL[detail.statusType]}`}>
           <span className="font-semibold">{detail.pct}</span>
           <span>{detail.status}</span>
           {ICON.caret}
@@ -516,6 +500,31 @@ export default function DealCard({ property }: { property: DealProperty }) {
             ]}
           />
         </span>
+        <div className="inline-flex items-center gap-1.5 text-[11.5px] text-gray-500">
+          <span className="relative group cursor-help hover:text-gray-900">
+            Opened <span className="font-medium text-gray-700">{detail.opened}</span>
+            <TipPanel
+              title="Open History"
+              align="right"
+              rows={[["First opened", detail.firstOpened], ["Last opened", detail.opened], ["Total opens", String(detail.totalOpens)]]}
+            />
+          </span>
+          <span className="text-gray-300">·</span>
+          <span className="relative group cursor-help hover:text-gray-900">
+            Called <span className="font-medium text-gray-700">{detail.called}</span>
+            <TipPanel
+              title="Communication History"
+              align="right"
+              rows={[["First call", detail.firstCalled], ["Last call", detail.called], ["Total comms", String(detail.totalCommsCount)]]}
+            >
+              <div className="mt-1.5 pt-1.5 border-t border-gray-200">
+                <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Calls</span><span className="text-gray-900 font-medium">{detail.totalCalls}</span></div>
+                <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Texts</span><span className="text-gray-900 font-medium">{detail.totalTexts}</span></div>
+                <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Emails</span><span className="text-gray-900 font-medium">{detail.totalEmails}</span></div>
+              </div>
+            </TipPanel>
+          </span>
+        </div>
       </div>
     </div>
   );
