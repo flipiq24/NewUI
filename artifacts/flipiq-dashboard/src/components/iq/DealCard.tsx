@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, type ReactNode } from "react";
 import type { DealProperty, ResponseStatus } from "@/lib/iq/mockData";
 import { useDailyChecklist } from "@/lib/iq/dailyChecklist";
-import { DEAL_DETAILS, type DealDetail } from "@/lib/iq/dealDetails";
+import { DEAL_DETAILS, type DealDetail, type CommLog } from "@/lib/iq/dealDetails";
 
 const RESPONSE_DOT: Record<ResponseStatus, string> = {
   positive: "bg-[#639922]",
@@ -225,25 +225,193 @@ const ICON = {
   chMail: <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3 h-3"><rect x="2" y="3.5" width="12" height="9" rx="1" /><polyline points="2.5,4.5 8,9 13.5,4.5" strokeLinecap="round" /></svg>,
 };
 
-function ChannelChips({ property }: { property: DealProperty }) {
-  const channels: { key: string; icon: ReactNode; label: string; status: ResponseStatus }[] = [];
-  if (property.callResponse) channels.push({ key: "call", icon: ICON.chPhone, label: "Call", status: property.callResponse });
-  if (property.textResponse) channels.push({ key: "text", icon: ICON.chText, label: "Text", status: property.textResponse });
-  if (property.emailResponse) channels.push({ key: "email", icon: ICON.chMail, label: "Email", status: property.emailResponse });
+/**
+ * Channel preview rendered inside the chip's hover tooltip.
+ * Shows the last outbound message we sent and the last inbound reply,
+ * so the rep can scan thread state without opening the modal.
+ */
+function ChannelPreview({ log }: { log?: CommLog }) {
+  if (!log || (!log.lastSent && !log.lastReply)) {
+    return (
+      <div className="text-[12px] text-gray-500 italic">
+        No messages yet on this channel.
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-2">
+      {log.lastSent && (
+        <div>
+          <div className="flex justify-between gap-3 text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
+            <span>Last sent</span><span>{log.lastSent.ts}</span>
+          </div>
+          <div className="text-[12px] text-gray-900 leading-snug mt-0.5">
+            {log.lastSent.body}
+          </div>
+        </div>
+      )}
+      {log.lastReply && (
+        <div>
+          <div className="flex justify-between gap-3 text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
+            <span>Last reply</span><span>{log.lastReply.ts}</span>
+          </div>
+          <div className="text-[12px] text-gray-900 leading-snug mt-0.5">
+            {log.lastReply.body}
+          </div>
+        </div>
+      )}
+      <div className="pt-1.5 border-t border-gray-200 text-[10px] uppercase tracking-wider text-orange-600 font-semibold">
+        Click to open communication →
+      </div>
+    </div>
+  );
+}
+
+type ChannelKey = "call" | "text" | "email";
+
+function ChannelChips({
+  property,
+  detail,
+  onOpenComm,
+}: {
+  property: DealProperty;
+  detail: DealDetail;
+  onOpenComm: (channel: ChannelKey) => void;
+}) {
+  const channels: { key: ChannelKey; icon: ReactNode; label: string; status: ResponseStatus }[] = [];
+  if (property.callResponse)  channels.push({ key: "call",  icon: ICON.chPhone, label: "Call",  status: property.callResponse });
+  if (property.textResponse)  channels.push({ key: "text",  icon: ICON.chText,  label: "Text",  status: property.textResponse });
+  if (property.emailResponse) channels.push({ key: "email", icon: ICON.chMail,  label: "Email", status: property.emailResponse });
   if (channels.length === 0) return null;
   return (
     <span className="inline-flex items-center gap-2.5">
       {channels.map((c) => (
-        <span
-          key={c.key}
-          title={`${c.label}: ${RESPONSE_LABEL[c.status]}`}
-          className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-800 cursor-help"
-        >
-          {c.icon}
-          <span className={`w-1.5 h-1.5 rounded-full ${RESPONSE_DOT[c.status]}`} />
+        <span key={c.key} className="relative group inline-flex items-center">
+          <button
+            type="button"
+            onClick={() => onOpenComm(c.key)}
+            className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-800 cursor-pointer"
+            aria-label={`Open ${c.label} thread`}
+          >
+            {c.icon}
+            <span className={`w-1.5 h-1.5 rounded-full ${RESPONSE_DOT[c.status]}`} />
+          </button>
+          <TipPanel title={`${c.label} — ${RESPONSE_LABEL[c.status]}`} wide>
+            <ChannelPreview log={detail.commLog?.[c.key]} />
+          </TipPanel>
         </span>
       ))}
     </span>
+  );
+}
+
+const COMM_LABEL: Record<ChannelKey, string> = { call: "Call", text: "Text", email: "Email" };
+
+/**
+ * Modal that opens when a chip is clicked. Shows the most recent
+ * outbound + inbound for the selected channel and a no-op composer.
+ * Closes on overlay click, Escape, or the X button.
+ */
+function CommunicationDialog({
+  open,
+  channel,
+  detail,
+  property,
+  onClose,
+}: {
+  open: boolean;
+  channel: ChannelKey | null;
+  detail: DealDetail;
+  property: DealProperty;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open || !channel) return null;
+  const log = detail.commLog?.[channel];
+  const placeholder =
+    channel === "call"  ? "Log a quick call note…"
+  : channel === "text"  ? "Type your text message…"
+                        : "Compose your email…";
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+          <div>
+            <div className="text-[11px] uppercase tracking-wider text-orange-600 font-semibold">
+              {COMM_LABEL[channel]} thread
+            </div>
+            <div className="text-[13px] text-gray-900 font-medium mt-0.5">
+              {property.address}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-700 text-xl leading-none cursor-pointer"
+            aria-label="Close"
+          >×</button>
+        </div>
+        <div className="px-4 py-3 max-h-[50vh] overflow-y-auto space-y-3">
+          {log?.lastSent && (
+            <div className="flex flex-col items-end">
+              <div className="max-w-[80%] bg-orange-50 border border-orange-200 text-gray-900 text-[13px] rounded-lg px-3 py-2">
+                {log.lastSent.body}
+              </div>
+              <div className="text-[10px] text-gray-400 mt-1">
+                You · {log.lastSent.ts}
+              </div>
+            </div>
+          )}
+          {log?.lastReply && (
+            <div className="flex flex-col items-start">
+              <div className="max-w-[80%] bg-gray-100 border border-gray-200 text-gray-900 text-[13px] rounded-lg px-3 py-2">
+                {log.lastReply.body}
+              </div>
+              <div className="text-[10px] text-gray-400 mt-1">
+                {detail.taskWho ?? "Agent"} · {log.lastReply.ts}
+              </div>
+            </div>
+          )}
+          {!log?.lastSent && !log?.lastReply && (
+            <div className="text-[12px] text-gray-500 italic text-center py-6">
+              No {COMM_LABEL[channel].toLowerCase()} history yet.
+            </div>
+          )}
+        </div>
+        <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
+          <textarea
+            placeholder={placeholder}
+            className="w-full text-[13px] border border-gray-300 rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-orange-300"
+            rows={2}
+          />
+          <div className="flex justify-end gap-2 mt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-[12px] px-3 py-1.5 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 cursor-pointer"
+            >Cancel</button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-[12px] px-3 py-1.5 bg-orange-500 text-white rounded-md hover:bg-orange-600 cursor-pointer"
+            >Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -316,6 +484,11 @@ export default function DealCard({ property }: { property: DealProperty }) {
   const detail = DEAL_DETAILS[property.id] ?? fallbackDetail(property);
   const [menuOpen, setMenuOpen] = useState(false);
   const [nudgeOpen, setNudgeOpen] = useState(false);
+  /**
+   * Which channel modal is open, if any. Set by the chip click handler;
+   * `null` keeps the dialog hidden.
+   */
+  const [commChannel, setCommChannel] = useState<ChannelKey | null>(null);
   const rowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -415,7 +588,11 @@ export default function DealCard({ property }: { property: DealProperty }) {
             />
           </span>
           {/* Channel chips after the next-step response */}
-          <ChannelChips property={property} />
+          <ChannelChips
+            property={property}
+            detail={detail}
+            onOpenComm={setCommChannel}
+          />
           {/* Plain inline flags (no box, no pill) */}
           {property.notifications?.includes("critical") && (
             <span className="text-[12px] font-semibold text-[#E24B4A]">Critical</span>
@@ -634,6 +811,13 @@ export default function DealCard({ property }: { property: DealProperty }) {
           </span>
         </div>
       </div>
+      <CommunicationDialog
+        open={commChannel !== null}
+        channel={commChannel}
+        detail={detail}
+        property={property}
+        onClose={() => setCommChannel(null)}
+      />
     </div>
   );
 }

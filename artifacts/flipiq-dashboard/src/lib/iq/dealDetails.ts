@@ -1,3 +1,18 @@
+/**
+ * One side of a channel exchange — either the last outbound message
+ * we sent or the last inbound reply we got back. `body` is plain text;
+ * the modal & tooltip both render it as-is.
+ */
+export type CommEntry = { ts: string; body: string };
+
+/**
+ * Per-channel thread log shown in the chip hover preview AND inside the
+ * communication modal. Either side can be missing (e.g. they replied
+ * without us having sent anything via that channel, or we sent but
+ * they never responded).
+ */
+export type CommLog = { lastSent?: CommEntry; lastReply?: CommEntry };
+
 export type DealDetail = {
   taskNote: string;
   prop: [string, string][];
@@ -41,6 +56,11 @@ export type DealDetail = {
   trackBackup?: number;
   trackSold?: number;
   trackTotal?: number;
+  /**
+   * Last sent / last reply per channel, surfaced via the chip hover
+   * preview on Row 1 and the full thread inside the comm modal.
+   */
+  commLog?: { call?: CommLog; text?: CommLog; email?: CommLog };
 };
 
 export const DEAL_DETAILS: Record<number, DealDetail> = {
@@ -68,6 +88,20 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     taskHow: "Call the agent, anchor at $399k, offer 7-day close + cash-equivalent EMD, then send updated PSA by EOD.",
     isc: 24,
     trackActive: 12, trackPending: 4, trackBackup: 1, trackSold: 87,
+    commLog: {
+      call: {
+        lastSent:  { ts: "04/29 02:14p", body: "Called Maria — discussed counter at $425k, asked for 7-day close." },
+        lastReply: { ts: "04/29 02:31p", body: "She'll talk to seller, push back tomorrow with a number." },
+      },
+      text: {
+        lastSent:  { ts: "04/30 09:02a", body: "Hey Maria — any update from the seller on the $425k counter?" },
+        lastReply: { ts: "04/30 11:18a", body: "Seller said 415 walk-away. Send a clean PSA and I'll push it." },
+      },
+      email: {
+        lastSent:  { ts: "04/30 11:45a", body: "Sent revised PSA at $415k cash, 7-day close, EMD $20k. Subject: 73750 Desert Vista — Revised PSA." },
+        lastReply: { ts: "04/30 03:22p", body: "Got it. Reviewing tonight, seller signing in the morning if it looks clean." },
+      },
+    },
   },
   2: {
     taskNote: "Primary buyer in escrow with 3% EMD. Submit backup at same number.",
@@ -93,6 +127,18 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     taskHow: "Call the agent, confirm primary's EMD + contingency dates, then submit a backup offer at $335,800 cash, AS-IS, 7-day close.",
     isc: 0,
     trackActive: 0, trackPending: 2, trackBackup: 5, trackSold: 33,
+    commLog: {
+      call: {
+        lastSent: { ts: "12/30 10:12a", body: "Called Tom Bauer at REO desk — straight to voicemail. Left a message about backup position." },
+      },
+      text: {
+        lastSent: { ts: "12/28 04:50p", body: "Tom — any movement on the primary buyer? Want to position our backup at $335,800 cash." },
+      },
+      email: {
+        lastSent: { ts: "12/26 09:00a", body: "Sent backup-offer package: $335,800 cash, AS-IS, 7-day close, $10k EMD. Subject: 9283 Atsina — Backup Offer Package." },
+        lastReply: { ts: "12/26 09:14a", body: "Auto-reply: Out of office until 01/05. For urgent matters contact REO Desk Asst." },
+      },
+    },
   },
   3: {
     taskNote: "Strong comps support $960k. Submit backup ready to move.",
@@ -281,6 +327,15 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     taskHow: "Confirm the agent didn't call you on your cell phone, then follow the process and send the offer.",
     isc: 11,
     trackActive: 5, trackPending: 8, trackBackup: 2, trackSold: 41,
+    commLog: {
+      text: {
+        lastSent: { ts: "04/22 08:15a", body: "Diana — checking in again on 1842 Camino Del Sol. Cash buyer ready, want to make this clean." },
+      },
+      email: {
+        lastSent: { ts: "04/22 08:18a", body: "Subject: 1842 Camino Del Sol — Cash Offer Inbound. Confirming we're sending a $525k cash offer today, 7-day close, no contingencies." },
+        lastReply: { ts: "04/22 08:19a", body: "Auto-reply: I'm currently with clients. I'll respond within 24 hours." },
+      },
+    },
   },
   11: {
     taskNote: "Off-market lead — silent for 3 days. Time to put paper in front of the seller.",

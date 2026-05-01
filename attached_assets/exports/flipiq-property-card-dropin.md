@@ -17,7 +17,7 @@ Every chip / icon / value has a hover tooltip:
 - **ARV** — asking vs ARV percentage
 - **Seller Pain** — DOM, price drops, showings, equity, propensity
 - **Last Attempts** — last 5 outreach attempts + response rate
-- **Channel chips** (call / text / email) — native title shows sentiment
+- **Channel chips** (call / text / email) — hover shows last sent + last reply for that channel; click opens a modal with the full thread bubbles + composer
 - **Investor Sourced Count (ISC)** — number of deals the agent has sourced to investors
 - **Deal Track Record** — Active / Pending / Backup / Sold / Total
 - **Listing Remarks** — public + agent comments with red `<span class="kw">` pills
@@ -224,7 +224,26 @@ export type DealDetail = {
   trackBackup?: number;  // 0
   trackSold?: number;    // 54
   trackTotal?: number;   // 57
+
+  // Communication log (NEW — drives chip hover preview + click-to-open modal)
+  commLog?: { call?: CommLog; text?: CommLog; email?: CommLog };
 };
+
+/**
+ * Outbound or inbound message captured for a single channel.
+ * `ts` is rendered verbatim — keep it short ("04/29 2:14p", "Today").
+ */
+export type CommEntry = {
+  ts: string;
+  body: string;
+};
+
+/**
+ * Per-channel record of the most recent send + reply.
+ * Tooltip shows both; modal renders them as bubbles (sent right/orange,
+ * reply left/gray). Either side may be omitted.
+ */
+export type CommLog = { lastSent?: CommEntry; lastReply?: CommEntry };
 
 /* ────────────────────────────────────────────────────────────────
    STYLE MAPS
@@ -437,8 +456,60 @@ function KwHtml({ html }: { html: string }) {
    CHANNEL CHIPS  (call/text/email + sentiment dot)
    ──────────────────────────────────────────────────────────────── */
 
-function ChannelChips({ property }: { property: DealProperty }) {
-  const channels: { key: string; icon: ReactNode; label: string; status: ResponseStatus }[] = [];
+/**
+ * Channel preview rendered inside the chip's hover tooltip.
+ * Shows the last outbound message we sent and the last inbound reply
+ * so the rep can scan thread state without opening the modal.
+ */
+function ChannelPreview({ log }: { log?: CommLog }) {
+  if (!log || (!log.lastSent && !log.lastReply)) {
+    return (
+      <div className="text-[12px] text-gray-500 italic">
+        No messages yet on this channel.
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-2">
+      {log.lastSent && (
+        <div>
+          <div className="flex justify-between gap-3 text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
+            <span>Last sent</span><span>{log.lastSent.ts}</span>
+          </div>
+          <div className="text-[12px] text-gray-900 leading-snug mt-0.5">
+            {log.lastSent.body}
+          </div>
+        </div>
+      )}
+      {log.lastReply && (
+        <div>
+          <div className="flex justify-between gap-3 text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
+            <span>Last reply</span><span>{log.lastReply.ts}</span>
+          </div>
+          <div className="text-[12px] text-gray-900 leading-snug mt-0.5">
+            {log.lastReply.body}
+          </div>
+        </div>
+      )}
+      <div className="pt-1.5 border-t border-gray-200 text-[10px] uppercase tracking-wider text-orange-600 font-semibold">
+        Click to open communication →
+      </div>
+    </div>
+  );
+}
+
+type ChannelKey = "call" | "text" | "email";
+
+function ChannelChips({
+  property,
+  detail,
+  onOpenComm,
+}: {
+  property: DealProperty;
+  detail: DealDetail;
+  onOpenComm: (channel: ChannelKey) => void;
+}) {
+  const channels: { key: ChannelKey; icon: ReactNode; label: string; status: ResponseStatus }[] = [];
   if (property.callResponse)  channels.push({ key: "call",  icon: ICON.chPhone, label: "Call",  status: property.callResponse });
   if (property.textResponse)  channels.push({ key: "text",  icon: ICON.chText,  label: "Text",  status: property.textResponse });
   if (property.emailResponse) channels.push({ key: "email", icon: ICON.chMail,  label: "Email", status: property.emailResponse });
@@ -446,17 +517,132 @@ function ChannelChips({ property }: { property: DealProperty }) {
   return (
     <span className="inline-flex items-center gap-2.5">
       {channels.map((c) => (
-        <span
-          key={c.key}
-          title={`${c.label}: ${RESPONSE_LABEL[c.status]}`}
-          aria-label={`${c.label}: ${RESPONSE_LABEL[c.status]}`}
-          className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-800 cursor-help"
-        >
-          {c.icon}
-          <span className={`w-1.5 h-1.5 rounded-full ${RESPONSE_DOT[c.status]}`} />
+        <span key={c.key} className="relative group inline-flex items-center">
+          <button
+            type="button"
+            onClick={() => onOpenComm(c.key)}
+            className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-800 cursor-pointer"
+            aria-label={`Open ${c.label} thread`}
+          >
+            {c.icon}
+            <span className={`w-1.5 h-1.5 rounded-full ${RESPONSE_DOT[c.status]}`} />
+          </button>
+          <TipPanel title={`${c.label} — ${RESPONSE_LABEL[c.status]}`} wide>
+            <ChannelPreview log={detail.commLog?.[c.key]} />
+          </TipPanel>
         </span>
       ))}
     </span>
+  );
+}
+
+const COMM_LABEL: Record<ChannelKey, string> = { call: "Call", text: "Text", email: "Email" };
+
+/**
+ * Modal that opens when a chip is clicked. Shows the most recent
+ * outbound + inbound for the selected channel and a no-op composer.
+ * Closes on overlay click, Escape, or the X button.
+ */
+function CommunicationDialog({
+  open,
+  channel,
+  detail,
+  property,
+  onClose,
+}: {
+  open: boolean;
+  channel: ChannelKey | null;
+  detail: DealDetail;
+  property: DealProperty;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open || !channel) return null;
+  const log = detail.commLog?.[channel];
+  const placeholder =
+    channel === "call"  ? "Log a quick call note…"
+  : channel === "text"  ? "Type your text message…"
+                        : "Compose your email…";
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+          <div>
+            <div className="text-[11px] uppercase tracking-wider text-orange-600 font-semibold">
+              {COMM_LABEL[channel]} thread
+            </div>
+            <div className="text-[13px] text-gray-900 font-medium mt-0.5">
+              {property.address}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-700 text-xl leading-none cursor-pointer"
+            aria-label="Close"
+          >×</button>
+        </div>
+        <div className="px-4 py-3 max-h-[50vh] overflow-y-auto space-y-3">
+          {log?.lastSent && (
+            <div className="flex flex-col items-end">
+              <div className="max-w-[80%] bg-orange-50 border border-orange-200 text-gray-900 text-[13px] rounded-lg px-3 py-2">
+                {log.lastSent.body}
+              </div>
+              <div className="text-[10px] text-gray-400 mt-1">
+                You · {log.lastSent.ts}
+              </div>
+            </div>
+          )}
+          {log?.lastReply && (
+            <div className="flex flex-col items-start">
+              <div className="max-w-[80%] bg-gray-100 border border-gray-200 text-gray-900 text-[13px] rounded-lg px-3 py-2">
+                {log.lastReply.body}
+              </div>
+              <div className="text-[10px] text-gray-400 mt-1">
+                {detail.taskWho ?? "Agent"} · {log.lastReply.ts}
+              </div>
+            </div>
+          )}
+          {!log?.lastSent && !log?.lastReply && (
+            <div className="text-[12px] text-gray-500 italic text-center py-6">
+              No {COMM_LABEL[channel].toLowerCase()} history yet.
+            </div>
+          )}
+        </div>
+        <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
+          <textarea
+            placeholder={placeholder}
+            className="w-full text-[13px] border border-gray-300 rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-orange-300"
+            rows={2}
+          />
+          <div className="flex justify-end gap-2 mt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-[12px] px-3 py-1.5 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 cursor-pointer"
+            >Cancel</button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-[12px] px-3 py-1.5 bg-orange-500 text-white rounded-md hover:bg-orange-600 cursor-pointer"
+            >Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -523,6 +709,11 @@ export default function DealCard({
   const [done, setDone] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [nudgeOpen, setNudgeOpen] = useState(false);
+  /**
+   * Which channel modal is open, if any. Set by the chip click handler;
+   * `null` keeps the dialog hidden.
+   */
+  const [commChannel, setCommChannel] = useState<ChannelKey | null>(null);
   const rowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -615,7 +806,11 @@ export default function DealCard({
             />
           </span>
           {/* Channel chips after the next-step response */}
-          <ChannelChips property={property} />
+          <ChannelChips
+            property={property}
+            detail={detail}
+            onOpenComm={setCommChannel}
+          />
           {/* Inline flags — plain words, no box, no pill */}
           {property.notifications?.includes("critical") && (
             <span className="text-[12px] font-semibold text-[#E24B4A]">Critical</span>
@@ -822,6 +1017,13 @@ export default function DealCard({
           </span>
         </div>
       </div>
+      <CommunicationDialog
+        open={commChannel !== null}
+        channel={commChannel}
+        detail={detail}
+        property={property}
+        onClose={() => setCommChannel(null)}
+      />
     </div>
   );
 }
@@ -864,6 +1066,7 @@ const property1: DealProperty = {
   lastOpenDate: "04/30",
   lastCalledDate: "04/29",
   callResponse: "positive",
+  textResponse: "positive",
   emailResponse: "positive",
   notifications: ["critical"],
 };
@@ -902,6 +1105,22 @@ const detail1: DealDetail = {
   activeYears: "4yr",
   trackActive: 12, trackPending: 4, trackBackup: 1, trackSold: 87,
   trackTotal: 104,
+
+  // Comm log — full thread on every channel; sellers warm and replying.
+  commLog: {
+    call: {
+      lastSent:  { ts: "04/29 02:14p", body: "Called Maria — discussed counter at $425k, asked for 7-day close." },
+      lastReply: { ts: "04/29 02:31p", body: "She'll talk to seller, push back tomorrow with a number." },
+    },
+    text: {
+      lastSent:  { ts: "04/30 09:02a", body: "Hey Maria — any update from the seller on the $425k counter?" },
+      lastReply: { ts: "04/30 11:18a", body: "Seller said 415 walk-away. Send a clean PSA and I'll push it." },
+    },
+    email: {
+      lastSent:  { ts: "04/30 11:45a", body: "Sent revised PSA at $415k cash, 7-day close, EMD $20k. Subject: 73750 Desert Vista — Revised PSA." },
+      lastReply: { ts: "04/30 03:22p", body: "Got it. Reviewing tonight, seller signing in the morning if it looks clean." },
+    },
+  },
 };
 
 /* ------------------------------------------------------------------ *
@@ -922,8 +1141,7 @@ const property2: DealProperty = {
   assignedUser: "Not Assigned",
   lastOpenDate: "04/26",
   lastCalledDate: "04/24",
-  callResponse: "negative",
-  emailResponse: "negative",
+  textResponse: "neutral",
   notifications: ["critical", "reminder"],
 };
 const detail2: DealDetail = {
@@ -961,13 +1179,27 @@ const detail2: DealDetail = {
   activeYears: "<1yr",
   trackActive: 0, trackPending: 2, trackBackup: 5, trackSold: 33,
   trackTotal: 40,
+
+  // Comm log — REO desk on holiday auto-reply; no human response yet.
+  commLog: {
+    call: {
+      lastSent: { ts: "12/30 10:12a", body: "Called Tom Bauer at REO desk — straight to voicemail. Left a message about backup position." },
+    },
+    text: {
+      lastSent: { ts: "12/28 04:50p", body: "Tom — any movement on the primary buyer? Want to position our backup at $335,800 cash." },
+    },
+    email: {
+      lastSent:  { ts: "12/26 09:00a", body: "Sent backup-offer package: $335,800 cash, AS-IS, 7-day close, $10k EMD. Subject: 9283 Atsina — Backup Offer Package." },
+      lastReply: { ts: "12/26 09:14a", body: "Auto-reply: Out of office until 01/05. For urgent matters contact REO Desk Asst." },
+    },
+  },
 };
 
 /* ------------------------------------------------------------------ *
- * Card 3 — MID pain · HIGH keywords (RED) · ISC 11 (blue) · 5A (orange)
+ * Card 3 (deal id 10) — MID pain · HIGH keywords (RED) · ISC 11 (blue) · 5A (orange)
  * ------------------------------------------------------------------ */
-const property3: DealProperty = {
-  id: 3,
+const property10: DealProperty = {
+  id: 10,
   address: "1842 Camino Del Sol, Riverside, CA 92506",
   type: "STD",
   propertyType: "SFR",
@@ -981,11 +1213,11 @@ const property3: DealProperty = {
   assignedUser: "Josh Santos",
   lastOpenDate: "04/22",
   lastCalledDate: "—",
-  callResponse: "negative",
+  textResponse: "negative",
   emailResponse: "negative",
   notifications: ["critical"],
 };
-const detail3: DealDetail = {
+const detail10: DealDetail = {
   taskNote: "3 days of automated outreach with zero reply. Send the offer anyway.",
   taskWho:  "Listing agent — Diana Hartwell (Re/Max Riverside)",
   taskWhat: "Angela sent texts and emails for 3 days straight with no response.",
@@ -998,7 +1230,7 @@ const detail3: DealDetail = {
   priceTotal: "-$24,000 (-4.4%)",
 
   pain: "mid", painLabel: "Mid",
-  painSig: [["Flagged","Open liens"],["Liens","Mechanic's lien"],["Debt","High (LTV >80%)"],["Mortgage","Adjustable rate"],["Propensity","6 / 10"]],
+  painSig: [["Flagged","Moderate pain"],["Distress","Tax delinquency"],["Ownership","Absentee"],["Equity","High (>50%)"],["Propensity","7 / 10"]],
 
   agent: "not-responsive", agentLabel: "Not Responsive",
   agentComms: [["Text 04/22","No reply (Angela)"],["Email 04/22","Opened, no reply (Angela)"],["Text 04/21","No reply (Angela)"],["Email 04/20","No reply (Angela)"],["Text 04/20","No reply (Angela)"]],
@@ -1020,12 +1252,23 @@ const detail3: DealDetail = {
   activeYears: "2yr",
   trackActive: 5, trackPending: 8, trackBackup: 2, trackSold: 41,
   trackTotal: 56,
+
+  // Comm log — Diana hasn't called back; only auto-reply on email.
+  commLog: {
+    text: {
+      lastSent: { ts: "04/22 08:15a", body: "Diana — checking in again on 1842 Camino Del Sol. Cash buyer ready, want to make this clean." },
+    },
+    email: {
+      lastSent:  { ts: "04/22 08:18a", body: "Subject: 1842 Camino Del Sol — Cash Offer Inbound. Confirming we're sending a $525k cash offer today, 7-day close, no contingencies." },
+      lastReply: { ts: "04/22 08:19a", body: "Auto-reply: I'm currently with clients. I'll respond within 24 hours." },
+    },
+  },
 };
 
 const SAMPLE_CARDS = [
   { property: property1, detail: detail1 },
   { property: property2, detail: detail2 },
-  { property: property3, detail: detail3 },
+  { property: property10, detail: detail10 },
 ];
 
 export default function App() {
@@ -1069,7 +1312,7 @@ The tooltip content sources:
 | 1   | Pulsing call CTA (📞)                | native `title` only     | "Call this agent first" / "Call logged"                                               |
 | 1   | **Pain label `MID`** (after phone, before CTA) | `Seller Pain` | colored uppercase chip: high red / mid amber / low gray; `painSig` rows in tooltip   |
 | 1   | Next-step orange text                | `Next Step`             | `taskWho` / `taskWhat` / `taskHow` / `taskNote`                                        |
-| 1   | Channel chips after the response (call/text/mail) | native `title` | `Call: Positive`, `Text: Negative`, `Email: Neutral` from `callResponse` etc.        |
+| 1   | Channel chips after the response (call/text/mail) | `Call — Positive` etc. via `TipPanel` | Hover renders `ChannelPreview` (last sent + last reply for that channel from `detail.commLog[key]`). Click opens `<CommunicationDialog>` — full thread bubbles (sent right/orange, reply left/gray) + composer. Modal closes on overlay, `Escape`, or `×`. |
 | 1   | Inline flag `Critical` / `Reminder`  | none — plain word       | rendered when `notifications` includes `"critical"` (red) or `"reminder"` (blue)       |
 | 2 (property) | Address                       | `Property`              | `prop` rows                                                                            |
 | 2 (property) | Sales-type code (e.g. `STD`)  | `Sales Type`            | code + full label, property type                                                       |
