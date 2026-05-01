@@ -473,9 +473,10 @@ export default function DealCard({ property }: { property: DealProperty }) {
           </span>
         </div>
 
-        {/* Line 3 — deal math (compact price + ARV) + agent.
+        {/* Line 3 — deal math (compact price + ARV) + Pain + agent.
             Price moved here, no "$" prefix, zeros collapsed (525k).
-            Pain isn't here anymore — it's the colored label on Row 1 next to the phone. */}
+            Pain shows as ● Pain: Mid right after ARV (the Row 1 chip is the
+            at-a-glance signal; this row is the inline data label). */}
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
           <span className="relative group cursor-help font-semibold text-gray-900">
             {compactPrice(property.price)}
@@ -485,6 +486,12 @@ export default function DealCard({ property }: { property: DealProperty }) {
           <span className="relative group cursor-help font-medium text-gray-700">
             {detail.arvPct}
             <TipPanel title="ARV" rows={[["Asking", property.price], ["ARV", detail.arv], ["Asking vs ARV", detail.arvPct]]} />
+          </span>
+          <span className="text-gray-300">·</span>
+          <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
+            <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
+            Pain: {detail.painLabel}
+            <TipPanel title="Seller Pain" rows={detail.painSig} />
           </span>
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">

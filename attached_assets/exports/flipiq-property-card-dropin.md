@@ -6,7 +6,7 @@ property row in the screenshot:
 > ☐  📞 **MID** **No response — send offer**  📞● 💬● ✉●  **Critical** **Reminder**     15% Outreach Sent ▾
 >                                                                                          [Opened 04/22] [Called —]   ← red tints (cold)
 > ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: Mid · Source: MLS — Active
-> 💬  **525k** · 77% ARV · ● Agent: Not Responsive · ISC: 19 · 7A / 3P / 0B / 54S
+> 💬  **525k** · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: 19 · 7A / 3P / 0B / 54S
 
 Every chip / icon / value has a hover tooltip:
 - **Next Step** — task / who / what / how / context
@@ -60,18 +60,21 @@ Detailed Analysis).
      with the address as the only `min-w-0 truncate` child — every
      other chip is `shrink-0`. The address truncates with `…` on
      narrow viewports (full address still in the hover tooltip).
-   - **Line 2 — deal math + agent (is it worth my time + who's gating
-     it):** **Compact price** (e.g. `525k`, no `$` prefix, zeros
-     collapsed via `compactPrice()`) → ARV % → ● **Agent**
-     (responsiveness / gatekeeper) → ISC → Deal Track Record (A/P/B/S).
-     Price is shown *without* the dollar sign because the column is
-     unambiguously money — the `$` is visual noise. "Active Nyr" is
-     intentionally omitted — tenure isn't actionable; A/P/B/S already
-     conveys experience.
-   Pain is **not** in the meta block — it's the colored uppercase chip
-   on Row 1 next to the phone icon, so it's the first thing the rep
-   processes. `Opened` and `Called` are deliberately *not* here either —
-   they're recency data and live with the offer status on the right.
+   - **Line 2 — deal math + Pain + agent (is it worth my time + who's
+     gating it):** **Compact price** (e.g. `525k`, no `$` prefix, zeros
+     collapsed via `compactPrice()`) → ARV % → ● **Pain: <label>**
+     (right after ARV, with the matching colored dot + Seller Pain
+     tooltip) → ● **Agent** (responsiveness / gatekeeper) → ISC → Deal
+     Track Record (A/P/B/S). Price is shown *without* the dollar sign
+     because the column is unambiguously money — the `$` is visual
+     noise. "Active Nyr" is intentionally omitted — tenure isn't
+     actionable; A/P/B/S already conveys experience.
+   Pain shows in **two** places on purpose: the uppercase **HIGH/MID/LOW**
+   chip on Row 1 next to the phone is the at-a-glance signal (so seller
+   motivation registers before the CTA itself), and `● Pain: <label>`
+   on Line 2 is the inline data label sitting with the rest of the deal
+   math. `Opened` and `Called` are deliberately *not* here — they're
+   recency data and live with the offer status on the right.
 
 The whole thing has **zero project-specific imports**. Just React,
 TypeScript, and Tailwind. Drop it into any Replit React project.
@@ -613,8 +616,9 @@ export default function DealCard({
         {/* Line 1 — property identity (what is it).
             flex-nowrap + whitespace-nowrap + min-w-0 truncate on the address
             keep this row on EXACTLY one visual line. Address gets `…` on
-            narrow viewports (full text in the hover tooltip). Price/ARV
-            live on Line 2; pain lives on Row 1 next to the phone. */}
+            narrow viewports (full text in the hover tooltip). Price /
+            ARV / Pain live on Line 2; the at-a-glance pain chip also
+            appears on Row 1 next to the phone. */}
         <div className="flex items-center flex-nowrap min-w-0 gap-x-2 text-[13px] text-gray-700 leading-6 whitespace-nowrap">
           <span className="relative group cursor-help min-w-0 truncate">
             <span className="group-hover:text-gray-900">{property.address}</span>
@@ -668,10 +672,11 @@ export default function DealCard({
           </span>
         </div>
 
-        {/* Line 2 — deal math + agent.
+        {/* Line 2 — deal math + Pain + agent.
             Compact price (no "$", zeros collapsed: 525k) + ARV % +
-            agent responsiveness + ISC + Deal Track Record (A/P/B/S).
-            Pain isn't here — it's the colored chip on Row 1 next to the phone. */}
+            ● Pain: <label> + agent responsiveness + ISC + Deal Track Record (A/P/B/S).
+            Pain shows here as the inline data label; the Row 1 chip is the
+            at-a-glance signal. */}
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
           <span className="relative group cursor-help font-semibold text-gray-900">
             {compactPrice(property.price)}
@@ -681,6 +686,12 @@ export default function DealCard({
           <span className="relative group cursor-help font-medium text-gray-700">
             {detail.arvPct}
             <TipPanel title="ARV" rows={[["Asking", property.price], ["ARV", detail.arv], ["Asking vs ARV", detail.arvPct]]} />
+          </span>
+          <span className="text-gray-300">·</span>
+          <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
+            <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
+            Pain: {detail.painLabel}
+            <TipPanel title="Seller Pain" rows={detail.painSig} />
           </span>
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
@@ -930,6 +941,7 @@ The tooltip content sources:
 | 2 (property) | `Source: MLS — Active`        | `Source`                | source / status / negotiator / assigned                                                |
 | 3 (deal)     | `525k` (semibold, gray-900, no `$`) | `Price History`   | `priceHist` + `priceTotal`. Rendered via `compactPrice(property.price)` — drops `$`, collapses zeros to `k` / `m` |
 | 3 (deal)     | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
+| 3 (deal)     | `● Pain: Mid` (after ARV)     | `Seller Pain`           | dot color from `PAIN_DOT[detail.pain]`, label from `detail.painLabel`, tooltip rows from `detail.painSig`. Mirrors the Row 1 chip — Row 1 is the at-a-glance signal, this is the inline data label. |
 | 3 (deal)     | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
 | 3 (deal)     | `ISC: 19`                     | `Investor Sourced Count` | `isc` + plain-English meaning ("Number of deals this agent has sourced to investors.") |
 | 3 (deal)     | `7A/3P/0B/54S`                | `Deal Track Record`     | `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable) |
