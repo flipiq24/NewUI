@@ -3,9 +3,8 @@
 A single self-contained React + TypeScript component that reproduces the
 property row in the screenshot:
 
-> ☐  📞 ✉●  **No response — send offer**                                15% Outreach Sent ▾
-> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · Source: MLS — Active · $525,000 · 77% ARV
-> 💬   ● Pain: Mid · ● Agent: Not Responsive · ISC: 19 · Active 2yr · 7A / 3P / 0B / 54S · ● Keywords: Mid · Opened 04/22 · Called —
+> ☐  📞 **No response — send offer**  📞● 💬● ✉●  **Critical** **Reminder**            15% Outreach Sent ▾
+> ⋮💬 1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: Mid · Source: MLS — Active · $525,000 · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: 19 · Active 2yr · 7A / 3P / 0B / 54S · Opened 04/22 · Called —
 
 Every chip / icon / value has a hover tooltip:
 - **Next Step** — task / who / what / how / context
@@ -26,17 +25,19 @@ Every chip / icon / value has a hover tooltip:
 The kebab opens a 3-column drill menu (Communication, Quick Links,
 Detailed Analysis).
 
-**Layout / UX ordering** (left → right by priority):
+**Layout / UX ordering** (2 visual lines below the CTA, not 3):
 
-1. **Row 1 (the action):** Call CTA → channel chips (what you've already
-   tried + how the agent responded) → next-step text. Channel chips sit
-   next to the CTA so you see channel history *before* deciding to dial.
-2. **Row 2 (the facts):** Address → world-icon → sales type → source/status
-   → asking price → ARV %. Reads left → right from "where" to "how much".
-3. **Row 3 (the signals):** Pain → Agent responsiveness → ISC / Active
-   years / Track record → Keywords → Opened → Called. Motivation first,
-   then who you're dealing with, then their volume, then listing
-   intel, then comms recency.
+1. **Row 1 (the action):** Call CTA → next-step text → channel chips
+   (call/text/email + sentiment dot, *after* the response) → optional
+   inline flags `Critical` (red) / `Reminder` (blue) as plain words —
+   no pill, no box.
+2. **Row 2 (everything else, wraps to 2 visual lines):** Address →
+   world-icon → sales type → **Keywords** (next to sales type — keywords
+   are *property* data) → Source/status → asking price → ARV % → Pain →
+   Agent responsiveness → ISC / Active years / Deal Track Record →
+   Opened → Called. Reads left → right: where → what type → how the
+   listing reads → where it came from → what it costs → motivation →
+   who the agent is → their volume → comms recency.
 
 The whole thing has **zero project-specific imports**. Just React,
 TypeScript, and Tailwind. Drop it into any Replit React project.
@@ -96,6 +97,7 @@ import { useState, useEffect, useRef, type ReactNode } from "react";
    ──────────────────────────────────────────────────────────────── */
 
 export type ResponseStatus = "positive" | "neutral" | "negative";
+export type NotificationKind = "critical" | "reminder" | "unseen" | "text";
 
 export type DealProperty = {
   id: number | string;
@@ -115,6 +117,11 @@ export type DealProperty = {
   callResponse?: ResponseStatus;
   textResponse?: ResponseStatus;
   emailResponse?: ResponseStatus;
+  /**
+   * Inline flags rendered as plain words on Row 1 after the channel chips.
+   * "critical" → red, "reminder" → blue. No pill, no box.
+   */
+  notifications?: NotificationKind[];
 };
 
 export type DealDetail = {
@@ -463,7 +470,7 @@ export default function DealCard({
 
       {/* Main */}
       <div className="min-w-0">
-        {/* Row 1 — Call CTA + channel chips + next step */}
+        {/* Row 1 — Call CTA → next step → channel chips → inline flags */}
         <div className="flex items-center gap-2.5 mb-1">
           <button
             type="button"
@@ -481,7 +488,6 @@ export default function DealCard({
               </svg>
             ) : ICON.phone}
           </button>
-          <ChannelChips property={property} />
           <span className="relative group cursor-help">
             <span className={`text-[15px] font-semibold leading-snug ${done ? "text-gray-400 line-through" : "text-orange-600 group-hover:text-orange-700"}`}>
               {property.nextSteps}
@@ -497,9 +503,18 @@ export default function DealCard({
               ]}
             />
           </span>
+          {/* Channel chips after the next-step response */}
+          <ChannelChips property={property} />
+          {/* Inline flags — plain words, no box, no pill */}
+          {property.notifications?.includes("critical") && (
+            <span className="text-[12px] font-semibold text-[#E24B4A]">Critical</span>
+          )}
+          {property.notifications?.includes("reminder") && (
+            <span className="text-[12px] font-semibold text-[#2F86D6]">Reminder</span>
+          )}
         </div>
 
-        {/* Row 2 — address line + chips */}
+        {/* Combined row — address + facts + signals (wraps to 2 visual lines) */}
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
           <span className="relative group cursor-help">
             <span className="group-hover:text-gray-900">{property.address}</span>
@@ -518,6 +533,18 @@ export default function DealCard({
                 ["Property Type", property.propertyType],
               ]}
             />
+          </span>
+          <span className="text-gray-300">·</span>
+          {/* Keywords — moved here, right after sales type (it's property data) */}
+          <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
+            <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
+            Keywords: {detail.kwLabel}
+            <TipPanel title="Listing Remarks" wide>
+              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1.5 mb-1">Public Comments</div>
+              <KwHtml html={detail.pubCmt} />
+              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-2 mb-1">Agent Comments</div>
+              <KwHtml html={detail.agtCmt} />
+            </TipPanel>
           </span>
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help text-gray-500 hover:text-gray-900">
@@ -549,17 +576,14 @@ export default function DealCard({
             {detail.arvPct}
             <TipPanel title="ARV" rows={[["Asking", property.price], ["ARV", detail.arv], ["Asking vs ARV", detail.arvPct]]} />
           </span>
-        </div>
-
-        {/* Row 3 — meta line */}
-        <div className="flex items-center flex-wrap gap-x-2.5 gap-y-1 text-[12px] text-gray-500 leading-5 mt-1">
-          <span className="relative group cursor-help inline-flex items-center gap-1.5 hover:text-gray-900">
+          <span className="text-gray-300">·</span>
+          <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
             Pain: {detail.painLabel}
             <TipPanel title="Seller Pain" rows={detail.painSig} />
           </span>
           <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help inline-flex items-center gap-1.5 hover:text-gray-900">
+          <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${AGENT_DOT[detail.agent]}`} />
             Agent: {detail.agentLabel}
             <TipPanel title="Last Attempts" rows={detail.agentComms}>
@@ -571,7 +595,7 @@ export default function DealCard({
           </span>
           <span className="text-gray-300">·</span>
           {/* Agent deal track record — ISC · Active Nyr · A/P/B/S */}
-          <span className="relative group cursor-help inline-flex items-center gap-1 hover:text-gray-900">
+          <span className="relative group cursor-help inline-flex items-center gap-1 text-[12px] text-gray-500 hover:text-gray-900">
             <span>ISC: <span className="font-medium text-gray-700">{detail.isc ?? 19}</span></span>
             <span className="text-gray-300">·</span>
             <span>Active <span className="font-medium text-gray-700">{detail.activeYears ?? "2yr"}</span></span>
@@ -591,23 +615,12 @@ export default function DealCard({
             />
           </span>
           <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help inline-flex items-center gap-1.5 hover:text-gray-900">
-            <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
-            Keywords: {detail.kwLabel}
-            <TipPanel title="Listing Remarks" wide>
-              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1.5 mb-1">Public Comments</div>
-              <KwHtml html={detail.pubCmt} />
-              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-2 mb-1">Agent Comments</div>
-              <KwHtml html={detail.agtCmt} />
-            </TipPanel>
-          </span>
-          <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help hover:text-gray-900">
+          <span className="relative group cursor-help text-[12px] text-gray-500 hover:text-gray-900">
             Opened <span className="font-medium text-gray-700">{detail.opened}</span>
             <TipPanel title="Open History" rows={[["First opened", detail.firstOpened], ["Last opened", detail.opened], ["Total opens", String(detail.totalOpens)]]} />
           </span>
           <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help hover:text-gray-900">
+          <span className="relative group cursor-help text-[12px] text-gray-500 hover:text-gray-900">
             Called <span className="font-medium text-gray-700">{detail.called}</span>
             <TipPanel title="Communication History" rows={[["First call", detail.firstCalled], ["Last call", detail.called], ["Total comms", String(detail.totalCommsCount)]]}>
               <div className="mt-1.5 pt-1.5 border-t border-gray-200">
@@ -680,6 +693,7 @@ const property: DealProperty = {
   lastCalledDate: "—",
   callResponse: "negative",
   emailResponse: "negative",
+  notifications: ["critical", "reminder"], // → red "Critical" + blue "Reminder" inline on Row 1
 };
 
 const detail: DealDetail = {
@@ -791,19 +805,20 @@ The tooltip content sources:
 | Row | Hover target                         | Tooltip title           | Data                                                                                  |
 |-----|--------------------------------------|-------------------------|---------------------------------------------------------------------------------------|
 | 1   | Pulsing call CTA (📞)                | native `title` only     | "Call this agent first" / "Call logged"                                               |
-| 1   | Channel chips next to CTA (call/text/mail) | native `title`     | `Call: Positive`, `Text: Negative`, `Email: Neutral` from `callResponse` etc.         |
 | 1   | Next-step orange text                | `Next Step`             | `taskWho` / `taskWhat` / `taskHow` / `taskNote`                                        |
+| 1   | Channel chips after the response (call/text/mail) | native `title` | `Call: Positive`, `Text: Negative`, `Email: Neutral` from `callResponse` etc.        |
+| 1   | Inline flag `Critical` / `Reminder`  | none — plain word       | rendered when `notifications` includes `"critical"` (red) or `"reminder"` (blue)       |
 | 2   | Address                              | `Property`              | `prop` rows                                                                            |
 | 2   | Sales-type code (e.g. `STD`)         | `Sales Type`            | code + full label, property type                                                       |
+| 2   | `● Keywords: Mid` (next to STD)      | `Listing Remarks`       | `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills                         |
 | 2   | `Source: MLS — Active`               | `Source`                | source / status / negotiator / assigned                                                |
 | 2   | `$525,000`                           | `Price History`         | `priceHist` + `priceTotal`                                                             |
 | 2   | `77% ARV`                            | `ARV`                   | asking vs ARV                                                                          |
-| 3   | `● Pain: Mid`                        | `Seller Pain`           | `painSig` (DOM, drops, equity, propensity, …)                                          |
-| 3   | `● Agent: Not Responsive`            | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
-| 3   | `ISC: 19 · Active 2yr · 7A/3P/0B/54S`| `Deal Track Record`     | `isc`, `activeYears`, `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` |
-| 3   | `● Keywords: Mid`                    | `Listing Remarks`       | `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills                         |
-| 3   | `Opened 04/22`                       | `Open History`          | first / last / total opens                                                             |
-| 3   | `Called —`                           | `Communication History` | first / last + per-channel calls/texts/emails                                          |
+| 2   | `● Pain: Mid`                        | `Seller Pain`           | `painSig` (DOM, drops, equity, propensity, …)                                          |
+| 2   | `● Agent: Not Responsive`            | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
+| 2   | `ISC: 19 · Active 2yr · 7A/3P/0B/54S`| `Deal Track Record`     | `isc`, `activeYears`, `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` |
+| 2   | `Opened 04/22`                       | `Open History`          | first / last / total opens                                                             |
+| 2   | `Called —`                           | `Communication History` | first / last + per-channel calls/texts/emails                                          |
 | Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / negotiator / assigned                            |
 | Kebab (⋮) | (click to open)                | drill menu              | 3 cols: Communication / Quick Links / Detailed Analysis + footer "Auto Tracker"        |
 | 💬 chat icon                          | inline tooltip          | "View conversations"                                                                   |
@@ -817,10 +832,13 @@ The tooltip content sources:
 | Positive / Responsive / High keywords | `#639922` (green) |
 | Mid pain / Mid keywords               | `#BA7517` (amber) |
 | Neutral / Low / None                  | `#B4B2A9` (gray)  |
-| Negative / Not responsive / High pain | `#E24B4A` (red)   |
+| Negative / Not responsive / High pain / `Critical` flag | `#E24B4A` (red) |
+| `Reminder` flag                       | `#2F86D6` (blue)  |
 
 To add more sentiment dots, just push to the `channels` array inside
-`ChannelChips` or extend the `*_DOT` maps.
+`ChannelChips` or extend the `*_DOT` maps. To add new inline flag
+words, extend `NotificationKind` and add another conditional `<span>`
+on Row 1 with the desired color.
 
 ---
 

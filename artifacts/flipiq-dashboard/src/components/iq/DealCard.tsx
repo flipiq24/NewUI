@@ -327,7 +327,6 @@ export default function DealCard({ property }: { property: DealProperty }) {
               ICON.phone
             )}
           </button>
-          <ChannelChips property={property} />
           <span className="relative group cursor-help">
             <span className={`text-[15px] font-semibold leading-snug ${done.call ? "text-gray-400 line-through" : "text-orange-600 group-hover:text-orange-700"}`}>
               {property.nextSteps}
@@ -344,9 +343,18 @@ export default function DealCard({ property }: { property: DealProperty }) {
               ]}
             />
           </span>
+          {/* Channel chips after the next-step response */}
+          <ChannelChips property={property} />
+          {/* Plain inline flags (no box, no pill) */}
+          {property.notifications?.includes("critical") && (
+            <span className="text-[12px] font-semibold text-[#E24B4A]">Critical</span>
+          )}
+          {property.notifications?.includes("reminder") && (
+            <span className="text-[12px] font-semibold text-[#2F86D6]">Reminder</span>
+          )}
         </div>
 
-        {/* Row 2 — address line */}
+        {/* Combined row — address + facts + signals (wraps to 2 lines naturally) */}
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
           <span className="relative group cursor-help">
             <span className="group-hover:text-gray-900">{property.address}</span>
@@ -365,6 +373,18 @@ export default function DealCard({ property }: { property: DealProperty }) {
                 ["Property Type", property.propertyType],
               ]}
             />
+          </span>
+          <span className="text-gray-300">·</span>
+          {/* Keywords — moved here, right after sales type (it's property data) */}
+          <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
+            <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
+            Keywords: {detail.kwLabel}
+            <TipPanel title="Listing Remarks" wide>
+              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1.5 mb-1">Public Comments</div>
+              <KwHtml html={detail.pubCmt} />
+              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-2 mb-1">Agent Comments</div>
+              <KwHtml html={detail.agtCmt} />
+            </TipPanel>
           </span>
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help text-gray-500 hover:text-gray-900">
@@ -399,17 +419,14 @@ export default function DealCard({ property }: { property: DealProperty }) {
             {detail.arvPct}
             <TipPanel title="ARV" rows={[["Asking", property.price], ["ARV", detail.arv], ["Asking vs ARV", detail.arvPct]]} />
           </span>
-        </div>
-
-        {/* Row 3 — meta */}
-        <div className="flex items-center flex-wrap gap-x-2.5 gap-y-1 text-[12px] text-gray-500 leading-5 mt-1">
-          <span className="relative group cursor-help inline-flex items-center gap-1.5 hover:text-gray-900">
+          <span className="text-gray-300">·</span>
+          <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
             Pain: {detail.painLabel}
             <TipPanel title="Seller Pain" rows={detail.painSig} />
           </span>
           <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help inline-flex items-center gap-1.5 hover:text-gray-900">
+          <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${AGENT_DOT[detail.agent]}`} />
             Agent: {detail.agentLabel}
             <TipPanel title="Last Attempts" rows={detail.agentComms}>
@@ -420,7 +437,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
             </TipPanel>
           </span>
           <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help inline-flex items-center gap-1 hover:text-gray-900">
+          <span className="relative group cursor-help inline-flex items-center gap-1 text-[12px] text-gray-500 hover:text-gray-900">
             <span>ISC: <span className="font-medium text-gray-700">{detail.isc ?? 19}</span></span>
             <span className="text-gray-300">·</span>
             <span>Active <span className="font-medium text-gray-700">{detail.activeYears ?? "2yr"}</span></span>
@@ -440,23 +457,12 @@ export default function DealCard({ property }: { property: DealProperty }) {
             />
           </span>
           <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help inline-flex items-center gap-1.5 hover:text-gray-900">
-            <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
-            Keywords: {detail.kwLabel}
-            <TipPanel title="Listing Remarks" wide>
-              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1.5 mb-1">Public Comments</div>
-              <KwHtml html={detail.pubCmt} />
-              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-2 mb-1">Agent Comments</div>
-              <KwHtml html={detail.agtCmt} />
-            </TipPanel>
-          </span>
-          <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help hover:text-gray-900">
+          <span className="relative group cursor-help text-[12px] text-gray-500 hover:text-gray-900">
             Opened <span className="font-medium text-gray-700">{detail.opened}</span>
             <TipPanel title="Open History" rows={[["First opened", detail.firstOpened], ["Last opened", detail.opened], ["Total opens", String(detail.totalOpens)]]} />
           </span>
           <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help hover:text-gray-900">
+          <span className="relative group cursor-help text-[12px] text-gray-500 hover:text-gray-900">
             Called <span className="font-medium text-gray-700">{detail.called}</span>
             <TipPanel title="Communication History" rows={[["First call", detail.firstCalled], ["Last call", detail.called], ["Total comms", String(detail.totalCommsCount)]]}>
               <div className="mt-1.5 pt-1.5 border-t border-gray-200">
