@@ -18,7 +18,7 @@ Every chip / icon / value has a hover tooltip:
 - **Seller Pain** — DOM, price drops, showings, equity, propensity
 - **Last Attempts** — last 5 outreach attempts + response rate
 - **Channel chips** (call / text / email) — hover shows last sent + last reply for that channel; click opens a modal with the full thread bubbles + composer
-- **Investor Sourced Count (ISC)** — number of deals the agent has sourced to investors
+- **Investor Sourced Count (ISC)** — three-line breakdown of the agent's investor history (listings sold for / to investors, plus unique relationships)
 - **Deal Track Record** — Active / Pending / Backup / Sold / Total
 - **Listing Remarks** — public + agent comments with red `<span class="kw">` pills
 - **Open History** — first / last / total opens
@@ -217,7 +217,10 @@ export type DealDetail = {
   assigned: string;
 
   // Agent deal track record (NEW — shows on row 3 after "Agent")
-  isc?: number;          // ISC count, e.g. 19
+  isc?: number;                 // ISC count shown inline, e.g. 19
+  iscSoldFor?: number;          // listings the agent SOLD FOR investor sellers
+  iscSoldTo?: number;           // listings the agent SOLD TO investor buyers
+  iscUniqueInvestors?: number;  // distinct investor relationships
   activeYears?: string;  // e.g. "2yr"
   trackActive?: number;  // 7
   trackPending?: number; // 3
@@ -934,8 +937,9 @@ export default function DealCard({
             <TipPanel
               title="Investor Sourced Count"
               rows={[
-                ["ISC",     String(detail.isc ?? 19)],
-                ["Meaning", "Number of deals this agent has sourced to investors."],
+                ["Listings Sold for Investors",   String(detail.iscSoldFor ?? 0)],
+                ["Listings Sold to Investors",    String(detail.iscSoldTo ?? 0)],
+                ["Unique Investor Relationships", String(detail.iscUniqueInvestors ?? 0)],
               ]}
             />
           </span>
@@ -1101,7 +1105,7 @@ const detail1: DealDetail = {
   source: "MLS — Active", negotiator: "Josh Santos", assigned: "Josh Santos",
 
   // Agent deal track record — colorful, hot agent, drillable history.
-  isc: 24,
+  isc: 24, iscSoldFor: 14, iscSoldTo: 10, iscUniqueInvestors: 19,
   activeYears: "4yr",
   trackActive: 12, trackPending: 4, trackBackup: 1, trackSold: 87,
   trackTotal: 104,
@@ -1175,7 +1179,7 @@ const detail2: DealDetail = {
   source: "MLS — Pending", negotiator: "Josh Santos", assigned: "Not Assigned",
 
   // Brand-new agent — 0 ISC renders gray, 0A renders WITHOUT orange.
-  isc: 0,
+  isc: 0, iscSoldFor: 0, iscSoldTo: 0, iscUniqueInvestors: 0,
   activeYears: "<1yr",
   trackActive: 0, trackPending: 2, trackBackup: 5, trackSold: 33,
   trackTotal: 40,
@@ -1248,7 +1252,7 @@ const detail10: DealDetail = {
   pct: "15%", status: "Outreach Sent", statusType: "init",
   source: "MLS — Active", negotiator: "Josh Santos", assigned: "Josh Santos",
 
-  isc: 11,
+  isc: 11, iscSoldFor: 6, iscSoldTo: 5, iscUniqueInvestors: 9,
   activeYears: "2yr",
   trackActive: 5, trackPending: 8, trackBackup: 2, trackSold: 41,
   trackTotal: 56,
@@ -1322,7 +1326,7 @@ The tooltip content sources:
 | 3 (deal)     | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
 | 3 (deal)     | `● Pain: Mid` (after ARV)     | `Seller Pain`           | dot color from `PAIN_DOT[detail.pain]`, label from `detail.painLabel`, tooltip rows from `detail.painSig`. Mirrors the Row 1 chip — Row 1 is the at-a-glance signal, this is the inline data label. |
 | 3 (deal)     | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
-| 3 (deal)     | `ISC: 19`                     | `Investor Sourced Count` | `isc` + plain-English meaning. **Color:** `0` renders the number gray (`text-gray-400`) — agent has never sourced a deal, nothing to drill into. Any positive count renders the number in hyperlink blue (`text-[#2F86D6]`) to signal it's drillable history. |
+| 3 (deal)     | `ISC: 19`                     | `Investor Sourced Count` | Three-row breakdown: `Listings Sold for Investors` (`iscSoldFor`), `Listings Sold to Investors` (`iscSoldTo`), `Unique Investor Relationships` (`iscUniqueInvestors`). **Color:** `isc === 0` renders the inline number gray (`text-gray-400`) — agent has never sourced a deal, nothing to drill into. Any positive count renders the inline number in hyperlink blue (`text-[#2F86D6]`) to signal it's drillable history. |
 | 3 (deal)     | `7A/3P/0B/54S` (`7A` orange when > 0) | `Deal Track Record` | `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable). The Active count is wrapped in `<span class="text-[#D67432] font-semibold">` whenever `trackActive > 0` — open deals are the only piece needing immediate attention. When `trackActive === 0`, the `0A` renders in the same plain gray as the rest of the row. |
 | Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / negotiator / assigned                            |
 | Right | `Opened 04/22` (plain colored text — green / yellow / red) | `Open History` (right-aligned) | first / last / total opens. Color via `gradeFreshness(detail.opened)` — green ≤3d, yellow 4–7d, red >7d / `—`. **No pill, no box.** |

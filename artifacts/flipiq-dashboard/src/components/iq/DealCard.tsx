@@ -714,8 +714,9 @@ export default function DealCard({ property }: { property: DealProperty }) {
             <TipPanel
               title="Investor Sourced Count"
               rows={[
-                ["ISC", String(detail.isc ?? 19)],
-                ["Meaning", "Number of deals this agent has sourced to investors."],
+                ["Listings Sold for Investors", String(detail.iscSoldFor ?? 0)],
+                ["Listings Sold to Investors", String(detail.iscSoldTo ?? 0)],
+                ["Unique Investor Relationships", String(detail.iscUniqueInvestors ?? 0)],
               ]}
             />
           </span>

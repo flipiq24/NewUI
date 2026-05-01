@@ -50,6 +50,9 @@ export type DealDetail = {
   taskWhat?: string;
   taskHow?: string;
   isc?: number;
+  iscSoldFor?: number;        // listings the agent SOLD FOR investor sellers
+  iscSoldTo?: number;         // listings the agent SOLD TO investor buyers
+  iscUniqueInvestors?: number; // distinct investor relationships
   activeYears?: string;
   trackActive?: number;
   trackPending?: number;
@@ -86,7 +89,7 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     taskWho: "Listing agent — Maria Reyes (Coldwell Banker)",
     taskWhat: "Counter their $425k ask and lock in revised terms.",
     taskHow: "Call the agent, anchor at $399k, offer 7-day close + cash-equivalent EMD, then send updated PSA by EOD.",
-    isc: 24,
+    isc: 24, iscSoldFor: 14, iscSoldTo: 10, iscUniqueInvestors: 19,
     trackActive: 12, trackPending: 4, trackBackup: 1, trackSold: 87,
     commLog: {
       call: {
@@ -125,7 +128,7 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     taskWho: "Listing agent — Tom Bauer (REO desk)",
     taskWhat: "Get into backup position behind the primary buyer.",
     taskHow: "Call the agent, confirm primary's EMD + contingency dates, then submit a backup offer at $335,800 cash, AS-IS, 7-day close.",
-    isc: 0,
+    isc: 0, iscSoldFor: 0, iscSoldTo: 0, iscUniqueInvestors: 0,
     trackActive: 0, trackPending: 2, trackBackup: 5, trackSold: 33,
     commLog: {
       call: {
@@ -325,7 +328,7 @@ export const DEAL_DETAILS: Record<number, DealDetail> = {
     taskWho: "Listing agent — Diana Hartwell (Re/Max Riverside)",
     taskWhat: "Angela sent texts and emails for 3 days straight with no response.",
     taskHow: "Confirm the agent didn't call you on your cell phone, then follow the process and send the offer.",
-    isc: 11,
+    isc: 11, iscSoldFor: 6, iscSoldTo: 5, iscUniqueInvestors: 9,
     trackActive: 5, trackPending: 8, trackBackup: 2, trackSold: 41,
     commLog: {
       text: {
