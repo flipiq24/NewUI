@@ -439,7 +439,16 @@ export default function DealCard({ property }: { property: DealProperty }) {
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help inline-flex items-center gap-1 text-[12px] text-gray-500 hover:text-gray-900">
             <span>ISC: <span className="font-medium text-gray-700">{detail.isc ?? 19}</span></span>
-            <span className="text-gray-300">·</span>
+            <TipPanel
+              title="Investor Sourced Count"
+              rows={[
+                ["ISC", String(detail.isc ?? 19)],
+                ["Meaning", "Number of deals this agent has sourced to investors."],
+              ]}
+            />
+          </span>
+          <span className="text-gray-300">·</span>
+          <span className="relative group cursor-help inline-flex items-center gap-1 text-[12px] text-gray-500 hover:text-gray-900">
             <span>Active <span className="font-medium text-gray-700">{detail.activeYears ?? "2yr"}</span></span>
             <span className="text-gray-300">·</span>
             <span className="font-medium text-gray-700 tabular-nums">

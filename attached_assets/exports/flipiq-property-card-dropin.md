@@ -18,6 +18,7 @@ Every chip / icon / value has a hover tooltip:
 - **Seller Pain** — DOM, price drops, showings, equity, propensity
 - **Last Attempts** — last 5 outreach attempts + response rate
 - **Channel chips** (call / text / email) — native title shows sentiment
+- **Investor Sourced Count (ISC)** — number of deals the agent has sourced to investors
 - **Deal Track Record** — Active / Pending / Backup / Sold / Total
 - **Listing Remarks** — public + agent comments with red `<span class="kw">` pills
 - **Open History** — first / last / total opens
@@ -602,10 +603,20 @@ export default function DealCard({
             </TipPanel>
           </span>
           <span className="text-gray-300">·</span>
-          {/* Agent deal track record — ISC · Active Nyr · A/P/B/S */}
+          {/* ISC — Investor Sourced Count (own tooltip) */}
           <span className="relative group cursor-help inline-flex items-center gap-1 text-[12px] text-gray-500 hover:text-gray-900">
             <span>ISC: <span className="font-medium text-gray-700">{detail.isc ?? 19}</span></span>
-            <span className="text-gray-300">·</span>
+            <TipPanel
+              title="Investor Sourced Count"
+              rows={[
+                ["ISC",     String(detail.isc ?? 19)],
+                ["Meaning", "Number of deals this agent has sourced to investors."],
+              ]}
+            />
+          </span>
+          <span className="text-gray-300">·</span>
+          {/* Agent deal track record — Active Nyr · A/P/B/S */}
+          <span className="relative group cursor-help inline-flex items-center gap-1 text-[12px] text-gray-500 hover:text-gray-900">
             <span>Active <span className="font-medium text-gray-700">{detail.activeYears ?? "2yr"}</span></span>
             <span className="text-gray-300">·</span>
             <span className="font-medium text-gray-700 tabular-nums">
@@ -831,7 +842,8 @@ The tooltip content sources:
 | 2   | `77% ARV`                            | `ARV`                   | asking vs ARV                                                                          |
 | 2   | `● Pain: Mid`                        | `Seller Pain`           | `painSig` (DOM, drops, equity, propensity, …)                                          |
 | 2   | `● Agent: Not Responsive`            | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
-| 2   | `ISC: 19 · Active 2yr · 7A/3P/0B/54S`| `Deal Track Record`     | `isc`, `activeYears`, `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` |
+| 2   | `ISC: 19`                            | `Investor Sourced Count` | `isc` + plain-English meaning ("Number of deals this agent has sourced to investors.") |
+| 2   | `Active 2yr · 7A/3P/0B/54S`          | `Deal Track Record`     | `activeYears`, `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` |
 | Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / negotiator / assigned                            |
 | Right | `Opened 04/22` (under offer status) | `Open History` (right-aligned) | first / last / total opens                                                  |
 | Right | `Called —` (under offer status)    | `Communication History` (right-aligned) | first / last + per-channel calls/texts/emails                          |
