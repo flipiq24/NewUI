@@ -33,9 +33,9 @@ const PAIN_TEXT: Record<DealDetail["pain"], string> = {
  * red = cold or never (>7 days, "—", "N/A").
  */
 const FRESHNESS: Record<"fresh" | "stale" | "cold", string> = {
-  fresh: "bg-[#EAF4DC] text-[#476B14]",
-  stale: "bg-[#FDF3DC] text-[#8B6210]",
-  cold:  "bg-[#FDE3E3] text-[#A33232]",
+  fresh: "text-[#476B14]",
+  stale: "text-[#8B6210]",
+  cold:  "text-[#A33232]",
 };
 
 /** Grade an "MM/DD" or "MM/DD/YY" string against today. */
@@ -576,8 +576,8 @@ export default function DealCard({ property }: { property: DealProperty }) {
           />
         </span>
         <div className="inline-flex items-center gap-1.5 text-[11.5px] text-gray-500">
-          {/* Tinted pill — green = ≤3d, yellow = 4–7d, red = cold/never. */}
-          <span className={`relative group cursor-help inline-flex items-center gap-1 px-1.5 py-px rounded-sm font-medium ${FRESHNESS[gradeFreshness(detail.opened)]}`}>
+          {/* Plain colored text — green = ≤3d, yellow = 4–7d, red = cold/never. No pills, no boxes. */}
+          <span className={`relative group cursor-help font-medium ${FRESHNESS[gradeFreshness(detail.opened)]}`}>
             Opened {detail.opened}
             <TipPanel
               title="Open History"
@@ -585,7 +585,8 @@ export default function DealCard({ property }: { property: DealProperty }) {
               rows={[["First opened", detail.firstOpened], ["Last opened", detail.opened], ["Total opens", String(detail.totalOpens)]]}
             />
           </span>
-          <span className={`relative group cursor-help inline-flex items-center gap-1 px-1.5 py-px rounded-sm font-medium ${FRESHNESS[gradeFreshness(detail.called)]}`}>
+          <span className="text-gray-300">·</span>
+          <span className={`relative group cursor-help font-medium ${FRESHNESS[gradeFreshness(detail.called)]}`}>
             Called {detail.called}
             <TipPanel
               title="Communication History"
