@@ -517,8 +517,13 @@ export default function DealCard({ property }: { property: DealProperty }) {
           </span>
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help inline-flex items-center gap-1 text-[12px] text-gray-500 hover:text-gray-900">
+            {/* Active count is highlighted orange whenever > 0 — open deals are
+                the only piece of this row that needs immediate attention. */}
             <span className="font-medium text-gray-700 tabular-nums">
-              {detail.trackActive ?? 7}A / {detail.trackPending ?? 3}P / {detail.trackBackup ?? 0}B / {detail.trackSold ?? 54}S
+              <span className={(detail.trackActive ?? 7) > 0 ? "text-[#D67432] font-semibold" : ""}>
+                {detail.trackActive ?? 7}A
+              </span>
+              {" / "}{detail.trackPending ?? 3}P / {detail.trackBackup ?? 0}B / {detail.trackSold ?? 54}S
             </span>
             <TipPanel
               title="Deal Track Record"

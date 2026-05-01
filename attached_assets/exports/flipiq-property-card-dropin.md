@@ -6,7 +6,7 @@ property row in the screenshot:
 > ☐  📞 **MID** **No response — send offer**  📞● 💬● ✉●  **Critical** **Reminder**     15% Outreach Sent ▾
 >                                                                                          Opened 04/22 · Called —   ← red text (cold)
 > ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: Mid · Source: MLS — Active
-> 💬  **525k** · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: 19 · 7A / 3P / 0B / 54S
+> 💬  **525k** · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: 19 · **7A** / 3P / 0B / 54S   ← `7A` is orange when > 0
 
 Every chip / icon / value has a hover tooltip:
 - **Next Step** — task / who / what / how / context
@@ -722,7 +722,12 @@ export default function DealCard({
           {/* Agent deal track record — A/P/B/S only ("Active Nyr" intentionally omitted) */}
           <span className="relative group cursor-help inline-flex items-center gap-1 text-[12px] text-gray-500 hover:text-gray-900">
             <span className="font-medium text-gray-700 tabular-nums">
-              {detail.trackActive ?? 7}A / {detail.trackPending ?? 3}P / {detail.trackBackup ?? 0}B / {detail.trackSold ?? 54}S
+              {/* Active count is highlighted orange whenever > 0 — open deals are
+                  the only piece of this row that needs immediate attention. */}
+              <span className={(detail.trackActive ?? 7) > 0 ? "text-[#D67432] font-semibold" : ""}>
+                {detail.trackActive ?? 7}A
+              </span>
+              {" / "}{detail.trackPending ?? 3}P / {detail.trackBackup ?? 0}B / {detail.trackSold ?? 54}S
             </span>
             <TipPanel
               title="Deal Track Record"
@@ -947,7 +952,7 @@ The tooltip content sources:
 | 3 (deal)     | `● Pain: Mid` (after ARV)     | `Seller Pain`           | dot color from `PAIN_DOT[detail.pain]`, label from `detail.painLabel`, tooltip rows from `detail.painSig`. Mirrors the Row 1 chip — Row 1 is the at-a-glance signal, this is the inline data label. |
 | 3 (deal)     | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
 | 3 (deal)     | `ISC: 19`                     | `Investor Sourced Count` | `isc` + plain-English meaning ("Number of deals this agent has sourced to investors.") |
-| 3 (deal)     | `7A/3P/0B/54S`                | `Deal Track Record`     | `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable) |
+| 3 (deal)     | `7A/3P/0B/54S` (`7A` orange when > 0) | `Deal Track Record` | `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable). The Active count is wrapped in `<span class="text-[#D67432] font-semibold">` whenever `trackActive > 0` — open deals are the only piece needing immediate attention. |
 | Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / negotiator / assigned                            |
 | Right | `Opened 04/22` (plain colored text — green / yellow / red) | `Open History` (right-aligned) | first / last / total opens. Color via `gradeFreshness(detail.opened)` — green ≤3d, yellow 4–7d, red >7d / `—`. **No pill, no box.** |
 | Right | `Called —` (plain colored text — green / yellow / red)     | `Communication History` (right-aligned) | first / last + per-channel calls/texts/emails. Same `gradeFreshness()` rule on `detail.called`. **No pill, no box.** |
