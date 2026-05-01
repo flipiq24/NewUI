@@ -6,8 +6,7 @@ property row in the screenshot:
 > ☐  📞 **No response — send offer**  📞● 💬● ✉●  **Critical** **Reminder**            15% Outreach Sent ▾
 >                                                                                          Opened 04/22 · Called —
 > ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: Mid · Source: MLS — Active · ● Pain: Mid
-> 💬  ● Agent: Not Responsive · ISC: 19 · Active 2yr · 7A / 3P / 0B / 54S
->     **$525,000** · 77% ARV
+> 💬  ● Agent: Not Responsive · ISC: 19 · Active 2yr · 7A / 3P / 0B / 54S · **$525,000** · 77% ARV
 
 Every chip / icon / value has a hover tooltip:
 - **Next Step** — task / who / what / how / context
@@ -40,15 +39,14 @@ Detailed Analysis).
    `60% In Negotiations ▾` on top, then a small muted
    `Opened 04/22 · Called —` underneath. Same mental beat: where am
    I, when was I last here.
-3. **Meta block — three forced lines** (separate `<div>`s, no wrap):
+3. **Meta block — two forced lines** (separate `<div>`s, no wrap):
    - **Line 1 — property identity:** Address → world-icon → sales type →
      **Keywords** (next to sales type — keywords are *property* data) →
      Source/status → Pain.
-   - **Line 2 — agent:** Agent responsiveness → ISC → Active years /
-     Deal Track Record (A/P/B/S).
-   - **Line 3 — money (the bottom-line number):** **Price** (semibold,
-     gray-900) → ARV %. Isolated on its own row so the dollar value
-     pops as the deal's headline number.
+   - **Line 2 — agent + money:** Agent responsiveness → ISC → Active years /
+     Deal Track Record (A/P/B/S) → **Price** (semibold, gray-900) →
+     ARV %. Money trails the agent stats on the same row so the whole
+     card stays at three lines (CTA + property + agent/money).
    `Opened` and `Called` are deliberately *not* here — they're
    recency data and live with the offer status on the right.
 
@@ -587,7 +585,7 @@ export default function DealCard({
           </span>
         </div>
 
-        {/* Line 2 — agent intel */}
+        {/* Line 2 — agent intel + money (price/ARV trail the agent stats) */}
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
           <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${AGENT_DOT[detail.agent]}`} />
@@ -630,10 +628,7 @@ export default function DealCard({
               ]}
             />
           </span>
-        </div>
-
-        {/* Line 3 — money (price + ARV, the bottom-line number) */}
-        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
+          <span className="text-gray-300">·</span>
           <span className="relative group cursor-help font-semibold text-gray-900">
             {property.price}
             <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />
@@ -849,11 +844,11 @@ The tooltip content sources:
 | 2 (property) | `● Keywords: Mid` (next to STD) | `Listing Remarks`     | `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills                         |
 | 2 (property) | `Source: MLS — Active`        | `Source`                | source / status / negotiator / assigned                                                |
 | 2 (property) | `● Pain: Mid`                 | `Seller Pain`           | `painSig` (DOM, drops, equity, propensity, …)                                          |
-| 3 (agent)    | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
-| 3 (agent)    | `ISC: 19`                     | `Investor Sourced Count` | `isc` + plain-English meaning ("Number of deals this agent has sourced to investors.") |
-| 3 (agent)    | `Active 2yr · 7A/3P/0B/54S`   | `Deal Track Record`     | `activeYears`, `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` |
-| 4 (money)    | `$525,000` (semibold, gray-900) | `Price History`       | `priceHist` + `priceTotal`                                                             |
-| 4 (money)    | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
+| 3 (agent + money) | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
+| 3 (agent + money) | `ISC: 19`                     | `Investor Sourced Count` | `isc` + plain-English meaning ("Number of deals this agent has sourced to investors.") |
+| 3 (agent + money) | `Active 2yr · 7A/3P/0B/54S`   | `Deal Track Record`     | `activeYears`, `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` |
+| 3 (agent + money) | `$525,000` (semibold, gray-900) | `Price History`       | `priceHist` + `priceTotal`                                                             |
+| 3 (agent + money) | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
 | Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / negotiator / assigned                            |
 | Right | `Opened 04/22` (under offer status) | `Open History` (right-aligned) | first / last / total opens                                                  |
 | Right | `Called —` (under offer status)    | `Communication History` (right-aligned) | first / last + per-channel calls/texts/emails                          |

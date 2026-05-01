@@ -417,7 +417,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
           </span>
         </div>
 
-        {/* Line 2 — agent intel */}
+        {/* Line 2 — agent intel + money (price/ARV trail the agent stats) */}
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
           <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${AGENT_DOT[detail.agent]}`} />
@@ -458,10 +458,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
               ]}
             />
           </span>
-        </div>
-
-        {/* Line 3 — money (price + ARV, the bottom-line number) */}
-        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
+          <span className="text-gray-300">·</span>
           <span className="relative group cursor-help font-semibold text-gray-900">
             {property.price}
             <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />
