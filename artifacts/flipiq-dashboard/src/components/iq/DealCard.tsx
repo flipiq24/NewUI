@@ -415,10 +415,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
             Pain: {detail.painLabel}
             <TipPanel title="Seller Pain" rows={detail.painSig} />
           </span>
-        </div>
-
-        {/* Line 2 — money leads, then agent intel */}
-        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
+          <span className="text-gray-300">·</span>
           <span className="relative group cursor-help font-semibold text-gray-900">
             {property.price}
             <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />
@@ -428,7 +425,10 @@ export default function DealCard({ property }: { property: DealProperty }) {
             {detail.arvPct}
             <TipPanel title="ARV" rows={[["Asking", property.price], ["ARV", detail.arv], ["Asking vs ARV", detail.arvPct]]} />
           </span>
-          <span className="text-gray-300">·</span>
+        </div>
+
+        {/* Line 3 — agent (who's gating the deal) */}
+        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
           <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${AGENT_DOT[detail.agent]}`} />
             Agent: {detail.agentLabel}
@@ -452,8 +452,6 @@ export default function DealCard({ property }: { property: DealProperty }) {
           </span>
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help inline-flex items-center gap-1 text-[12px] text-gray-500 hover:text-gray-900">
-            <span>Active <span className="font-medium text-gray-700">{detail.activeYears ?? "2yr"}</span></span>
-            <span className="text-gray-300">·</span>
             <span className="font-medium text-gray-700 tabular-nums">
               {detail.trackActive ?? 7}A / {detail.trackPending ?? 3}P / {detail.trackBackup ?? 0}B / {detail.trackSold ?? 54}S
             </span>
