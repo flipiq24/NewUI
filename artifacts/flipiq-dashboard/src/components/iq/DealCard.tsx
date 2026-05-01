@@ -354,7 +354,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
           )}
         </div>
 
-        {/* Combined row — address + facts + signals (wraps to 2 lines naturally) */}
+        {/* Line 1 — property identity (no price/ARV) */}
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
           <span className="relative group cursor-help">
             <span className="group-hover:text-gray-900">{property.address}</span>
@@ -375,7 +375,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
             />
           </span>
           <span className="text-gray-300">·</span>
-          {/* Keywords — moved here, right after sales type (it's property data) */}
+          {/* Keywords — right after sales type (it's property data) */}
           <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
             Keywords: {detail.kwLabel}
@@ -410,22 +410,15 @@ export default function DealCard({ property }: { property: DealProperty }) {
             />
           </span>
           <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help font-medium text-gray-900">
-            {property.price}
-            <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />
-          </span>
-          <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help font-medium text-gray-700">
-            {detail.arvPct}
-            <TipPanel title="ARV" rows={[["Asking", property.price], ["ARV", detail.arv], ["Asking vs ARV", detail.arvPct]]} />
-          </span>
-          <span className="text-gray-300">·</span>
           <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
             Pain: {detail.painLabel}
             <TipPanel title="Seller Pain" rows={detail.painSig} />
           </span>
-          <span className="text-gray-300">·</span>
+        </div>
+
+        {/* Line 2 — agent intel */}
+        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
           <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${AGENT_DOT[detail.agent]}`} />
             Agent: {detail.agentLabel}
@@ -464,6 +457,19 @@ export default function DealCard({ property }: { property: DealProperty }) {
                 ["Total",   String(detail.trackTotal   ?? 57)],
               ]}
             />
+          </span>
+        </div>
+
+        {/* Line 3 — money (price + ARV, the bottom-line number) */}
+        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
+          <span className="relative group cursor-help font-semibold text-gray-900">
+            {property.price}
+            <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />
+          </span>
+          <span className="text-gray-300">·</span>
+          <span className="relative group cursor-help font-medium text-gray-700">
+            {detail.arvPct}
+            <TipPanel title="ARV" rows={[["Asking", property.price], ["ARV", detail.arv], ["Asking vs ARV", detail.arvPct]]} />
           </span>
         </div>
 
