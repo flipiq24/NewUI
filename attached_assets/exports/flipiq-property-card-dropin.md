@@ -5,7 +5,7 @@ property row in the screenshot:
 
 > ☐  📞 **MID** **No response — send offer**  📞● 💬● ✉●  **Critical**            15% Outreach Sent ▾
 >                                                                                       Opened 04/22 · Called —   ← red text (cold)
-> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · ● **Keywords: High** · Source: MLS — Active   ← `Keywords: High` renders red
+> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: **High** · Source: MLS — Active   ← only the `High` value is red; `Keywords:` stays gray
 > 💬  **525k** · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: **11** · **5A** / 8P / 2B / 41S   ← `ISC` blue when > 0, gray when 0; `5A` orange when > 0
 
 Every chip / icon / value has a hover tooltip:
@@ -854,7 +854,7 @@ export default function DealCard({
               mid = amber, low = gray. */}
           <span className="shrink-0 relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
-            <span className={KW_TEXT[detail.kw]}>Keywords: {detail.kwLabel}</span>
+            <span>Keywords: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span></span>
             <TipPanel title="Listing Remarks" align="right" wide>
               <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1.5 mb-1">Public Comments</div>
               <KwHtml html={detail.pubCmt} />
@@ -1320,7 +1320,7 @@ The tooltip content sources:
 | 1   | Inline flag `Critical` / `Reminder`  | none — plain word       | rendered when `notifications` includes `"critical"` (red) or `"reminder"` (blue)       |
 | 2 (property) | Address                       | `Property`              | `prop` rows                                                                            |
 | 2 (property) | Sales-type code (e.g. `STD`)  | `Sales Type`            | code + full label, property type                                                       |
-| 2 (property) | `● Keywords: Mid` (next to STD) | `Listing Remarks`     | dot color from `KW_DOT[detail.kw]`, label color from `KW_TEXT[detail.kw]` (high = **red #E24B4A semibold**, mid = amber #BA7517, low = gray #B4B2A9). Tooltip: `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills |
+| 2 (property) | `● Keywords: Mid` (next to STD) | `Listing Remarks`     | dot color from `KW_DOT[detail.kw]`. The literal `Keywords:` prefix stays the row's default gray — **only the `kwLabel` value** (`High` / `Mid` / `Low`) is colored via `KW_TEXT[detail.kw]` (high = **red #E24B4A semibold**, mid = amber #BA7517, low = gray #B4B2A9). Tooltip: `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills |
 | 2 (property) | `Source: MLS — Active`        | `Source`                | source / status / negotiator / assigned                                                |
 | 3 (deal)     | `525k` (semibold, gray-900, no `$`) | `Price History`   | `priceHist` + `priceTotal`. Rendered via `compactPrice(property.price)` — drops `$`, collapses zeros to `k` / `m` |
 | 3 (deal)     | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
@@ -1352,9 +1352,10 @@ The tooltip content sources:
 | Freshness text — cold (>7d, `—`, `N/A`) | `#A33232` (dark red)  |
 
 **Key rules to keep all three cards consistent:**
-- `Keywords: High` → red dot **and** red semibold label (`KW_TEXT.high`).
-- `Keywords: Mid` → amber dot + amber label.
-- `Keywords: Low` → gray dot + gray label.
+- The literal `Keywords:` prefix always renders in the row's default gray. Only the value (`High` / `Mid` / `Low`) picks up the color.
+- `Keywords: High` → red dot + red semibold value (`KW_TEXT.high`).
+- `Keywords: Mid` → amber dot + amber value.
+- `Keywords: Low` → gray dot + gray value.
 - `ISC: 0` → number is gray (`text-gray-400`); `ISC > 0` → number is hyperlink blue (`text-[#2F86D6]`).
 - `xA` in `xA / yP / zB / wS` → orange `#D67432` + semibold when `trackActive > 0`; plain gray when `0A`.
 

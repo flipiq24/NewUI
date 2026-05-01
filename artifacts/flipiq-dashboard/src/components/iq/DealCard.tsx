@@ -629,7 +629,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
               mid = amber, low = gray. */}
           <span className="shrink-0 relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
-            <span className={KW_TEXT[detail.kw]}>Keywords: {detail.kwLabel}</span>
+            <span>Keywords: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span></span>
             <TipPanel title="Listing Remarks" align="right" wide>
               <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1.5 mb-1">Public Comments</div>
               <KwHtml html={detail.pubCmt} />
