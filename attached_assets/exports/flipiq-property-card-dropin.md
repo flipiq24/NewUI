@@ -4,7 +4,7 @@ A single self-contained React + TypeScript component that reproduces the
 property row in the screenshot:
 
 > ☐  📞 **MID** **No response — send offer**  📞● 💬● ✉●  **Critical** **Reminder**     15% Outreach Sent ▾
->                                                                                          Opened 04/22 · Called —
+>                                                                                          [Opened 04/22] [Called —]   ← red tints (cold)
 > ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: Mid · Source: MLS — Active
 > 💬  **525k** · 77% ARV · ● Agent: Not Responsive · ISC: 19 · 7A / 3P / 0B / 54S
 
@@ -41,9 +41,15 @@ Detailed Analysis).
    `#B4B2A9`) and is *the very first thing* the rep sees after the
    phone icon, so seller motivation registers before the CTA itself.
 2. **Right column — status + recency (right-aligned, stacked):**
-   `60% In Negotiations ▾` on top, then a small muted
-   `Opened 04/22 · Called —` underneath. Same mental beat: where am
-   I, when was I last here.
+   `60% In Negotiations ▾` on top, then two small **traffic-light
+   tinted pills** `Opened MM/DD` and `Called MM/DD` underneath.
+   The tint grades freshness against today via `gradeFreshness()`:
+   - **Green** = ≤ 3 days (recent activity — happy state)
+   - **Yellow** = 4–7 days (getting stale — call soon)
+   - **Red** = > 7 days, `—`, or `N/A` (cold / never — urgent)
+   Same mental beat as the rest of the card: where am I, when was I
+   last here, and *should I worry about it*. The color is the worry
+   signal — no math required.
 3. **Meta block — two forced lines** (separate `<div>`s). Grouped by
    *what mental question it answers* so the rep's eye scans
    top-to-bottom in priority order.
@@ -243,6 +249,36 @@ const PAIN_TEXT: Record<DealDetail["pain"], string> = {
   low:  "text-[#B4B2A9]",
   none: "text-[#B4B2A9]",
 };
+
+/**
+ * Recency tint for the Opened / Called timestamps on the right of the card.
+ * Green = recent (≤3 days), yellow = getting stale (4–7 days),
+ * red = cold or never (>7 days, "—", "N/A").
+ */
+const FRESHNESS: Record<"fresh" | "stale" | "cold", string> = {
+  fresh: "bg-[#EAF4DC] text-[#476B14]", // green
+  stale: "bg-[#FDF3DC] text-[#8B6210]", // yellow
+  cold:  "bg-[#FDE3E3] text-[#A33232]", // red
+};
+
+/** Grade an "MM/DD" or "MM/DD/YY" string against today. */
+function gradeFreshness(mmdd: string): keyof typeof FRESHNESS {
+  if (!mmdd || mmdd === "—" || /n\/?a/i.test(mmdd)) return "cold";
+  const m = mmdd.match(/^(\d{1,2})\/(\d{1,2})/);
+  if (!m) return "cold";
+  const today = new Date();
+  const month = Number(m[1]);
+  const day = Number(m[2]);
+  // MM/DD has no year — assume current year, roll back if month is in the future.
+  let year = today.getFullYear();
+  if (month > today.getMonth() + 1) year -= 1;
+  const then = new Date(year, month - 1, day);
+  const days = Math.floor((today.getTime() - then.getTime()) / 86_400_000);
+  if (days < 0) return "fresh";
+  if (days <= 3) return "fresh";
+  if (days <= 7) return "stale";
+  return "cold";
+}
 
 /**
  * "$525,000" → "525k", "$1,250,000" → "1.25m", "$335,800" → "336k".
@@ -718,16 +754,16 @@ export default function DealCard({
           />
         </span>
         <div className="inline-flex items-center gap-1.5 text-[11.5px] text-gray-500">
-          <span className="relative group cursor-help hover:text-gray-900">
-            Opened <span className="font-medium text-gray-700">{detail.opened}</span>
+          {/* Tinted pill — green = ≤3d, yellow = 4–7d, red = cold/never. */}
+          <span className={`relative group cursor-help inline-flex items-center gap-1 px-1.5 py-px rounded-sm font-medium ${FRESHNESS[gradeFreshness(detail.opened)]}`}>
+            Opened {detail.opened}
             <TipPanel
               title="Open History" align="right"
               rows={[["First opened", detail.firstOpened], ["Last opened", detail.opened], ["Total opens", String(detail.totalOpens)]]}
             />
           </span>
-          <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help hover:text-gray-900">
-            Called <span className="font-medium text-gray-700">{detail.called}</span>
+          <span className={`relative group cursor-help inline-flex items-center gap-1 px-1.5 py-px rounded-sm font-medium ${FRESHNESS[gradeFreshness(detail.called)]}`}>
+            Called {detail.called}
             <TipPanel
               title="Communication History" align="right"
               rows={[["First call", detail.firstCalled], ["Last call", detail.called], ["Total comms", String(detail.totalCommsCount)]]}
@@ -898,8 +934,8 @@ The tooltip content sources:
 | 3 (deal)     | `ISC: 19`                     | `Investor Sourced Count` | `isc` + plain-English meaning ("Number of deals this agent has sourced to investors.") |
 | 3 (deal)     | `7A/3P/0B/54S`                | `Deal Track Record`     | `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable) |
 | Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / negotiator / assigned                            |
-| Right | `Opened 04/22` (under offer status) | `Open History` (right-aligned) | first / last / total opens                                                  |
-| Right | `Called —` (under offer status)    | `Communication History` (right-aligned) | first / last + per-channel calls/texts/emails                          |
+| Right | `Opened 04/22` **tinted pill** (green/yellow/red) | `Open History` (right-aligned) | first / last / total opens. Tint via `gradeFreshness(detail.opened)` — green ≤3d, yellow 4–7d, red >7d / `—` |
+| Right | `Called —` **tinted pill** (green/yellow/red) | `Communication History` (right-aligned) | first / last + per-channel calls/texts/emails. Same `gradeFreshness()` rule on `detail.called` |
 | Kebab (⋮) | (click to open)                | drill menu              | 3 cols: Communication / Quick Links / Detailed Analysis + footer "Auto Tracker"        |
 | 💬 chat icon                          | inline tooltip          | "View conversations"                                                                   |
 
@@ -914,6 +950,9 @@ The tooltip content sources:
 | Neutral / Low / None                  | `#B4B2A9` (gray)  |
 | Negative / Not responsive / High pain / `Critical` flag | `#E24B4A` (red) |
 | `Reminder` flag                       | `#2F86D6` (blue)  |
+| Freshness pill — fresh (≤3d)          | bg `#EAF4DC` / text `#476B14` (green tint)  |
+| Freshness pill — stale (4–7d)         | bg `#FDF3DC` / text `#8B6210` (yellow tint) |
+| Freshness pill — cold (>7d, `—`, `N/A`) | bg `#FDE3E3` / text `#A33232` (red tint)  |
 
 To add more sentiment dots, just push to the `channels` array inside
 `ChannelChips` or extend the `*_DOT` maps. To add new inline flag

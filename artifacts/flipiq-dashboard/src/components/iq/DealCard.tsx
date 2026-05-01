@@ -28,6 +28,36 @@ const PAIN_TEXT: Record<DealDetail["pain"], string> = {
 };
 
 /**
+ * Recency tint for the Opened / Called timestamps on the right of the card.
+ * Green = recent (≤3 days), yellow = getting stale (4–7 days),
+ * red = cold or never (>7 days, "—", "N/A").
+ */
+const FRESHNESS: Record<"fresh" | "stale" | "cold", string> = {
+  fresh: "bg-[#EAF4DC] text-[#476B14]",
+  stale: "bg-[#FDF3DC] text-[#8B6210]",
+  cold:  "bg-[#FDE3E3] text-[#A33232]",
+};
+
+/** Grade an "MM/DD" or "MM/DD/YY" string against today. */
+function gradeFreshness(mmdd: string): keyof typeof FRESHNESS {
+  if (!mmdd || mmdd === "—" || /n\/?a/i.test(mmdd)) return "cold";
+  const m = mmdd.match(/^(\d{1,2})\/(\d{1,2})/);
+  if (!m) return "cold";
+  const today = new Date();
+  const month = Number(m[1]);
+  const day = Number(m[2]);
+  // MM/DD has no year — assume current year, roll back if month is in the future.
+  let year = today.getFullYear();
+  if (month > today.getMonth() + 1) year -= 1;
+  const then = new Date(year, month - 1, day);
+  const days = Math.floor((today.getTime() - then.getTime()) / 86_400_000);
+  if (days < 0) return "fresh";
+  if (days <= 3) return "fresh";
+  if (days <= 7) return "stale";
+  return "cold";
+}
+
+/**
  * "$525,000" → "525k", "$1,250,000" → "1.25m", "$335,800" → "336k".
  * Used in the meta row where the dollar sign is dropped and zeros are
  * collapsed for scannability.
@@ -539,17 +569,17 @@ export default function DealCard({ property }: { property: DealProperty }) {
           />
         </span>
         <div className="inline-flex items-center gap-1.5 text-[11.5px] text-gray-500">
-          <span className="relative group cursor-help hover:text-gray-900">
-            Opened <span className="font-medium text-gray-700">{detail.opened}</span>
+          {/* Tinted pill — green = ≤3d, yellow = 4–7d, red = cold/never. */}
+          <span className={`relative group cursor-help inline-flex items-center gap-1 px-1.5 py-px rounded-sm font-medium ${FRESHNESS[gradeFreshness(detail.opened)]}`}>
+            Opened {detail.opened}
             <TipPanel
               title="Open History"
               align="right"
               rows={[["First opened", detail.firstOpened], ["Last opened", detail.opened], ["Total opens", String(detail.totalOpens)]]}
             />
           </span>
-          <span className="text-gray-300">·</span>
-          <span className="relative group cursor-help hover:text-gray-900">
-            Called <span className="font-medium text-gray-700">{detail.called}</span>
+          <span className={`relative group cursor-help inline-flex items-center gap-1 px-1.5 py-px rounded-sm font-medium ${FRESHNESS[gradeFreshness(detail.called)]}`}>
+            Called {detail.called}
             <TipPanel
               title="Communication History"
               align="right"
