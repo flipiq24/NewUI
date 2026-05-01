@@ -3,10 +3,10 @@
 A single self-contained React + TypeScript component that reproduces the
 property row in the screenshot:
 
-> ☐  📞 **No response — send offer**  📞● 💬● ✉●  **Critical** **Reminder**            15% Outreach Sent ▾
+> ☐  📞 **MID** **No response — send offer**  📞● 💬● ✉●  **Critical** **Reminder**     15% Outreach Sent ▾
 >                                                                                          Opened 04/22 · Called —
-> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: Mid · Source: MLS — Active · **$525,000** · 77% ARV
-> 💬  ● Pain: Mid · ● Agent: Not Responsive · ISC: 19 · 7A / 3P / 0B / 54S
+> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: Mid · Source: MLS — Active
+> 💬  **525k** · 77% ARV · ● Agent: Not Responsive · ISC: 19 · 7A / 3P / 0B / 54S
 
 Every chip / icon / value has a hover tooltip:
 - **Next Step** — task / who / what / how / context
@@ -31,39 +31,41 @@ Detailed Analysis).
 **Layout / UX ordering** — built for an acquisition rep's scan path:
 *"do I act now → is the property worth my time → who's the agent → where is the deal"*.
 
-1. **Row 1 — action (left):** Call CTA → next-step text → channel chips
+1. **Row 1 — action (left):** Call CTA → **pain level chip (HIGH / MID /
+   LOW)** as a colored uppercase label sitting between the phone icon
+   and the next-step text → next-step text → channel chips
    (call/text/email + sentiment dot, *after* the response) → optional
    inline flags `Critical` (red) / `Reminder` (blue) as plain words —
-   no pill, no box.
+   no pill, no box. The pain label uses the same palette as the dot
+   (high = red `#E24B4A`, mid = amber `#BA7517`, low = muted gray
+   `#B4B2A9`) and is *the very first thing* the rep sees after the
+   phone icon, so seller motivation registers before the CTA itself.
 2. **Right column — status + recency (right-aligned, stacked):**
    `60% In Negotiations ▾` on top, then a small muted
    `Opened 04/22 · Called —` underneath. Same mental beat: where am
    I, when was I last here.
-3. **Meta block — two forced lines** (separate `<div>`s).
-   Grouped by *what mental question it answers* so the rep's eye scans
+3. **Meta block — two forced lines** (separate `<div>`s). Grouped by
+   *what mental question it answers* so the rep's eye scans
    top-to-bottom in priority order.
-   - **Line 1 — property (asset facts + deal math):** Address →
+   - **Line 1 — property identity (what is it):** Address →
      world-icon → sales type → **Keywords** (next to sales type —
-     keywords are *property* data) → Source/status → **Price**
-     (semibold, gray-900) → ARV %. Price/ARV live with the property
-     because they *are* a property attribute (the deal math). This row
-     is **`flex-nowrap` + `whitespace-nowrap`** with the address as the
-     only `min-w-0 truncate` child — every other chip is `shrink-0`.
-     Result: the property row is **always exactly one visual line**;
-     the address truncates with `…` on narrow viewports (full address
-     still in the hover tooltip) instead of letting `77% ARV` orphan
-     to a 4th line.
-   - **Line 2 — humans (who you're dealing with):** ● **Pain** (seller
-     motivation) → ● **Agent** (responsiveness / gatekeeper) → ISC →
-     Deal Track Record (A/P/B/S). Pain lives here, not on the property
-     line, because it's a *human* signal — same family as agent
-     responsiveness. Keeping it here also guarantees Pain appears in
-     the *same position on every card* (the property row is variable
-     width, so anything tacked on the end of it shifted around). "Active
-     Nyr" is intentionally omitted — tenure isn't actionable; A/P/B/S
-     already conveys experience.
-   `Opened` and `Called` are deliberately *not* here — they're
-   recency data and live with the offer status on the right.
+     keywords are *property* data) → Source/status. Pure asset
+     description. This row is **`flex-nowrap` + `whitespace-nowrap`**
+     with the address as the only `min-w-0 truncate` child — every
+     other chip is `shrink-0`. The address truncates with `…` on
+     narrow viewports (full address still in the hover tooltip).
+   - **Line 2 — deal math + agent (is it worth my time + who's gating
+     it):** **Compact price** (e.g. `525k`, no `$` prefix, zeros
+     collapsed via `compactPrice()`) → ARV % → ● **Agent**
+     (responsiveness / gatekeeper) → ISC → Deal Track Record (A/P/B/S).
+     Price is shown *without* the dollar sign because the column is
+     unambiguously money — the `$` is visual noise. "Active Nyr" is
+     intentionally omitted — tenure isn't actionable; A/P/B/S already
+     conveys experience.
+   Pain is **not** in the meta block — it's the colored uppercase chip
+   on Row 1 next to the phone icon, so it's the first thing the rep
+   processes. `Opened` and `Called` are deliberately *not* here either —
+   they're recency data and live with the offer status on the right.
 
 The whole thing has **zero project-specific imports**. Just React,
 TypeScript, and Tailwind. Drop it into any Replit React project.
@@ -235,6 +237,27 @@ const PAIN_DOT: Record<DealDetail["pain"], string> = {
   low:  "bg-[#B4B2A9]",
   none: "bg-[#B4B2A9]",
 };
+const PAIN_TEXT: Record<DealDetail["pain"], string> = {
+  high: "text-[#E24B4A]",
+  mid:  "text-[#BA7517]",
+  low:  "text-[#B4B2A9]",
+  none: "text-[#B4B2A9]",
+};
+
+/**
+ * "$525,000" → "525k", "$1,250,000" → "1.25m", "$335,800" → "336k".
+ * The meta row drops the "$" prefix and collapses zeros for scannability.
+ */
+function compactPrice(raw: string): string {
+  const n = Number(String(raw).replace(/[^0-9.]/g, ""));
+  if (!Number.isFinite(n) || n <= 0) return raw;
+  if (n >= 1_000_000) {
+    const m = n / 1_000_000;
+    return `${m % 1 === 0 ? m.toFixed(0) : m.toFixed(2).replace(/\.?0+$/, "")}m`;
+  }
+  return `${Math.round(n / 1000)}k`;
+}
+
 const AGENT_DOT: Record<DealDetail["agent"], string> = {
   responsive:       "bg-[#639922]",
   "not-responsive": "bg-[#E24B4A]",
@@ -514,6 +537,17 @@ export default function DealCard({
               </svg>
             ) : ICON.phone}
           </button>
+          {/* Pain level (HIGH / MID / LOW) — between the phone icon and the
+              CTA. Same palette as the dot. Seller motivation registers
+              before the CTA itself. */}
+          {detail.pain !== "none" && (
+            <span className="relative group cursor-help shrink-0">
+              <span className={`text-[12px] font-semibold uppercase tracking-wide ${PAIN_TEXT[detail.pain]}`}>
+                {detail.painLabel}
+              </span>
+              <TipPanel title="Seller Pain" rows={detail.painSig} />
+            </span>
+          )}
           <span className="relative group cursor-help">
             <span className={`text-[15px] font-semibold leading-snug ${done ? "text-gray-400 line-through" : "text-orange-600 group-hover:text-orange-700"}`}>
               {property.nextSteps}
@@ -540,11 +574,11 @@ export default function DealCard({
           )}
         </div>
 
-        {/* Line 1 — property (asset facts + deal math).
+        {/* Line 1 — property identity (what is it).
             flex-nowrap + whitespace-nowrap + min-w-0 truncate on the address
-            keep this row on EXACTLY one visual line — the address gets `…`
-            on narrow viewports (full text in the hover tooltip) instead of
-            `77% ARV` orphaning to a 4th line. */}
+            keep this row on EXACTLY one visual line. Address gets `…` on
+            narrow viewports (full text in the hover tooltip). Price/ARV
+            live on Line 2; pain lives on Row 1 next to the phone. */}
         <div className="flex items-center flex-nowrap min-w-0 gap-x-2 text-[13px] text-gray-700 leading-6 whitespace-nowrap">
           <span className="relative group cursor-help min-w-0 truncate">
             <span className="group-hover:text-gray-900">{property.address}</span>
@@ -596,27 +630,21 @@ export default function DealCard({
               ]}
             />
           </span>
-          <span className="shrink-0 text-gray-300">·</span>
-          {/* Price / ARV live on the property line — they ARE property attributes (deal math) */}
-          <span className="shrink-0 relative group cursor-help font-semibold text-gray-900">
-            {property.price}
-            <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />
-          </span>
-          <span className="shrink-0 text-gray-300">·</span>
-          <span className="shrink-0 relative group cursor-help font-medium text-gray-700">
-            {detail.arvPct}
-            <TipPanel title="ARV" rows={[["Asking", property.price], ["ARV", detail.arv], ["Asking vs ARV", detail.arvPct]]} />
-          </span>
         </div>
 
-        {/* Line 2 — humans (seller motivation + agent gatekeeper).
-            Pain lives here, NOT on the property row, so its position is
-            consistent across cards (the property row is variable width). */}
+        {/* Line 2 — deal math + agent.
+            Compact price (no "$", zeros collapsed: 525k) + ARV % +
+            agent responsiveness + ISC + Deal Track Record (A/P/B/S).
+            Pain isn't here — it's the colored chip on Row 1 next to the phone. */}
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
-          <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
-            <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
-            Pain: {detail.painLabel}
-            <TipPanel title="Seller Pain" rows={detail.painSig} />
+          <span className="relative group cursor-help font-semibold text-gray-900">
+            {compactPrice(property.price)}
+            <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />
+          </span>
+          <span className="text-gray-300">·</span>
+          <span className="relative group cursor-help font-medium text-gray-700">
+            {detail.arvPct}
+            <TipPanel title="ARV" rows={[["Asking", property.price], ["ARV", detail.arv], ["Asking vs ARV", detail.arvPct]]} />
           </span>
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
@@ -856,6 +884,7 @@ The tooltip content sources:
 | Row | Hover target                         | Tooltip title           | Data                                                                                  |
 |-----|--------------------------------------|-------------------------|---------------------------------------------------------------------------------------|
 | 1   | Pulsing call CTA (📞)                | native `title` only     | "Call this agent first" / "Call logged"                                               |
+| 1   | **Pain label `MID`** (after phone, before CTA) | `Seller Pain` | colored uppercase chip: high red / mid amber / low gray; `painSig` rows in tooltip   |
 | 1   | Next-step orange text                | `Next Step`             | `taskWho` / `taskWhat` / `taskHow` / `taskNote`                                        |
 | 1   | Channel chips after the response (call/text/mail) | native `title` | `Call: Positive`, `Text: Negative`, `Email: Neutral` from `callResponse` etc.        |
 | 1   | Inline flag `Critical` / `Reminder`  | none — plain word       | rendered when `notifications` includes `"critical"` (red) or `"reminder"` (blue)       |
@@ -863,12 +892,11 @@ The tooltip content sources:
 | 2 (property) | Sales-type code (e.g. `STD`)  | `Sales Type`            | code + full label, property type                                                       |
 | 2 (property) | `● Keywords: Mid` (next to STD) | `Listing Remarks`     | `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills                         |
 | 2 (property) | `Source: MLS — Active`        | `Source`                | source / status / negotiator / assigned                                                |
-| 2 (property) | `$525,000` (semibold, gray-900) | `Price History`       | `priceHist` + `priceTotal` — price is a property attribute (deal math)                 |
-| 2 (property) | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
-| 3 (humans)   | `● Pain: Mid`                 | `Seller Pain`           | `painSig` (DOM, drops, equity, propensity, …) — seller motivation, lives with humans   |
-| 3 (humans)   | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
-| 3 (humans)   | `ISC: 19`                     | `Investor Sourced Count` | `isc` + plain-English meaning ("Number of deals this agent has sourced to investors.") |
-| 3 (humans)   | `7A/3P/0B/54S`                | `Deal Track Record`     | `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable) |
+| 3 (deal)     | `525k` (semibold, gray-900, no `$`) | `Price History`   | `priceHist` + `priceTotal`. Rendered via `compactPrice(property.price)` — drops `$`, collapses zeros to `k` / `m` |
+| 3 (deal)     | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
+| 3 (deal)     | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
+| 3 (deal)     | `ISC: 19`                     | `Investor Sourced Count` | `isc` + plain-English meaning ("Number of deals this agent has sourced to investors.") |
+| 3 (deal)     | `7A/3P/0B/54S`                | `Deal Track Record`     | `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable) |
 | Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / negotiator / assigned                            |
 | Right | `Opened 04/22` (under offer status) | `Open History` (right-aligned) | first / last / total opens                                                  |
 | Right | `Called —` (under offer status)    | `Communication History` (right-aligned) | first / last + per-channel calls/texts/emails                          |

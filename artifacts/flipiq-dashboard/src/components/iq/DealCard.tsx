@@ -20,6 +20,27 @@ const PAIN_DOT: Record<DealDetail["pain"], string> = {
   low: "bg-[#B4B2A9]",
   none: "bg-[#B4B2A9]",
 };
+const PAIN_TEXT: Record<DealDetail["pain"], string> = {
+  high: "text-[#E24B4A]",
+  mid: "text-[#BA7517]",
+  low: "text-[#B4B2A9]",
+  none: "text-[#B4B2A9]",
+};
+
+/**
+ * "$525,000" → "525k", "$1,250,000" → "1.25m", "$335,800" → "336k".
+ * Used in the meta row where the dollar sign is dropped and zeros are
+ * collapsed for scannability.
+ */
+function compactPrice(raw: string): string {
+  const n = Number(String(raw).replace(/[^0-9.]/g, ""));
+  if (!Number.isFinite(n) || n <= 0) return raw;
+  if (n >= 1_000_000) {
+    const m = n / 1_000_000;
+    return `${m % 1 === 0 ? m.toFixed(0) : m.toFixed(2).replace(/\.?0+$/, "")}m`;
+  }
+  return `${Math.round(n / 1000)}k`;
+}
 const AGENT_DOT: Record<DealDetail["agent"], string> = {
   responsive: "bg-[#639922]",
   "not-responsive": "bg-[#E24B4A]",
@@ -327,6 +348,16 @@ export default function DealCard({ property }: { property: DealProperty }) {
               ICON.phone
             )}
           </button>
+          {/* Pain level (HIGH / MID / LOW) — sits between the phone icon
+              and the next-step CTA so the rep sees seller motivation FIRST. */}
+          {detail.pain !== "none" && (
+            <span className="relative group cursor-help shrink-0">
+              <span className={`text-[12px] font-semibold uppercase tracking-wide ${PAIN_TEXT[detail.pain]}`}>
+                {detail.painLabel}
+              </span>
+              <TipPanel title="Seller Pain" rows={detail.painSig} />
+            </span>
+          )}
           <span className="relative group cursor-help">
             <span className={`text-[15px] font-semibold leading-snug ${done.call ? "text-gray-400 line-through" : "text-orange-600 group-hover:text-orange-700"}`}>
               {property.nextSteps}
@@ -410,24 +441,20 @@ export default function DealCard({ property }: { property: DealProperty }) {
               ]}
             />
           </span>
-          <span className="shrink-0 text-gray-300">·</span>
-          <span className="shrink-0 relative group cursor-help font-semibold text-gray-900">
-            {property.price}
-            <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />
-          </span>
-          <span className="shrink-0 text-gray-300">·</span>
-          <span className="shrink-0 relative group cursor-help font-medium text-gray-700">
-            {detail.arvPct}
-            <TipPanel title="ARV" rows={[["Asking", property.price], ["ARV", detail.arv], ["Asking vs ARV", detail.arvPct]]} />
-          </span>
         </div>
 
-        {/* Line 3 — humans (seller motivation + agent gatekeeper) */}
+        {/* Line 3 — deal math (compact price + ARV) + agent.
+            Price moved here, no "$" prefix, zeros collapsed (525k).
+            Pain isn't here anymore — it's the colored label on Row 1 next to the phone. */}
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
-          <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
-            <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
-            Pain: {detail.painLabel}
-            <TipPanel title="Seller Pain" rows={detail.painSig} />
+          <span className="relative group cursor-help font-semibold text-gray-900">
+            {compactPrice(property.price)}
+            <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />
+          </span>
+          <span className="text-gray-300">·</span>
+          <span className="relative group cursor-help font-medium text-gray-700">
+            {detail.arvPct}
+            <TipPanel title="ARV" rows={[["Asking", property.price], ["ARV", detail.arv], ["Asking vs ARV", detail.arvPct]]} />
           </span>
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
