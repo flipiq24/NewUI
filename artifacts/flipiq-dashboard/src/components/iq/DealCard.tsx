@@ -307,7 +307,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
 
       {/* Main */}
       <div className="min-w-0">
-        {/* Row 1 */}
+        {/* Row 1 — Call CTA + channel chips next to it + next step */}
         <div className="flex items-center gap-2.5 mb-1">
           <button
             type="button"
@@ -327,6 +327,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
               ICON.phone
             )}
           </button>
+          <ChannelChips property={property} />
           <span className="relative group cursor-help">
             <span className={`text-[15px] font-semibold leading-snug ${done.call ? "text-gray-400 line-through" : "text-orange-600 group-hover:text-orange-700"}`}>
               {property.nextSteps}
@@ -418,7 +419,26 @@ export default function DealCard({ property }: { property: DealProperty }) {
               </div>
             </TipPanel>
           </span>
-          <ChannelChips property={property} />
+          <span className="text-gray-300">·</span>
+          <span className="relative group cursor-help inline-flex items-center gap-1 hover:text-gray-900">
+            <span>ISC: <span className="font-medium text-gray-700">{detail.isc ?? 19}</span></span>
+            <span className="text-gray-300">·</span>
+            <span>Active <span className="font-medium text-gray-700">{detail.activeYears ?? "2yr"}</span></span>
+            <span className="text-gray-300">·</span>
+            <span className="font-medium text-gray-700 tabular-nums">
+              {detail.trackActive ?? 7}A / {detail.trackPending ?? 3}P / {detail.trackBackup ?? 0}B / {detail.trackSold ?? 54}S
+            </span>
+            <TipPanel
+              title="Deal Track Record"
+              rows={[
+                ["Active",  String(detail.trackActive  ?? 7)],
+                ["Pending", String(detail.trackPending ?? 3)],
+                ["Backup",  String(detail.trackBackup  ?? 0)],
+                ["Sold",    String(detail.trackSold    ?? 54)],
+                ["Total",   String(detail.trackTotal   ?? 57)],
+              ]}
+            />
+          </span>
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help inline-flex items-center gap-1.5 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />

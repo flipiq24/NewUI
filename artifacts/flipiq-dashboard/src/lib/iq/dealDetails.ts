@@ -34,6 +34,13 @@ export type DealDetail = {
   taskWho?: string;
   taskWhat?: string;
   taskHow?: string;
+  isc?: number;
+  activeYears?: string;
+  trackActive?: number;
+  trackPending?: number;
+  trackBackup?: number;
+  trackSold?: number;
+  trackTotal?: number;
 };
 
 export const DEAL_DETAILS: Record<number, DealDetail> = {

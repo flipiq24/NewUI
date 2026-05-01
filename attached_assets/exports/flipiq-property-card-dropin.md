@@ -3,14 +3,40 @@
 A single self-contained React + TypeScript component that reproduces the
 property row in the screenshot:
 
-> ☐  📞  **No response — send offer**                                    15% Outreach Sent ▾
+> ☐  📞 ✉●  **No response — send offer**                                15% Outreach Sent ▾
 > ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · Source: MLS — Active · $525,000 · 77% ARV
-> 💬   ● Pain: Mid · ● Agent: Not Responsive   📞●  ✉●  · ● Keywords: Mid · Opened 04/22 · Called —
+> 💬   ● Pain: Mid · ● Agent: Not Responsive · ISC: 19 · Active 2yr · 7A / 3P / 0B / 54S · ● Keywords: Mid · Opened 04/22 · Called —
 
-Every chip / icon / value has a hover tooltip (price history, ARV, sales
-type, source, agent comms, listing remarks, open history, call history,
-offer status). The kebab opens a 3-column drill menu (Communication,
-Quick Links, Detailed Analysis).
+Every chip / icon / value has a hover tooltip:
+- **Next Step** — task / who / what / how / context
+- **Property** — type, beds/baths, sq ft, lot, year, etc.
+- **Sales Type** — code → full label (STD = Standard, REO, NOD, …)
+- **Source** — source / status / negotiator / assigned
+- **Price History** — every list-price change + total reduction
+- **ARV** — asking vs ARV percentage
+- **Seller Pain** — DOM, price drops, showings, equity, propensity
+- **Last Attempts** — last 5 outreach attempts + response rate
+- **Channel chips** (call / text / email) — native title shows sentiment
+- **Deal Track Record** — Active / Pending / Backup / Sold / Total
+- **Listing Remarks** — public + agent comments with red `<span class="kw">` pills
+- **Open History** — first / last / total opens
+- **Communication History** — first / last + per-channel call/text/email totals
+- **Offer Status** — completion %, stage, source, negotiator, assigned
+
+The kebab opens a 3-column drill menu (Communication, Quick Links,
+Detailed Analysis).
+
+**Layout / UX ordering** (left → right by priority):
+
+1. **Row 1 (the action):** Call CTA → channel chips (what you've already
+   tried + how the agent responded) → next-step text. Channel chips sit
+   next to the CTA so you see channel history *before* deciding to dial.
+2. **Row 2 (the facts):** Address → world-icon → sales type → source/status
+   → asking price → ARV %. Reads left → right from "where" to "how much".
+3. **Row 3 (the signals):** Pain → Agent responsiveness → ISC / Active
+   years / Track record → Keywords → Opened → Called. Motivation first,
+   then who you're dealing with, then their volume, then listing
+   intel, then comms recency.
 
 The whole thing has **zero project-specific imports**. Just React,
 TypeScript, and Tailwind. Drop it into any Replit React project.
@@ -144,6 +170,15 @@ export type DealDetail = {
   source: string;
   negotiator: string;
   assigned: string;
+
+  // Agent deal track record (NEW — shows on row 3 after "Agent")
+  isc?: number;          // ISC count, e.g. 19
+  activeYears?: string;  // e.g. "2yr"
+  trackActive?: number;  // 7
+  trackPending?: number; // 3
+  trackBackup?: number;  // 0
+  trackSold?: number;    // 54
+  trackTotal?: number;   // 57
 };
 
 /* ────────────────────────────────────────────────────────────────
@@ -428,7 +463,7 @@ export default function DealCard({
 
       {/* Main */}
       <div className="min-w-0">
-        {/* Row 1 — call button + next step (with tooltip) */}
+        {/* Row 1 — Call CTA + channel chips + next step */}
         <div className="flex items-center gap-2.5 mb-1">
           <button
             type="button"
@@ -446,6 +481,7 @@ export default function DealCard({
               </svg>
             ) : ICON.phone}
           </button>
+          <ChannelChips property={property} />
           <span className="relative group cursor-help">
             <span className={`text-[15px] font-semibold leading-snug ${done ? "text-gray-400 line-through" : "text-orange-600 group-hover:text-orange-700"}`}>
               {property.nextSteps}
@@ -533,7 +569,27 @@ export default function DealCard({
               </div>
             </TipPanel>
           </span>
-          <ChannelChips property={property} />
+          <span className="text-gray-300">·</span>
+          {/* Agent deal track record — ISC · Active Nyr · A/P/B/S */}
+          <span className="relative group cursor-help inline-flex items-center gap-1 hover:text-gray-900">
+            <span>ISC: <span className="font-medium text-gray-700">{detail.isc ?? 19}</span></span>
+            <span className="text-gray-300">·</span>
+            <span>Active <span className="font-medium text-gray-700">{detail.activeYears ?? "2yr"}</span></span>
+            <span className="text-gray-300">·</span>
+            <span className="font-medium text-gray-700 tabular-nums">
+              {detail.trackActive ?? 7}A / {detail.trackPending ?? 3}P / {detail.trackBackup ?? 0}B / {detail.trackSold ?? 54}S
+            </span>
+            <TipPanel
+              title="Deal Track Record"
+              rows={[
+                ["Active",  String(detail.trackActive  ?? 7)],
+                ["Pending", String(detail.trackPending ?? 3)],
+                ["Backup",  String(detail.trackBackup  ?? 0)],
+                ["Sold",    String(detail.trackSold    ?? 54)],
+                ["Total",   String(detail.trackTotal   ?? 57)],
+              ]}
+            />
+          </span>
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help inline-flex items-center gap-1.5 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
@@ -688,6 +744,15 @@ const detail: DealDetail = {
   source:     "MLS — Active",
   negotiator: "Josh Santos",
   assigned:   "Josh Santos",
+
+  // Agent deal track record (ISC · Active Nyr · A/P/B/S)
+  isc:          19,
+  activeYears:  "2yr",
+  trackActive:  7,
+  trackPending: 3,
+  trackBackup:  0,
+  trackSold:    54,
+  trackTotal:   57,
 };
 
 export default function App() {
@@ -723,21 +788,25 @@ off-screen). Pass `wide` for tooltips with comments / long text.
 
 The tooltip content sources:
 
-| Hover target              | Tooltip title           | Data              |
-|---------------------------|-------------------------|-------------------|
-| Next-step orange text     | `Next Step`             | `taskWho/What/How/Note` |
-| Address                   | `Property`              | `prop`            |
-| Sales-type code (e.g. STD)| `Sales Type`            | full label map    |
-| `Source: MLS — Active`    | `Source`                | source/status/negotiator/assigned |
-| `$525,000`                | `Price History`         | `priceHist` + `priceTotal` |
-| `77% ARV`                 | `ARV`                   | asking vs ARV     |
-| `Pain: Mid`               | `Seller Pain`           | `painSig`         |
-| `Agent: Not Responsive`   | `Last Attempts`         | `agentComms` + `agentRate` |
-| Channel icons (call/text/mail) | `Call: Positive` etc. (native title) | `callResponse`, `textResponse`, `emailResponse` |
-| `Keywords: Mid`           | `Listing Remarks`       | `pubCmt` + `agtCmt` (with `<span class="kw">…</span>` red pills) |
-| `Opened 04/22`            | `Open History`          | first/last/total  |
-| `Called —`                | `Communication History` | calls/texts/emails breakdown |
-| `15% Outreach Sent ▾`     | `Offer Status` (right-aligned) | completion/stage/source/negotiator/assigned |
+| Row | Hover target                         | Tooltip title           | Data                                                                                  |
+|-----|--------------------------------------|-------------------------|---------------------------------------------------------------------------------------|
+| 1   | Pulsing call CTA (📞)                | native `title` only     | "Call this agent first" / "Call logged"                                               |
+| 1   | Channel chips next to CTA (call/text/mail) | native `title`     | `Call: Positive`, `Text: Negative`, `Email: Neutral` from `callResponse` etc.         |
+| 1   | Next-step orange text                | `Next Step`             | `taskWho` / `taskWhat` / `taskHow` / `taskNote`                                        |
+| 2   | Address                              | `Property`              | `prop` rows                                                                            |
+| 2   | Sales-type code (e.g. `STD`)         | `Sales Type`            | code + full label, property type                                                       |
+| 2   | `Source: MLS — Active`               | `Source`                | source / status / negotiator / assigned                                                |
+| 2   | `$525,000`                           | `Price History`         | `priceHist` + `priceTotal`                                                             |
+| 2   | `77% ARV`                            | `ARV`                   | asking vs ARV                                                                          |
+| 3   | `● Pain: Mid`                        | `Seller Pain`           | `painSig` (DOM, drops, equity, propensity, …)                                          |
+| 3   | `● Agent: Not Responsive`            | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
+| 3   | `ISC: 19 · Active 2yr · 7A/3P/0B/54S`| `Deal Track Record`     | `isc`, `activeYears`, `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` |
+| 3   | `● Keywords: Mid`                    | `Listing Remarks`       | `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills                         |
+| 3   | `Opened 04/22`                       | `Open History`          | first / last / total opens                                                             |
+| 3   | `Called —`                           | `Communication History` | first / last + per-channel calls/texts/emails                                          |
+| Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / negotiator / assigned                            |
+| Kebab (⋮) | (click to open)                | drill menu              | 3 cols: Communication / Quick Links / Detailed Analysis + footer "Auto Tracker"        |
+| 💬 chat icon                          | inline tooltip          | "View conversations"                                                                   |
 
 ---
 
