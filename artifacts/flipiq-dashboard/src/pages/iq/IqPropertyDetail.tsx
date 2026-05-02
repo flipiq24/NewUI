@@ -142,20 +142,23 @@ export default function IqPropertyDetail() {
               <span className="shrink-0 text-[12px] text-gray-500 cursor-help" title="Keywords pulled from listing remarks">
                 Keywords: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span>
               </span>
-              <span className="ml-auto shrink-0 inline-flex items-center gap-1.5 text-[11.5px] text-gray-500">
-                <span
-                  className={`font-medium cursor-help ${FRESHNESS[gradeFreshness(property.lastOpenDate)]}`}
-                  title={`Last opened: ${property.lastOpenDate}`}
-                >
-                  Opened {property.lastOpenDate}
+              <span className="ml-auto shrink-0 inline-flex flex-col items-end gap-1">
+                <span className="inline-flex items-center gap-1.5 text-[11.5px] text-gray-500">
+                  <span
+                    className={`font-medium cursor-help ${FRESHNESS[gradeFreshness(property.lastOpenDate)]}`}
+                    title={`Last opened: ${property.lastOpenDate}`}
+                  >
+                    Opened {property.lastOpenDate}
+                  </span>
+                  <span className="text-gray-300">·</span>
+                  <span
+                    className={`font-medium cursor-help ${FRESHNESS[gradeFreshness(property.lastCalledDate)]}`}
+                    title={`Last called: ${property.lastCalledDate}`}
+                  >
+                    Called {property.lastCalledDate}
+                  </span>
                 </span>
-                <span className="text-gray-300">·</span>
-                <span
-                  className={`font-medium cursor-help ${FRESHNESS[gradeFreshness(property.lastCalledDate)]}`}
-                  title={`Last called: ${property.lastCalledDate}`}
-                >
-                  Called {property.lastCalledDate}
-                </span>
+                <SecondaryIconStrip detail={detail} />
               </span>
             </div>
 
@@ -217,14 +220,12 @@ export default function IqPropertyDetail() {
             </div>
           </div>
 
-          {/* PROPERTY BASICS — always visible one-liner. The Details
-              section below is hidden by default; click the toggle to reveal
-              the 5 metric cards. */}
-          <div className="px-6 pt-4 pb-3 flex items-start justify-between gap-4 border-b border-gray-100">
+          {/* PROPERTY BASICS — always visible one-liner, blended with header
+              above (no divider). */}
+          <div className="px-6 pb-3">
             <div className="text-[13px] text-gray-800 leading-6 min-w-0" title={propertyBasics}>
               {propertyBasics}
             </div>
-            <SecondaryIconStrip detail={detail} />
           </div>
 
           {/* WORKFLOW STEPPER — thin inline progress. Completed = green check,
@@ -313,7 +314,7 @@ function SecondaryIconStrip({ detail }: { detail: DealDetail }) {
       key: "notes",
       title: "Property Notes",
       icon: (
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4">
           <path d="M3 2h7l3 3v9H3V2z" />
           <polyline points="10,2 10,5 13,5" />
           <line x1="5" y1="8" x2="11" y2="8" />
@@ -326,7 +327,7 @@ function SecondaryIconStrip({ detail }: { detail: DealDetail }) {
       title: "Communications",
       badge: commCount,
       icon: (
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4">
           <path d="M2 3.5h12v7H6.5L3.5 13v-2.5H2v-7z" />
         </svg>
       ),
@@ -335,7 +336,7 @@ function SecondaryIconStrip({ detail }: { detail: DealDetail }) {
       key: "reminders",
       title: "Reminders",
       icon: (
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4">
           <circle cx="8" cy="9" r="5.5" />
           <polyline points="8,6 8,9 10,10.5" />
           <line x1="6" y1="2" x2="3.5" y2="4" />
@@ -347,7 +348,7 @@ function SecondaryIconStrip({ detail }: { detail: DealDetail }) {
       key: "activity",
       title: "Activity",
       icon: (
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4">
           <polyline points="2,9 5,9 7,4 9,12 11,7 14,7" />
         </svg>
       ),
@@ -356,7 +357,7 @@ function SecondaryIconStrip({ detail }: { detail: DealDetail }) {
       key: "tax",
       title: "Tax Data",
       icon: (
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4">
           <rect x="2.5" y="2.5" width="11" height="11" rx="1" />
           <line x1="2.5" y1="6" x2="13.5" y2="6" />
           <line x1="6" y1="6" x2="6" y2="13.5" />
@@ -370,7 +371,7 @@ function SecondaryIconStrip({ detail }: { detail: DealDetail }) {
         <button
           key={it.key}
           title={it.badge ? `${it.title} (${it.badge})` : it.title}
-          className="relative inline-flex items-center justify-center w-7 h-7 rounded-md text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-colors cursor-pointer"
+          className="relative inline-flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-colors cursor-pointer"
         >
           {it.icon}
           {it.badge ? (
