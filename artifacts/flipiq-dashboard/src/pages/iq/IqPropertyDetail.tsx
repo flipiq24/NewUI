@@ -1,7 +1,6 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { useParams, useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
-import IqTopBar from "@/components/iq/IqTopBar";
 import IqAskBar from "@/components/iq/IqAskBar";
 import { DEAL_REVIEW_PROPERTIES, type DealProperty } from "@/lib/iq/mockData";
 import { DEAL_DETAILS, type DealDetail } from "@/lib/iq/dealDetails";
@@ -59,8 +58,6 @@ export default function IqPropertyDetail() {
     <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <IqTopBar />
-
         {/* Breadcrumb — secondary-tab icons on the LEFT, then breadcrumb,
             then Back on the right. */}
         <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
