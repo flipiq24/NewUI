@@ -92,36 +92,53 @@ export default function IqPropertyDetail() {
         <div className="flex-1 overflow-y-auto bg-white">
           {/* HEADER — address + flavor + status, then pain/todo/action */}
           <div className="px-6 pt-5 pb-4 border-b border-gray-100">
-            <div className="flex items-start justify-between gap-4 mb-3">
-              <div className="flex items-center gap-2.5 min-w-0 flex-wrap">
-                <h1 className="text-[20px] font-bold text-gray-900 truncate">
-                  {property.address}
-                </h1>
-                <button className="shrink-0 text-gray-400 hover:text-orange-500 cursor-pointer" title="Open map">
-                  <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4" className="w-3.5 h-3.5">
-                    <circle cx="6" cy="6" r="5" />
-                    <line x1="1" y1="6" x2="11" y2="6" />
-                    <path d="M6 1c1.5 1.5 1.5 8.5 0 10M6 1c-1.5 1.5-1.5 8.5 0 10" />
-                  </svg>
-                </button>
-                <button className="shrink-0 text-gray-400 hover:text-orange-500 cursor-pointer" title="Edit">
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5">
-                    <path d="M3 13l2-.5 7-7-1.5-1.5-7 7L3 13z" />
-                  </svg>
-                </button>
-                <span className="text-[12.5px] text-orange-600 font-medium ml-1">
-                  Agent has 3 other listings
+            {/* ROW 1 — Action row mirroring DealCard exactly:
+                ☐ checkbox · pulsing action circle · HIGH (colored text, no
+                pill) · action text (orange bold) · 3 channel shortcuts ·
+                Critical · Reminder ........ status pill · ⋮ */}
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <input
+                type="checkbox"
+                className="w-3.5 h-3.5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer shrink-0"
+                title="Mark as done"
+              />
+              <ActionCircle channel={rec} />
+              {detail.pain !== "none" && (
+                <span
+                  className={`text-[12px] font-semibold uppercase tracking-wide cursor-help ${PAIN_TEXT[detail.pain]}`}
+                  title={detail.painSig.map(([k, v]) => `${k}: ${v}`).join(" · ")}
+                >
+                  {detail.painLabel}
                 </span>
-              </div>
-              <div className="shrink-0 flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 text-[13px] text-gray-700 border border-gray-300 rounded-full px-3 py-1">
+              )}
+              <span
+                className="text-[15px] font-semibold leading-snug text-orange-600 hover:text-orange-700 cursor-help"
+                title={`${REC_COPY[rec].label} — ${REC_COPY[rec].how}`}
+              >
+                {property.nextSteps}
+              </span>
+              <ChannelShortcut kind="call" />
+              <ChannelShortcut kind="text" />
+              <ChannelShortcut kind="email" />
+              {isCritical && (
+                <span className="text-[12px] font-semibold text-[#E24B4A] cursor-help" title="Critical flag">
+                  Critical
+                </span>
+              )}
+              {isReminder && (
+                <span className="text-[12px] font-semibold text-[#2F86D6] cursor-help" title="Reminder set">
+                  Reminder
+                </span>
+              )}
+              <div className="ml-auto shrink-0 flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 text-[13px] text-gray-700 cursor-pointer hover:text-gray-900">
                   <span className="font-semibold">{property.offerPct}%</span>
                   <span>{property.offerLabel}</span>
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-3 h-3 text-gray-400 ml-0.5">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-3 h-3 text-gray-400">
                     <polyline points="4,6 8,10 12,6" />
                   </svg>
                 </span>
-                <button className="text-gray-400 hover:text-gray-700 cursor-pointer p-1 border border-gray-200 rounded-full" title="More">
+                <button className="text-gray-400 hover:text-gray-700 cursor-pointer p-1" title="More">
                   <svg viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3">
                     <circle cx="8" cy="3" r="1.4" />
                     <circle cx="8" cy="8" r="1.4" />
@@ -131,50 +148,42 @@ export default function IqPropertyDetail() {
               </div>
             </div>
 
-            {/* Action row — pain + To do + action circle + 3 channel quick
-                shortcuts + Critical/Reminder flags + source meta + dates */}
-            <div className="flex items-center gap-2 flex-wrap text-[12.5px] text-gray-600">
-              <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold uppercase tracking-wide bg-gray-50 border border-gray-200 ${PAIN_TEXT[detail.pain]}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
-                {detail.painLabel}
+            {/* ROW 2 — Address + globe · source — status · sales-type ·
+                keywords ........ Opened/Called dates */}
+            <div className="flex items-center flex-wrap gap-x-2 mt-2 text-[13px] text-gray-700 leading-6">
+              <span className="font-semibold text-gray-900 truncate max-w-full" title={property.address}>
+                {property.address}
               </span>
-              <label className="inline-flex items-center gap-2 cursor-pointer text-[13px] text-gray-700">
-                <input type="checkbox" className="w-3.5 h-3.5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer" />
-                <span>To do: <span className="font-medium text-gray-900">{property.nextSteps}</span></span>
-              </label>
-              <span className="text-gray-300">·</span>
-              <ActionCircle channel={rec} />
-              <ChannelShortcut kind="call" />
-              <ChannelShortcut kind="text" />
-              <ChannelShortcut kind="email" />
-              {isCritical && (
-                <span className="text-[12px] font-semibold text-[#E24B4A]" title="Critical flag">Critical</span>
-              )}
-              {isReminder && (
-                <span className="text-[12px] font-semibold text-[#2F86D6]" title="Reminder set">Reminder</span>
-              )}
-              <span className="text-gray-300">·</span>
-              <span className="text-[12px] text-gray-500">
-                {property.source.replace(/\s*—\s*.*$/, "")}{" — "}
-                <span style={{ color: sourceTextColor(property.source, property.sourceStatus) }}>
+              <button className="shrink-0 text-gray-400 hover:text-orange-500 cursor-pointer" title="Open map">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4" className="w-3.5 h-3.5">
+                  <circle cx="6" cy="6" r="5" />
+                  <line x1="1" y1="6" x2="11" y2="6" />
+                  <path d="M6 1c1.5 1.5 1.5 8.5 0 10M6 1c-1.5 1.5-1.5 8.5 0 10" />
+                </svg>
+              </button>
+              <span className="shrink-0 text-gray-300">·</span>
+              <span className="shrink-0 cursor-help text-gray-700" title={`${property.source} · ${SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}`}>
+                <span className="font-medium">{property.source.replace(/\s*—\s*.*$/, "")}</span>
+                {" — "}
+                <span className="font-medium" style={{ color: sourceTextColor(property.source, property.sourceStatus) }}>
                   {property.sourceStatus || (property.source.match(/\s*—\s*(.*)$/)?.[1] ?? "")}
                 </span>
-                {" · "}
-                {SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}
-                {" · "}
-                Keywrds: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span>
+                <span> - {SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}</span>
               </span>
-              <span className="ml-auto text-[12px] text-gray-500" title="Last opened / Last called">
+              <span className="shrink-0 text-gray-300">·</span>
+              <span className="shrink-0 text-[12px] text-gray-500 cursor-help" title="Keywords pulled from listing remarks">
+                Keywords: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span>
+              </span>
+              <span className="ml-auto shrink-0 text-[12px] text-gray-500" title="Last opened / Last called">
                 Opened <span className="text-emerald-600 font-medium">{property.lastOpenDate}</span>
                 <span className="mx-1.5 text-gray-300">·</span>
                 Called <span className="text-gray-700 font-medium">{property.lastCalledDate}</span>
               </span>
             </div>
 
-            {/* Data row — price · ARV% · Pain · Agent · ISC · S/P/B/A.
-                Same fields as DealCard's bottom row, with hover-only details
-                via the title attribute. */}
-            <div className="flex items-center gap-2 flex-wrap mt-2.5 text-[12.5px] text-gray-600">
+            {/* ROW 3 — Data row. Same fields as DealCard's bottom row, with
+                hover-only details via the title attribute. */}
+            <div className="flex items-center gap-x-2 flex-wrap mt-2 text-[13px] text-gray-700 leading-6">
               <span
                 className="font-semibold text-gray-900 cursor-help"
                 title={`Asking ${property.price} · ARV ${detail.arv}`}
@@ -187,7 +196,7 @@ export default function IqPropertyDetail() {
               </span>
               <span className="text-gray-300">·</span>
               <span
-                className="inline-flex items-center gap-1.5 cursor-help"
+                className="inline-flex items-center gap-1.5 text-[12px] text-gray-500 cursor-help"
                 title={detail.painSig.map(([k, v]) => `${k}: ${v}`).join(" · ")}
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
@@ -195,14 +204,14 @@ export default function IqPropertyDetail() {
               </span>
               <span className="text-gray-300">·</span>
               <span
-                className="inline-flex items-center gap-1.5 cursor-help"
+                className="inline-flex items-center gap-1.5 text-[12px] text-gray-500 cursor-help"
                 title={`Response rate: ${detail.agentRate ?? "—"}`}
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${AGENT_DOT[detail.agent]}`} />
                 Agent: <span className="text-gray-800 font-medium">{detail.agentLabel}</span>
               </span>
               <span className="text-gray-300">·</span>
-              <span className="cursor-help" title="Investor Sourced Count">
+              <span className="text-[12px] text-gray-500 cursor-help" title="Investor Sourced Count">
                 ISC:{" "}
                 <span className={(detail.isc ?? 0) > 0 ? "font-medium text-[#2F86D6]" : "font-medium text-gray-400"}>
                   {detail.isc ?? 0}
