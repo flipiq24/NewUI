@@ -214,9 +214,6 @@ export default function IqPropertyDetail() {
                   {detail.trackActive ?? 0}A
                 </span>
               </span>
-              <span className="ml-auto shrink-0">
-                <SecondaryIconStrip detail={detail} />
-              </span>
             </div>
           </div>
 
@@ -228,10 +225,17 @@ export default function IqPropertyDetail() {
             </div>
           </div>
 
-          {/* WORKFLOW STEPPER — thin inline progress. Completed = green check,
-              current = orange dot + bold label, future = gray. Click to jump. */}
-          <div className="px-6 py-2 border-b border-gray-100">
+          {/* WORKFLOW STEPPER — thin inline progress on the left, contact +
+              utility icons on the right. */}
+          <div className="px-6 py-2 border-b border-gray-100 flex items-center gap-4">
             <WorkflowTabs active={activeStep} onChange={setActiveStep} />
+            <div className="ml-auto flex items-center gap-1 shrink-0">
+              <NavActionIcon kind="call" />
+              <NavActionIcon kind="text" />
+              <NavActionIcon kind="email" />
+              <span className="mx-1 h-5 w-px bg-gray-200" />
+              <SecondaryIconStrip detail={detail} />
+            </div>
           </div>
 
           {/* Body intentionally empty — prototyping. */}
@@ -382,6 +386,39 @@ function SecondaryIconStrip({ detail }: { detail: DealDetail }) {
         </button>
       ))}
     </div>
+  );
+}
+
+/**
+ * Call / Text / Email icon button shown on the workflow nav row's right side.
+ * Matches the visual treatment of the SecondaryIconStrip buttons so the two
+ * groups read as one cohesive cluster.
+ */
+function NavActionIcon({ kind }: { kind: "call" | "text" | "email" }) {
+  const label = kind === "call" ? "Call" : kind === "text" ? "Text" : "Email";
+  const icon =
+    kind === "call" ? (
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4">
+        <path d="M3 2h3l1.5 3.5-2 1.2C6.3 9 7 9.7 8.3 10.5l1.2-2L13 10v3c0 .6-.5 1-1 1C5.4 14 2 6.6 2 3c0-.5.4-1 1-1z" />
+      </svg>
+    ) : kind === "text" ? (
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4">
+        <path d="M2 3.5h12v7H6.5L3.5 13v-2.5H2v-7z" />
+      </svg>
+    ) : (
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4">
+        <rect x="2" y="3.5" width="12" height="9" rx="1" />
+        <polyline points="2.5,4.5 8,9 13.5,4.5" />
+      </svg>
+    );
+  return (
+    <button
+      type="button"
+      title={label}
+      className="relative inline-flex items-center justify-center w-9 h-9 rounded-md text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-colors cursor-pointer"
+    >
+      {icon}
+    </button>
   );
 }
 
