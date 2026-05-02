@@ -225,19 +225,17 @@ export default function IqPropertyDetail() {
           </div>
 
           {/* WORKFLOW STEPPER — thin inline progress. Contact icons (with an
-              orange "action needed" dot) only appear at the final step
-              (Offer Terms), pinned all the way to the right. */}
+              orange "action needed" dot on Call) plus the secondary utility
+              strip live on the right at all times, regardless of step. */}
           <div className="px-6 py-2 border-b border-gray-100 flex items-center gap-4">
             <WorkflowTabs active={activeStep} onChange={setActiveStep} />
-            {activeStep === WORKFLOW_STEPS.length - 1 && (
-              <div className="ml-auto flex items-center gap-1 shrink-0">
-                <NavActionIcon kind="call" needsAction />
-                <NavActionIcon kind="text" />
-                <NavActionIcon kind="email" />
-                <span className="mx-1 h-5 w-px bg-gray-200" />
-                <SecondaryIconStrip detail={detail} />
-              </div>
-            )}
+            <div className="ml-auto flex items-center gap-1 shrink-0">
+              <NavActionIcon kind="call" needsAction />
+              <NavActionIcon kind="text" />
+              <NavActionIcon kind="email" />
+              <span className="mx-1 h-5 w-px bg-gray-200" />
+              <SecondaryIconStrip detail={detail} />
+            </div>
           </div>
 
           {/* Body intentionally empty — prototyping. */}
