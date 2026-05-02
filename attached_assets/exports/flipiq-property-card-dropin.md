@@ -21,9 +21,9 @@ Every chip / icon / value has a hover tooltip:
 - **Investor Sourced Count (ISC)** — three-line breakdown of the agent's investor history (listings sold for / to investors, plus unique relationships)
 - **Deal Track Record** — Active / Pending / Backup / Sold / Total
 - **Listing Remarks** — public + agent comments with red `<span class="kw">` pills
-- **Open History** — first / last / total opens
-- **Communication History** — first / last + per-channel call/text/email totals
-- **Offer Status** — completion %, stage, source, negotiator, assigned
+- **Open History** — first / last / total opens + agent assigned to + property assigned to
+- **Communication History** — first / last + per-channel call/text/email totals + agent assigned to + property assigned to
+- **Offer Status** — completion %, stage, source, agent assigned to, property assigned to
 
 The kebab opens a 3-column drill menu (Communication, Quick Links,
 Detailed Analysis).
@@ -877,8 +877,6 @@ export default function DealCard({
               rows={[
                 ["Source", property.source],
                 ...(property.sourceStatus ? ([["Status", property.sourceStatus]] as [string, string][]) : []),
-                ["Negotiator", detail.negotiator],
-                ["Assigned",   detail.assigned],
               ]}
             />
           </span>
@@ -991,8 +989,8 @@ export default function DealCard({
               ["Completion", detail.pct],
               ["Stage",      detail.status],
               ["Source",     detail.source],
-              ["Negotiator", detail.negotiator],
-              ["Assigned",   detail.assigned],
+              ["Agent assigned to", detail.negotiator],
+              ["Property assigned to", detail.assigned],
             ]}
           />
         </span>
@@ -1002,7 +1000,13 @@ export default function DealCard({
             Opened {detail.opened}
             <TipPanel
               title="Open History" align="right"
-              rows={[["First opened", detail.firstOpened], ["Last opened", detail.opened], ["Total opens", String(detail.totalOpens)]]}
+              rows={[
+                ["First opened", detail.firstOpened],
+                ["Last opened", detail.opened],
+                ["Total opens", String(detail.totalOpens)],
+                ["Agent assigned to", detail.negotiator],
+                ["Property assigned to", detail.assigned],
+              ]}
             />
           </span>
           <span className="text-gray-300">·</span>
@@ -1010,7 +1014,13 @@ export default function DealCard({
             Called {detail.called}
             <TipPanel
               title="Communication History" align="right"
-              rows={[["First call", detail.firstCalled], ["Last call", detail.called], ["Total comms", String(detail.totalCommsCount)]]}
+              rows={[
+                ["First call", detail.firstCalled],
+                ["Last call", detail.called],
+                ["Total comms", String(detail.totalCommsCount)],
+                ["Agent assigned to", detail.negotiator],
+                ["Property assigned to", detail.assigned],
+              ]}
             >
               <div className="mt-1.5 pt-1.5 border-t border-gray-200">
                 <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Calls</span><span className="text-gray-900 font-medium">{detail.totalCalls}</span></div>
@@ -1328,9 +1338,9 @@ The tooltip content sources:
 | 3 (deal)     | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
 | 3 (deal)     | `ISC: 19`                     | `Investor Sourced Count` | Three-row breakdown: `Listings Sold for Investors` (`iscSoldFor`), `Listings Sold to Investors` (`iscSoldTo`), `Unique Investor Relationships` (`iscUniqueInvestors`). **Color:** `isc === 0` renders the inline number gray (`text-gray-400`) — agent has never sourced a deal, nothing to drill into. Any positive count renders the inline number in hyperlink blue (`text-[#2F86D6]`) to signal it's drillable history. |
 | 3 (deal)     | `7A/3P/0B/54S` (`7A` orange when > 0) | `Deal Track Record` | `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable). The Active count is wrapped in `<span class="text-[#D67432] font-semibold">` whenever `trackActive > 0` — open deals are the only piece needing immediate attention. When `trackActive === 0`, the `0A` renders in the same plain gray as the rest of the row. |
-| Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / negotiator / assigned                            |
-| Right | `Opened 04/22` (plain colored text — green / yellow / red) | `Open History` (right-aligned) | first / last / total opens. Color via `gradeFreshness(detail.opened)` — green ≤3d, yellow 4–7d, red >7d / `—`. **No pill, no box.** |
-| Right | `Called —` (plain colored text — green / yellow / red)     | `Communication History` (right-aligned) | first / last + per-channel calls/texts/emails. Same `gradeFreshness()` rule on `detail.called`. **No pill, no box.** |
+| Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / **agent assigned to** / **property assigned to** |
+| Right | `Opened 04/22` (plain colored text — green / yellow / red) | `Open History` (right-aligned) | first / last / total opens, then **agent assigned to** + **property assigned to**. Color via `gradeFreshness(detail.opened)` — green ≤3d, yellow 4–7d, red >7d / `—`. **No pill, no box.** |
+| Right | `Called —` (plain colored text — green / yellow / red)     | `Communication History` (right-aligned) | first / last + per-channel calls/texts/emails, then **agent assigned to** + **property assigned to**. Same `gradeFreshness()` rule on `detail.called`. **No pill, no box.** |
 | Kebab (⋮) | (click to open)                | drill menu              | 3 cols: Communication / Quick Links / Detailed Analysis + footer "Auto Tracker"        |
 | 💬 chat icon                          | inline tooltip          | "View conversations"                                                                   |
 

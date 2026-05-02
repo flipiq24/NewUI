@@ -655,8 +655,6 @@ export default function DealCard({ property }: { property: DealProperty }) {
               rows={[
                 ["Source", property.source],
                 ...(property.sourceStatus ? ([["Status", property.sourceStatus]] as [string, string][]) : []),
-                ["Negotiator", detail.negotiator],
-                ["Assigned", detail.assigned],
               ]}
             />
           </span>
@@ -780,8 +778,8 @@ export default function DealCard({ property }: { property: DealProperty }) {
               ["Completion", detail.pct],
               ["Stage", detail.status],
               ["Source", detail.source],
-              ["Negotiator", detail.negotiator],
-              ["Assigned", detail.assigned],
+              ["Agent assigned to", detail.negotiator],
+              ["Property assigned to", detail.assigned],
             ]}
           />
         </span>
@@ -792,7 +790,13 @@ export default function DealCard({ property }: { property: DealProperty }) {
             <TipPanel
               title="Open History"
               align="right"
-              rows={[["First opened", detail.firstOpened], ["Last opened", detail.opened], ["Total opens", String(detail.totalOpens)]]}
+              rows={[
+                ["First opened", detail.firstOpened],
+                ["Last opened", detail.opened],
+                ["Total opens", String(detail.totalOpens)],
+                ["Agent assigned to", detail.negotiator],
+                ["Property assigned to", detail.assigned],
+              ]}
             />
           </span>
           <span className="text-gray-300">·</span>
@@ -801,7 +805,13 @@ export default function DealCard({ property }: { property: DealProperty }) {
             <TipPanel
               title="Communication History"
               align="right"
-              rows={[["First call", detail.firstCalled], ["Last call", detail.called], ["Total comms", String(detail.totalCommsCount)]]}
+              rows={[
+                ["First call", detail.firstCalled],
+                ["Last call", detail.called],
+                ["Total comms", String(detail.totalCommsCount)],
+                ["Agent assigned to", detail.negotiator],
+                ["Property assigned to", detail.assigned],
+              ]}
             >
               <div className="mt-1.5 pt-1.5 border-t border-gray-200">
                 <div className="flex justify-between gap-3.5 py-[1.5px] text-[12px]"><span className="text-gray-400">Calls</span><span className="text-gray-900 font-medium">{detail.totalCalls}</span></div>
