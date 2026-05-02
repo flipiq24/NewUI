@@ -30,15 +30,20 @@ Detailed Analysis).
 **Layout / UX ordering** — built for an acquisition rep's scan path:
 *"do I act now → is the property worth my time → who's the agent → where is the deal"*.
 
-1. **Row 1 — action (left):** Call CTA → **pain level chip (HIGH / MID /
-   LOW)** as a colored uppercase label sitting between the phone icon
-   and the next-step text → next-step text → channel chips
-   (call/text/email + sentiment dot, *after* the response) → optional
-   inline flags `Critical` (red) / `Reminder` (blue) as plain words —
+1. **Row 1 — action (left):** Action CTA (icon **switches** based on the
+   recommended channel — 📞 phone / 💬 text / ✉ email — driven by
+   `recommendedChannel(detail)`; hover shows a free-form "Recommended
+   Action" tooltip explaining the playbook for that channel) → **pain
+   level chip (HIGH / MID / LOW)** as a colored uppercase label sitting
+   between the action icon and the next-step text → next-step text
+   (tooltip's `Recommended channel` + `How` rows are channel-aware) →
+   channel chips (call/text/email + sentiment dot, *after* the response)
+   → optional inline flags `Critical` (red) / `Reminder` (blue) as plain
+   words —
    no pill, no box. The pain label uses the same palette as the dot
    (high = red `#E24B4A`, mid = amber `#BA7517`, low = muted gray
    `#B4B2A9`) and is *the very first thing* the rep sees after the
-   phone icon, so seller motivation registers before the CTA itself.
+   action icon, so seller motivation registers before the CTA itself.
 2. **Right column — status + recency (right-aligned, stacked):**
    `60% In Negotiations ▾` on top, then `Opened MM/DD · Called MM/DD`
    underneath as **plain colored text** (no pill, no box, no
@@ -71,7 +76,7 @@ Detailed Analysis).
      noise. "Active Nyr" is intentionally omitted — tenure isn't
      actionable; A/P/B/S already conveys experience.
    Pain shows in **two** places on purpose: the uppercase **HIGH/MID/LOW**
-   chip on Row 1 next to the phone is the at-a-glance signal (so seller
+   chip on Row 1 next to the action icon is the at-a-glance signal (so seller
    motivation registers before the CTA itself), and `● Pain: <label>`
    on Line 2 is the inline data label sitting with the rest of the deal
    math. `Opened` and `Called` are deliberately *not* here — they're
@@ -376,6 +381,40 @@ function sourceTextColor(source: string, status: string): string {
 
 const STATUS_PILL: Record<DealDetail["statusType"], string> = {
   neg: "text-gray-700", bu: "text-gray-700", init: "text-gray-700", none: "text-gray-700",
+};
+
+/**
+ * Channel-aware "what to do next" recommendation.
+ * - HIGH pain  OR unresponsive agent → CALL  first (multi-channel sweep)
+ * - MID  pain  AND not unresponsive  → TEXT  first, follow with email
+ * - everything else                  → EMAIL is enough
+ *
+ * The orange Row-1 action circle uses this to swap its icon AND its hover
+ * tooltip; the Next-Step tooltip rewrites its "How" row to match. The rep
+ * always sees the recommended channel + the exact playbook for that channel.
+ */
+type RecChannel = "call" | "text" | "email";
+function recommendedChannel(detail: DealDetail): RecChannel {
+  if (detail.pain === "high" || detail.agent === "not-responsive") return "call";
+  if (detail.pain === "mid") return "text";
+  return "email";
+}
+const REC_COPY: Record<RecChannel, { label: string; tip: string; how: string }> = {
+  call: {
+    label: "Call first",
+    tip:  "This property has critical signals and the agent hasn't replied to text or email. Pick up the phone — if no answer, leave a voicemail and immediately follow with both a text and an email so all three channels are stamped within 5 minutes.",
+    how:  "Call the agent first — if no answer, leave a 20-second voicemail with the offer headline. Within 2 minutes of the call, send the same headline as a text and email the full PSA so all three channels land together.",
+  },
+  text: {
+    label: "Text first",
+    tip:  "The agent has been replying to texts within the hour — open with a short text to gauge engagement, then follow with an email containing the offer terms. Only call if there's no text reply within 30 minutes.",
+    how:  "Open with a one-line text to confirm interest. The moment they reply, send the offer email with the PSA. Skip the call unless they go silent for 30+ minutes.",
+  },
+  email: {
+    label: "Email is enough",
+    tip:  "No urgency and no phone signal — send the standard offer email with the PSA attached, log it, and let the auto-follow-up sequence handle the next touch.",
+    how:  "Send the standard offer email with the PSA attached and CC the negotiator. No call, no text — the auto-follow-up handles day 2.",
+  },
 };
 
 /* ────────────────────────────────────────────────────────────────
@@ -728,6 +767,10 @@ export default function DealCard({
 
   const triggerCall = () => { setMenuOpen(false); setNudgeOpen(true); };
 
+  // Channel recommended for this deal — drives the Row-1 action circle
+  // (icon + tooltip) AND the "How" row inside the Next Step tooltip.
+  const rec = recommendedChannel(detail);
+
   return (
     <div
       ref={rowRef}
@@ -762,26 +805,44 @@ export default function DealCard({
 
       {/* Main */}
       <div className="min-w-0">
-        {/* Row 1 — Call CTA → next step → channel chips → inline flags */}
+        {/* Row 1 — Action CTA → next step → channel chips → inline flags
+            The action circle's icon AND hover tooltip both reflect the
+            recommended channel for THIS deal (call / text / email), via
+            recommendedChannel(detail). When done → checkmark. */}
         <div className="flex items-center gap-2.5 mb-1">
-          <button
-            type="button"
-            onClick={triggerCall}
-            title={done ? "Call logged" : "Call this agent first"}
-            className={`w-[22px] h-[22px] rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer ${
-              done
-                ? "bg-white border-[1.5px] border-orange-500 text-orange-600"
-                : "bg-orange-50 border border-orange-300 text-orange-600 hover:bg-orange-500 hover:text-white ring-2 ring-orange-300 shadow-[0_0_0_3px_rgba(251,146,60,0.35)] animate-pulse"
-            }`}
-          >
-            {done ? (
-              <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="3,8 7,12 13,4" />
-              </svg>
-            ) : ICON.phone}
-          </button>
-          {/* Pain level (HIGH / MID / LOW) — between the phone icon and the
-              CTA. Same palette as the dot. Seller motivation registers
+          <span className="relative group shrink-0">
+            <button
+              type="button"
+              onClick={triggerCall}
+              title={done ? "Action logged" : REC_COPY[rec].label}
+              className={`w-[22px] h-[22px] rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer ${
+                done
+                  ? "bg-white border-[1.5px] border-orange-500 text-orange-600"
+                  : "bg-orange-50 border border-orange-300 text-orange-600 hover:bg-orange-500 hover:text-white ring-2 ring-orange-300 shadow-[0_0_0_3px_rgba(251,146,60,0.35)] animate-pulse"
+              }`}
+            >
+              {done ? (
+                <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3,8 7,12 13,4" />
+                </svg>
+              ) : (
+                rec === "call" ? ICON.chPhone :
+                rec === "text" ? ICON.chText  :
+                                 ICON.chMail
+              )}
+            </button>
+            {/* "Recommended Action" tooltip — free-form (not key/value rows). */}
+            <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity pointer-events-none absolute bottom-full mb-1.5 left-0 z-50 bg-white border border-gray-300 rounded-md shadow-lg p-3 text-left min-w-[260px] max-w-[320px]">
+              <div className="text-[10px] uppercase tracking-wider font-semibold text-orange-600 mb-1.5">
+                Recommended Action — {REC_COPY[rec].label}
+              </div>
+              <p className="text-[12px] text-gray-900 leading-snug m-0">
+                {REC_COPY[rec].tip}
+              </p>
+            </div>
+          </span>
+          {/* Pain level (HIGH / MID / LOW) — between the action icon and
+              the CTA. Same palette as the dot. Seller motivation registers
               before the CTA itself. */}
           {detail.pain !== "none" && (
             <span className="relative group cursor-help shrink-0">
@@ -799,9 +860,10 @@ export default function DealCard({
               title="Next Step" wide
               rows={[
                 ["Task", property.nextSteps],
+                ["Recommended channel", REC_COPY[rec].label],
                 ...(detail.taskWho  ? ([["Who",  detail.taskWho]]  as [string, string][]) : []),
                 ...(detail.taskWhat ? ([["What", detail.taskWhat]] as [string, string][]) : []),
-                ...(detail.taskHow  ? ([["How",  detail.taskHow]]  as [string, string][]) : []),
+                ["How", REC_COPY[rec].how],
                 ["Context", detail.taskNote],
               ]}
             />
@@ -826,7 +888,7 @@ export default function DealCard({
             keep this row on EXACTLY one visual line. Address gets `…` on
             narrow viewports (full text in the hover tooltip). Price /
             ARV / Pain live on Line 2; the at-a-glance pain chip also
-            appears on Row 1 next to the phone. */}
+            appears on Row 1 next to the action icon. */}
         <div className="flex items-center flex-nowrap min-w-0 gap-x-2 text-[13px] text-gray-700 leading-6 whitespace-nowrap">
           <span className="relative group cursor-help min-w-0 truncate">
             <span className="group-hover:text-gray-900">{property.address}</span>
@@ -889,7 +951,14 @@ export default function DealCard({
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
           <span className="relative group cursor-help font-semibold text-gray-900">
             {compactPrice(property.price)}
-            <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />
+            <TipPanel
+              title="Price History"
+              rows={[
+                ...detail.priceHist,
+                ["DOM / CDOM", `${property.dom} / ${property.cdom}`],
+              ]}
+              total={detail.priceTotal}
+            />
           </span>
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help font-medium text-gray-700">
@@ -1326,15 +1395,15 @@ The tooltip content sources:
 
 | Row | Hover target                         | Tooltip title           | Data                                                                                  |
 |-----|--------------------------------------|-------------------------|---------------------------------------------------------------------------------------|
-| 1   | Pulsing call CTA (📞)                | native `title` only     | "Call this agent first" / "Call logged"                                               |
-| 1   | **Pain label `MID`** (after phone, before CTA) | `Seller Pain` | colored uppercase chip: high red / mid amber / low gray; `painSig` rows in tooltip   |
-| 1   | Next-step orange text                | `Next Step`             | `taskWho` / `taskWhat` / `taskHow` / `taskNote`                                        |
+| 1   | Pulsing action CTA (icon = 📞 / 💬 / ✉, switches per `recommendedChannel(detail)`) | `Recommended Action` (free-form, not key/value rows) | Title: `Recommended Action — Call first` / `… — Text first` / `… — Email is enough`. Body is `REC_COPY[rec].tip` — a one-paragraph playbook tailored to the recommended channel. Native `title` falls back to the same label string. |
+| 1   | **Pain label `MID`** (after action icon, before CTA) | `Seller Pain` | colored uppercase chip: high red / mid amber / low gray; `painSig` rows in tooltip   |
+| 1   | Next-step orange text                | `Next Step`             | `Task` / **`Recommended channel`** (`REC_COPY[rec].label`) / `Who` / `What` / **`How`** (`REC_COPY[rec].how` — channel-aware) / `Context` (`taskNote`) |
 | 1   | Channel chips after the response (call/text/mail) | `Call — Positive` etc. via `TipPanel` | Hover renders `ChannelPreview` (last sent + last reply for that channel from `detail.commLog[key]`). Click opens `<CommunicationDialog>` — full thread bubbles (sent right/orange, reply left/gray) + composer. Modal closes on overlay, `Escape`, or `×`. |
 | 1   | Inline flag `Critical` / `Reminder`  | none — plain word       | rendered when `notifications` includes `"critical"` (red) or `"reminder"` (blue)       |
 | 2 (property) | Address                       | `Property`              | `prop` rows                                                                            |
 | 2 (property) | `Keywrds: Mid` (at the end of Row 2, after the source) | `Listing Remarks` | **No dot** — the value color is the only signal. The literal `Keywrds:` prefix stays the row's default gray; **only the `kwLabel` value** (`High` / `Mid` / `Low`) is colored via `KW_TEXT[detail.kw]` (high = **red #E24B4A semibold**, mid = amber #BA7517, low = gray #B4B2A9). Tooltip: `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills |
 | 2 (property) | `MLS — Active - Standard` (no `Source:` prefix) | `Source` | Consolidated `origin — status - sales-type` label. Origin (`MLS`) and the trailing sales-type (rendered fully spelled out via `SALES_TYPE_LABELS` — "Standard", "Real Estate Owned", "Notice Of Default", …) render in `text-gray-700 font-medium`; the status segment (`Active`/`Pending`/etc.) sits in the middle and is colored via `sourceTextColor(property.source, property.sourceStatus)`. Tooltip rows: `Source` (raw `property.source`), optional `Status`, `Sales Type` (code + full label from `SALES_TYPE_LABELS`), `Property Type`, `List Date`, `DOM / CDOM`. The standalone Sales-Type chip is removed — its data is embedded here. |
-| 3 (deal)     | `525k` (semibold, gray-900, no `$`) | `Price History`   | `priceHist` + `priceTotal`. Rendered via `compactPrice(property.price)` — drops `$`, collapses zeros to `k` / `m` |
+| 3 (deal)     | `525k` (semibold, gray-900, no `$`) | `Price History`   | `priceHist` rows + appended `["DOM / CDOM", "${property.dom} / ${property.cdom}"]` row + `priceTotal` footer. Rendered via `compactPrice(property.price)` — drops `$`, collapses zeros to `k` / `m` |
 | 3 (deal)     | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
 | 3 (deal)     | `● Pain: Mid` (after ARV)     | `Seller Pain`           | dot color from `PAIN_DOT[detail.pain]`, label from `detail.painLabel`, tooltip rows from `detail.painSig`. Mirrors the Row 1 chip — Row 1 is the at-a-glance signal, this is the inline data label. |
 | 3 (deal)     | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |

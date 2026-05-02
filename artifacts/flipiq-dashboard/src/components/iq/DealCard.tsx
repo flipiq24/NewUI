@@ -120,6 +120,41 @@ function sourceTextColor(source: string, status: string): string {
   return c.text;
 }
 
+/**
+ * Channel-aware "what to do next" recommendation.
+ * - HIGH pain  OR unresponsive agent → CALL first (multi-channel sweep)
+ * - MID  pain  AND not unresponsive  → TEXT first, follow with email
+ * - everything else                  → EMAIL is enough
+ *
+ * The orange Row-1 action circle uses this to swap its icon AND its hover
+ * tooltip, and the Next-Step tooltip rewrites its "How" row to match —
+ * so the rep always sees the recommended channel + the exact playbook for
+ * that channel.
+ */
+type RecChannel = "call" | "text" | "email";
+function recommendedChannel(detail: DealDetail): RecChannel {
+  if (detail.pain === "high" || detail.agent === "not-responsive") return "call";
+  if (detail.pain === "mid") return "text";
+  return "email";
+}
+const REC_COPY: Record<RecChannel, { label: string; tip: string; how: string }> = {
+  call: {
+    label: "Call first",
+    tip: "This property has critical signals and the agent hasn't replied to text or email. Pick up the phone — if no answer, leave a voicemail and immediately follow with both a text and an email so all three channels are stamped within 5 minutes.",
+    how:  "Call the agent first — if no answer, leave a 20-second voicemail with the offer headline. Within 2 minutes of the call, send the same headline as a text and email the full PSA so all three channels land together.",
+  },
+  text: {
+    label: "Text first",
+    tip: "The agent has been replying to texts within the hour — open with a short text to gauge engagement, then follow with an email containing the offer terms. Only call if there's no text reply within 30 minutes.",
+    how:  "Open with a one-line text to confirm interest. The moment they reply, send the offer email with the PSA. Skip the call unless they go silent for 30+ minutes.",
+  },
+  email: {
+    label: "Email is enough",
+    tip: "No urgency and no phone signal — send the standard offer email with the PSA attached, log it, and let the auto-follow-up sequence handle the next touch.",
+    how:  "Send the standard offer email with the PSA attached and CC the negotiator. No call, no text — the auto-follow-up handles day 2.",
+  },
+};
+
 const STATUS_PILL: Record<DealDetail["statusType"], string> = {
   neg: "text-gray-700",
   bu: "text-gray-700",
@@ -500,6 +535,10 @@ export default function DealCard({ property }: { property: DealProperty }) {
     setNudgeOpen(true);
   };
 
+  // Channel recommended for this deal — drives the Row-1 action circle
+  // (icon + tooltip) AND the "How" row inside the Next Step tooltip.
+  const rec = recommendedChannel(detail);
+
   return (
     <div ref={rowRef} className={`grid grid-cols-[16px_1fr_auto] gap-4 px-2 py-3 border-b border-gray-100 last:border-b-0 hover:bg-[#FAFAF9] transition-colors relative ${done.call ? "opacity-60" : ""}`}>
       {/* Left rail */}
@@ -538,24 +577,39 @@ export default function DealCard({ property }: { property: DealProperty }) {
       <div className="min-w-0">
         {/* Row 1 — Call CTA + channel chips next to it + next step */}
         <div className="flex items-center gap-2.5 mb-1">
-          <button
-            type="button"
-            onClick={triggerCall}
-            title={done.call ? "Call logged" : "Call this agent first"}
-            className={`w-[22px] h-[22px] rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer ${
-              done.call
-                ? "bg-white border-[1.5px] border-orange-500 text-orange-600"
-                : "bg-orange-50 border border-orange-300 text-orange-600 hover:bg-orange-500 hover:text-white ring-2 ring-orange-300 shadow-[0_0_0_3px_rgba(251,146,60,0.35)] animate-pulse"
-            }`}
-          >
-            {done.call ? (
-              <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="3,8 7,12 13,4" />
-              </svg>
-            ) : (
-              ICON.phone
-            )}
-          </button>
+          {/* Action circle — icon + hover tooltip both reflect the recommended
+              channel (call / text / email) for THIS deal. Driven by pain +
+              agent responsiveness via recommendedChannel(detail). */}
+          <span className="relative group shrink-0">
+            <button
+              type="button"
+              onClick={triggerCall}
+              title={done.call ? "Action logged" : REC_COPY[rec].label}
+              className={`w-[22px] h-[22px] rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer ${
+                done.call
+                  ? "bg-white border-[1.5px] border-orange-500 text-orange-600"
+                  : "bg-orange-50 border border-orange-300 text-orange-600 hover:bg-orange-500 hover:text-white ring-2 ring-orange-300 shadow-[0_0_0_3px_rgba(251,146,60,0.35)] animate-pulse"
+              }`}
+            >
+              {done.call ? (
+                <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3,8 7,12 13,4" />
+                </svg>
+              ) : (
+                rec === "call"  ? ICON.chPhone :
+                rec === "text"  ? ICON.chText  :
+                                  ICON.chMail
+              )}
+            </button>
+            <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity pointer-events-none absolute bottom-full mb-1.5 left-0 z-50 bg-white border border-gray-300 rounded-md shadow-lg p-3 text-left min-w-[260px] max-w-[320px]">
+              <div className="text-[10px] uppercase tracking-wider font-semibold text-orange-600 mb-1.5">
+                Recommended Action — {REC_COPY[rec].label}
+              </div>
+              <p className="text-[12px] text-gray-900 leading-snug m-0">
+                {REC_COPY[rec].tip}
+              </p>
+            </div>
+          </span>
           {/* Pain level (HIGH / MID / LOW) — sits between the phone icon
               and the next-step CTA so the rep sees seller motivation FIRST. */}
           {detail.pain !== "none" && (
@@ -575,9 +629,10 @@ export default function DealCard({ property }: { property: DealProperty }) {
               wide
               rows={[
                 ["Task", property.nextSteps],
+                ["Recommended channel", REC_COPY[rec].label],
                 ...(detail.taskWho ? ([["Who", detail.taskWho]] as [string, string][]) : []),
                 ...(detail.taskWhat ? ([["What", detail.taskWhat]] as [string, string][]) : []),
-                ...(detail.taskHow ? ([["How", detail.taskHow]] as [string, string][]) : []),
+                ["How", REC_COPY[rec].how],
                 ["Context", detail.taskNote],
               ]}
             />
@@ -658,7 +713,14 @@ export default function DealCard({ property }: { property: DealProperty }) {
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-[13px] text-gray-700 leading-6">
           <span className="relative group cursor-help font-semibold text-gray-900">
             {compactPrice(property.price)}
-            <TipPanel title="Price History" rows={detail.priceHist} total={detail.priceTotal} />
+            <TipPanel
+              title="Price History"
+              rows={[
+                ...detail.priceHist,
+                ["DOM / CDOM", `${property.dom} / ${property.cdom}`],
+              ]}
+              total={detail.priceTotal}
+            />
           </span>
           <span className="text-gray-300">·</span>
           <span className="relative group cursor-help font-medium text-gray-700">
