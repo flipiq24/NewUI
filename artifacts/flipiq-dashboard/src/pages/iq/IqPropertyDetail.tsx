@@ -35,34 +35,14 @@ export default function IqPropertyDetail() {
   const [, navigate] = useLocation();
   const decoded = decodeURIComponent(params.address ?? "");
 
-  const property = useMemo<DealProperty | undefined>(
-    () => DEAL_REVIEW_PROPERTIES.find((p) => p.address === decoded),
-    [decoded],
-  );
-  const detail: DealDetail | undefined = property ? DEAL_DETAILS[property.id] : undefined;
-
-  if (!property || !detail) {
-    return (
-      <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
-        <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <IqTopBar />
-          <div className="flex-1 flex items-center justify-center bg-white">
-            <div className="text-center">
-              <h2 className="text-lg font-bold text-gray-700 mb-2">Property not found</h2>
-              <p className="text-gray-400 text-sm mb-4">No deal matched “{decoded}”.</p>
-              <button
-                onClick={() => navigate("/iq/deal-review")}
-                className="text-xs font-semibold bg-orange-500 text-white px-3 py-1.5 rounded-full hover:bg-orange-600 cursor-pointer"
-              >
-                Back to deal review
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Look up by exact address match first; if the URL is the literal `:address`
+  // placeholder or any other unmatched value, fall back to the first deal so
+  // the page is always navigable as a demo entry point.
+  const property = useMemo<DealProperty>(() => {
+    const match = DEAL_REVIEW_PROPERTIES.find((p) => p.address === decoded);
+    return match ?? DEAL_REVIEW_PROPERTIES[0];
+  }, [decoded]);
+  const detail: DealDetail = DEAL_DETAILS[property.id];
 
   const rec = recommendedChannel(detail);
 
