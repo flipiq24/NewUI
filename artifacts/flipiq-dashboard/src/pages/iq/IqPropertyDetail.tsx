@@ -512,8 +512,8 @@ function WorkflowStepper({
   const steps = ["PIQ", "Comps", "Investment Analysis", "Agent", "Offer Terms"];
   const activeIdx = steps.indexOf(active);
   return (
-    <div className="px-6 py-4 border-y border-gray-100 bg-gray-50/40">
-      <div className="flex items-center justify-between gap-1 max-w-3xl mx-auto">
+    <div className="px-6 py-2 border-b border-gray-100 bg-white">
+      <div className="flex items-center gap-2 flex-wrap text-[12px]">
         {steps.map((step, i) => {
           const isActive = i === activeIdx;
           const isComplete = i < activeIdx;
@@ -522,44 +522,36 @@ function WorkflowStepper({
               <button
                 type="button"
                 onClick={() => onChange(step)}
-                className="flex flex-col items-center gap-1.5 cursor-pointer group min-w-0"
+                title={
+                  isComplete ? `${step} — done` : isActive ? `${step} — current step` : `${step} — pending`
+                }
+                className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 transition-colors cursor-pointer ${
+                  isActive
+                    ? "bg-orange-50 text-orange-600 font-semibold"
+                    : isComplete
+                    ? "text-emerald-700 hover:bg-emerald-50"
+                    : "text-gray-400 hover:text-gray-700 hover:bg-gray-50"
+                }`}
               >
                 <span
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold transition-colors ${
+                  className={`w-3.5 h-3.5 rounded-[3px] border flex items-center justify-center shrink-0 ${
                     isActive
-                      ? "bg-orange-500 text-white ring-4 ring-orange-100"
+                      ? "border-orange-500 bg-white"
                       : isComplete
-                      ? "bg-emerald-500 text-white"
-                      : "bg-gray-200 text-gray-500 group-hover:bg-gray-300"
+                      ? "border-emerald-500 bg-emerald-500"
+                      : "border-gray-300 bg-white"
                   }`}
                 >
-                  {isComplete ? (
-                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3 h-3">
+                  {isComplete && (
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="3" className="w-2.5 h-2.5 text-white">
                       <polyline points="3,8 7,12 13,4" />
                     </svg>
-                  ) : (
-                    i + 1
                   )}
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />}
                 </span>
-                <span
-                  className={`text-[11px] font-medium whitespace-nowrap ${
-                    isActive
-                      ? "text-orange-600"
-                      : isComplete
-                      ? "text-emerald-700"
-                      : "text-gray-500 group-hover:text-gray-700"
-                  }`}
-                >
-                  {step}
-                </span>
+                <span className="whitespace-nowrap">{step}</span>
               </button>
-              {i < steps.length - 1 && (
-                <div
-                  className={`flex-1 h-px mx-1 mb-5 transition-colors ${
-                    i < activeIdx ? "bg-emerald-300" : "bg-gray-200"
-                  }`}
-                />
-              )}
+              {i < steps.length - 1 && <span className="text-gray-300">›</span>}
             </Fragment>
           );
         })}
