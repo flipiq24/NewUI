@@ -230,8 +230,8 @@ export default function IqPropertyDetail() {
           <div className="px-6 py-2 border-b border-gray-100 flex items-center gap-4">
             <WorkflowTabs active={activeStep} onChange={setActiveStep} />
             <div className="ml-auto flex items-center gap-1 shrink-0">
-              <NavActionIcon kind="call" needsAction />
               <CommsActionIcon detail={detail} />
+              <NavActionIcon kind="call" needsAction />
               <NavActionIcon kind="email" />
               <span className="mx-1 h-5 w-px bg-gray-200" />
               <SecondaryIconStrip detail={detail} />
