@@ -5,7 +5,7 @@ property row in the screenshot:
 
 > ☐  📞 **MID** **No response — send offer**  📞● 💬● ✉●  **Critical**            15% Outreach Sent ▾
 >                                                                                       Opened 04/22 · Called —   ← red text (cold)
-> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · ● Keywords: **High** · MLS — STD - **Active**   ← only the `High` value is red; `Keywords:` stays gray. Source label is consolidated `origin — type - status` (no `Source:` prefix); only the status keeps its color.
+> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · MLS — STD - **Active** · Keywrds: **High**   ← Source label is consolidated `origin — type - status` (no `Source:` prefix); only the status keeps its color. `Keywrds:` is the new short label, no dot indicator — the value color (`High` = red) is the only signal.
 > 💬  **525k** · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: **11** · **5A** / 8P / 2B / 41S   ← `ISC` blue when > 0, gray when 0; `5A` orange when > 0
 
 Every chip / icon / value has a hover tooltip:
@@ -54,9 +54,10 @@ Detailed Analysis).
    *what mental question it answers* so the rep's eye scans
    top-to-bottom in priority order.
    - **Line 1 — property identity (what is it):** Address →
-     world-icon → sales type → **Keywords** (next to sales type —
-     keywords are *property* data) → Source/status. Pure asset
-     description. This row is **`flex-nowrap` + `whitespace-nowrap`**
+     world-icon → consolidated source label (`MLS — STD - Active`,
+     no `Source:` prefix; sales type is folded in) → **Keywrds**
+     (short label, no dot — value color is the only signal). Pure
+     asset description. This row is **`flex-nowrap` + `whitespace-nowrap`**
      with the address as the only `min-w-0 truncate` child — every
      other chip is `shrink-0`. The address truncates with `…` on
      narrow viewports (full address still in the hover tooltip).
@@ -325,13 +326,8 @@ const AGENT_DOT: Record<DealDetail["agent"], string> = {
   "not-responsive": "bg-[#E24B4A]",
   none:             "bg-[#B4B2A9]",
 };
-const KW_DOT: Record<DealDetail["kw"], string> = {
-  high: "bg-[#E24B4A]",
-  mid:  "bg-[#BA7517]",
-  low:  "bg-[#B4B2A9]",
-};
 /**
- * Label color for "Keywords: High / Mid / Low" so the WORD itself reflects
+ * Label color for "Keywrds: High / Mid / Low" so the WORD itself reflects
  * the heat — high deserves the same urgency as Pain. Mirrors PAIN_TEXT.
  */
 const KW_TEXT: Record<DealDetail["kw"], string> = {
@@ -837,19 +833,6 @@ export default function DealCard({
             {ICON.globe}
           </button>
           <span className="shrink-0 text-gray-300">·</span>
-          {/* Keywords — right after address. Label color mirrors the dot via
-              KW_TEXT — high = red, mid = amber, low = gray. */}
-          <span className="shrink-0 relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
-            <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
-            <span>Keywords: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span></span>
-            <TipPanel title="Listing Remarks" align="right" wide>
-              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1.5 mb-1">Public Comments</div>
-              <KwHtml html={detail.pubCmt} />
-              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-2 mb-1">Agent Comments</div>
-              <KwHtml html={detail.agtCmt} />
-            </TipPanel>
-          </span>
-          <span className="shrink-0 text-gray-300">·</span>
           {/* Consolidated source — no "Source:" prefix. Format: `MLS — STD - Active`
               (origin · sales type · status). The status segment keeps its color
               via sourceTextColor(). The Sales Type chip is gone — its data lives
@@ -873,6 +856,18 @@ export default function DealCard({
                 ["Property Type", property.propertyType],
               ]}
             />
+          </span>
+          <span className="shrink-0 text-gray-300">·</span>
+          {/* Keywords — moved to the end of Row 2. No dot indicator; the value
+              color (KW_TEXT) is the only signal. Shortened label "Keywrds:". */}
+          <span className="shrink-0 relative group cursor-help inline-flex items-center text-[12px] text-gray-500 hover:text-gray-900">
+            <span>Keywrds: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span></span>
+            <TipPanel title="Listing Remarks" align="right" wide>
+              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1.5 mb-1">Public Comments</div>
+              <KwHtml html={detail.pubCmt} />
+              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-2 mb-1">Agent Comments</div>
+              <KwHtml html={detail.agtCmt} />
+            </TipPanel>
           </span>
         </div>
 
@@ -1323,7 +1318,7 @@ The tooltip content sources:
 | 1   | Channel chips after the response (call/text/mail) | `Call — Positive` etc. via `TipPanel` | Hover renders `ChannelPreview` (last sent + last reply for that channel from `detail.commLog[key]`). Click opens `<CommunicationDialog>` — full thread bubbles (sent right/orange, reply left/gray) + composer. Modal closes on overlay, `Escape`, or `×`. |
 | 1   | Inline flag `Critical` / `Reminder`  | none — plain word       | rendered when `notifications` includes `"critical"` (red) or `"reminder"` (blue)       |
 | 2 (property) | Address                       | `Property`              | `prop` rows                                                                            |
-| 2 (property) | `● Keywords: Mid` (next to STD) | `Listing Remarks`     | dot color from `KW_DOT[detail.kw]`. The literal `Keywords:` prefix stays the row's default gray — **only the `kwLabel` value** (`High` / `Mid` / `Low`) is colored via `KW_TEXT[detail.kw]` (high = **red #E24B4A semibold**, mid = amber #BA7517, low = gray #B4B2A9). Tooltip: `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills |
+| 2 (property) | `Keywrds: Mid` (at the end of Row 2, after the source) | `Listing Remarks` | **No dot** — the value color is the only signal. The literal `Keywrds:` prefix stays the row's default gray; **only the `kwLabel` value** (`High` / `Mid` / `Low`) is colored via `KW_TEXT[detail.kw]` (high = **red #E24B4A semibold**, mid = amber #BA7517, low = gray #B4B2A9). Tooltip: `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills |
 | 2 (property) | `MLS — STD - Active` (no `Source:` prefix) | `Source` | Consolidated `origin — sales-type - status` label. Origin (`MLS`) and type (`STD`/`REO`) render in `text-gray-700 font-medium`; the status segment (`Active`/`Pending`/etc.) is colored via `sourceTextColor(property.source, property.sourceStatus)`. Tooltip rows: `Source` (raw `property.source`), optional `Status`, `Sales Type` (code + full label from `SALES_TYPE_LABELS`), `Property Type`. The standalone Sales-Type chip is removed — its data is embedded here. |
 | 3 (deal)     | `525k` (semibold, gray-900, no `$`) | `Price History`   | `priceHist` + `priceTotal`. Rendered via `compactPrice(property.price)` — drops `$`, collapses zeros to `k` / `m` |
 | 3 (deal)     | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
@@ -1355,10 +1350,10 @@ The tooltip content sources:
 | Freshness text — cold (>7d, `—`, `N/A`) | `#A33232` (dark red)  |
 
 **Key rules to keep all three cards consistent:**
-- The literal `Keywords:` prefix always renders in the row's default gray. Only the value (`High` / `Mid` / `Low`) picks up the color.
-- `Keywords: High` → red dot + red semibold value (`KW_TEXT.high`).
-- `Keywords: Mid` → amber dot + amber value.
-- `Keywords: Low` → gray dot + gray value.
+- The literal `Keywrds:` prefix always renders in the row's default gray. Only the value (`High` / `Mid` / `Low`) picks up the color. **No dot** — the value color is the only signal.
+- `Keywrds: High` → red semibold value (`KW_TEXT.high`).
+- `Keywrds: Mid` → amber value.
+- `Keywrds: Low` → gray value.
 - `ISC: 0` → number is gray (`text-gray-400`); `ISC > 0` → number is hyperlink blue (`text-[#2F86D6]`).
 - `xA` in `xA / yP / zB / wS` → orange `#D67432` + semibold when `trackActive > 0`; plain gray when `0A`.
 

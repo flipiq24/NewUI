@@ -76,13 +76,8 @@ const AGENT_DOT: Record<DealDetail["agent"], string> = {
   "not-responsive": "bg-[#E24B4A]",
   none: "bg-[#B4B2A9]",
 };
-const KW_DOT: Record<DealDetail["kw"], string> = {
-  high: "bg-[#E24B4A]",
-  mid:  "bg-[#BA7517]",
-  low:  "bg-[#B4B2A9]",
-};
 /**
- * Label color for "Keywords: High / Mid / Low" so the WORD itself reflects
+ * Label color for "Keywrds: High / Mid / Low" so the WORD itself reflects
  * the heat — high deserves the same urgency as Pain. Mirrors PAIN_TEXT.
  */
 const KW_TEXT: Record<DealDetail["kw"], string> = {
@@ -613,19 +608,6 @@ export default function DealCard({ property }: { property: DealProperty }) {
             {ICON.globe}
           </button>
           <span className="shrink-0 text-gray-300">·</span>
-          {/* Keywords — right after address. Label color mirrors the dot via
-              KW_TEXT — high = red, mid = amber, low = gray. */}
-          <span className="shrink-0 relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
-            <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
-            <span>Keywords: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span></span>
-            <TipPanel title="Listing Remarks" align="right" wide>
-              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1.5 mb-1">Public Comments</div>
-              <KwHtml html={detail.pubCmt} />
-              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-2 mb-1">Agent Comments</div>
-              <KwHtml html={detail.agtCmt} />
-            </TipPanel>
-          </span>
-          <span className="shrink-0 text-gray-300">·</span>
           {/* Consolidated source — no "Source:" prefix. Format: `MLS — STD - Active`
               (origin · sales type · status). The status segment keeps its color. */}
           <span className="shrink-0 relative group cursor-help text-gray-700 font-medium hover:text-gray-900">
@@ -650,6 +632,18 @@ export default function DealCard({ property }: { property: DealProperty }) {
                 ["Property Type", property.propertyType],
               ]}
             />
+          </span>
+          <span className="shrink-0 text-gray-300">·</span>
+          {/* Keywords — moved to the end of Row 2. No dot indicator; the value
+              color (KW_TEXT) is the only signal. Shortened label "Keywrds:". */}
+          <span className="shrink-0 relative group cursor-help inline-flex items-center text-[12px] text-gray-500 hover:text-gray-900">
+            <span>Keywrds: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span></span>
+            <TipPanel title="Listing Remarks" align="right" wide>
+              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1.5 mb-1">Public Comments</div>
+              <KwHtml html={detail.pubCmt} />
+              <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-2 mb-1">Agent Comments</div>
+              <KwHtml html={detail.agtCmt} />
+            </TipPanel>
           </span>
         </div>
 
