@@ -63,10 +63,12 @@ export default function IqPropertyDetail() {
         <div className="flex-1 overflow-y-auto bg-white">
           {/* HEADER — address + flavor + status, then pain/todo/action */}
           <div className="px-6 pt-5 pb-3">
-            {/* ROW 1 — Action row mirroring DealCard exactly:
-                ☐ checkbox · pulsing action circle · HIGH (colored text, no
-                pill) · action text (orange bold) · 3 channel shortcuts ·
-                Critical · Reminder ........ status pill · ⋮ */}
+            {/* ROW 1 — Action row mirroring DealCard:
+                pulsing action circle · HIGH (colored text, no pill) ·
+                action text (orange bold) · Critical · Reminder ........
+                status pill · ⋮
+                Channel quick-shortcuts now live exclusively in the
+                Offer Terms workflow cluster (see ROW 5 below). */}
             <div className="flex items-center gap-2.5 flex-wrap">
               <ActionCircle channel={rec} />
               {detail.pain !== "none" && (
