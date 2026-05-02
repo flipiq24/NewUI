@@ -713,7 +713,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
               <span className={(detail.trackActive ?? 7) > 0 ? "text-[#D67432] font-semibold" : ""}>
                 {detail.trackActive ?? 7}A
               </span>
-              {" / "}{detail.trackPending ?? 3}P / {detail.trackBackup ?? 0}B / {detail.trackSold ?? 54}S
+              {" / "}{detail.trackBackup ?? 0}B / {detail.trackPending ?? 3}P / {detail.trackSold ?? 54}S
             </span>
             <TipPanel
               title="Deal Track Record"

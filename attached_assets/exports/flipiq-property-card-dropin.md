@@ -6,7 +6,7 @@ property row in the screenshot:
 > ☐  📞 **MID** **No response — send offer**  📞● 💬● ✉●  **Critical**            15% Outreach Sent ▾
 >                                                                                       Opened 04/22 · Called —   ← red text (cold)
 > ⋮   1842 Camino Del Sol, Riverside, CA 92506 · MLS — STD - **Active** · Keywrds: **High**   ← Source label is consolidated `origin — type - status` (no `Source:` prefix); only the status keeps its color. `Keywrds:` is the new short label, no dot indicator — the value color (`High` = red) is the only signal.
-> 💬  **525k** · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: **11** · **5A** / 8P / 2B / 41S   ← `ISC` blue when > 0, gray when 0; `5A` orange when > 0
+> 💬  **525k** · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: **11** · **5A** / 2B / 8P / 41S   ← `ISC` blue when > 0, gray when 0; `5A` orange when > 0
 
 Every chip / icon / value has a hover tooltip:
 - **Next Step** — task / who / what / how / context
@@ -939,7 +939,7 @@ export default function DealCard({
               <span className={(detail.trackActive ?? 7) > 0 ? "text-[#D67432] font-semibold" : ""}>
                 {detail.trackActive ?? 7}A
               </span>
-              {" / "}{detail.trackPending ?? 3}P / {detail.trackBackup ?? 0}B / {detail.trackSold ?? 54}S
+              {" / "}{detail.trackBackup ?? 0}B / {detail.trackPending ?? 3}P / {detail.trackSold ?? 54}S
             </span>
             <TipPanel
               title="Deal Track Record"
@@ -1325,7 +1325,7 @@ The tooltip content sources:
 | 3 (deal)     | `● Pain: Mid` (after ARV)     | `Seller Pain`           | dot color from `PAIN_DOT[detail.pain]`, label from `detail.painLabel`, tooltip rows from `detail.painSig`. Mirrors the Row 1 chip — Row 1 is the at-a-glance signal, this is the inline data label. |
 | 3 (deal)     | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
 | 3 (deal)     | `ISC: 19`                     | `Investor Sourced Count` | Three-row breakdown: `Listings Sold for Investors` (`iscSoldFor`), `Listings Sold to Investors` (`iscSoldTo`), `Unique Investor Relationships` (`iscUniqueInvestors`). **Color:** `isc === 0` renders the inline number gray (`text-gray-400`) — agent has never sourced a deal, nothing to drill into. Any positive count renders the inline number in hyperlink blue (`text-[#2F86D6]`) to signal it's drillable history. |
-| 3 (deal)     | `7A/3P/0B/54S` (`7A` orange when > 0) | `Deal Track Record` | `trackActive`, `trackPending`, `trackBackup`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable). The Active count is wrapped in `<span class="text-[#D67432] font-semibold">` whenever `trackActive > 0` — open deals are the only piece needing immediate attention. When `trackActive === 0`, the `0A` renders in the same plain gray as the rest of the row. |
+| 3 (deal)     | `7A/0B/3P/54S` (`7A` orange when > 0) | `Deal Track Record` | Render order is **A / B / P / S** (Active, Backup, Pending, Sold) — Backup sits next to Active because it's the next-most-actionable signal. Backed by `trackActive`, `trackBackup`, `trackPending`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable). The Active count is wrapped in `<span class="text-[#D67432] font-semibold">` whenever `trackActive > 0` — open deals are the only piece needing immediate attention. When `trackActive === 0`, the `0A` renders in the same plain gray as the rest of the row. |
 | Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / **property assigned to** / **agent assigned to** |
 | Right | `Opened 04/22` (plain colored text — green / yellow / red) | `Open History` (right-aligned) | first / last / total opens, then **property assigned to** + **agent assigned to**. Color via `gradeFreshness(detail.opened)` — green ≤3d, yellow 4–7d, red >7d / `—`. **No pill, no box.** |
 | Right | `Called —` (plain colored text — green / yellow / red)     | `Communication History` (right-aligned) | first / last + per-channel calls/texts/emails, then **property assigned to** + **agent assigned to**. Same `gradeFreshness()` rule on `detail.called`. **No pill, no box.** |
@@ -1355,7 +1355,7 @@ The tooltip content sources:
 - `Keywrds: Mid` → amber value.
 - `Keywrds: Low` → gray value.
 - `ISC: 0` → number is gray (`text-gray-400`); `ISC > 0` → number is hyperlink blue (`text-[#2F86D6]`).
-- `xA` in `xA / yP / zB / wS` → orange `#D67432` + semibold when `trackActive > 0`; plain gray when `0A`.
+- `xA` in `xA / yB / zP / wS` (Active / Backup / Pending / Sold) → orange `#D67432` + semibold when `trackActive > 0`; plain gray when `0A`.
 
 To add more sentiment dots, just push to the `channels` array inside
 `ChannelChips` or extend the `*_DOT` maps. To add new inline flag
