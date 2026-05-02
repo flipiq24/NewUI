@@ -46,7 +46,10 @@ export default function IqPropertyDetail() {
 
   const rec = recommendedChannel(detail);
   const [detailed, setDetailed] = useState(false);
+  const [snapshotOpen, setSnapshotOpen] = useState(false);
   const [activeStep, setActiveStep] = useState("PIQ");
+
+  const propertyBasics = `${property.propertyType} / ${property.beds} Br / ${property.baths} Ba / ${property.garage} Gar / ${property.year} / ${property.sqft} / ${property.lotSqft} / Pool: ${property.pool}`;
 
   return (
     <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
@@ -151,7 +154,35 @@ export default function IqPropertyDetail() {
             </div>
           </div>
 
-          {/* METRIC CARDS with Simple / Detailed toggle */}
+          {/* PROPERTY BASICS — always visible one-liner. The Snapshot
+              section below is hidden by default; click the toggle to reveal
+              the 5 metric cards. */}
+          <div className="px-6 pt-4 pb-3 flex items-start justify-between gap-4 border-b border-gray-100">
+            <div className="text-[13px] text-gray-800 leading-6 min-w-0" title={propertyBasics}>
+              {propertyBasics}
+            </div>
+            <button
+              type="button"
+              onClick={() => setSnapshotOpen((v) => !v)}
+              className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500 hover:text-orange-500 transition-colors cursor-pointer"
+              title={snapshotOpen ? "Hide snapshot" : "Show snapshot"}
+            >
+              <span>{snapshotOpen ? "Hide" : "Show"} snapshot</span>
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className={`w-3 h-3 transition-transform ${snapshotOpen ? "rotate-180" : ""}`}
+              >
+                <polyline points="4,6 8,10 12,6" />
+              </svg>
+            </button>
+          </div>
+
+          {/* METRIC CARDS — collapsed by default */}
+          {snapshotOpen && (
+          <>
           <div className="px-6 pt-4 pb-2 flex items-center justify-between">
             <div className="text-[11px] uppercase tracking-wider font-semibold text-gray-400">
               Snapshot
@@ -161,12 +192,11 @@ export default function IqPropertyDetail() {
           <div className="px-6 pb-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
             <MetricCard
               label="Property Details"
-              headline={`${property.propertyType} · ${property.beds} Br`}
+              headline={propertyBasics}
               detailed={detailed}
             >
               <div className="text-[13px] text-gray-800 leading-6">
-                {property.propertyType} / {property.beds} Br / {property.baths} Ba / {property.garage} Gar /{" "}
-                {property.year} / {property.sqft} / {property.lotSqft} / Pool: {property.pool}
+                {propertyBasics}
               </div>
             </MetricCard>
 
@@ -240,6 +270,8 @@ export default function IqPropertyDetail() {
               <div className="text-[12px] text-gray-700 mt-1.5">LCD: {property.lastCalledDate}</div>
             </MetricCard>
           </div>
+          </>
+          )}
 
           {/* WORKFLOW STEPPER — PIQ → Offer Terms */}
           <WorkflowStepper active={activeStep} onChange={setActiveStep} />
