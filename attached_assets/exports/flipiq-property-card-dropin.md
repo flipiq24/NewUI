@@ -5,13 +5,13 @@ property row in the screenshot:
 
 > ☐  📞 **MID** **No response — send offer**  📞● 💬● ✉●  **Critical**            15% Outreach Sent ▾
 >                                                                                       Opened 04/22 · Called —   ← red text (cold)
-> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · MLS — STD - **Active** · Keywrds: **High**   ← Source label is consolidated `origin — type - status` (no `Source:` prefix); only the status keeps its color. `Keywrds:` is the new short label, no dot indicator — the value color (`High` = red) is the only signal.
+> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · MLS — **Active** - STD · Keywrds: **High**   ← Source label is consolidated `origin — status - type` (no `Source:` prefix); only the status keeps its color. `Keywrds:` is the new short label, no dot indicator — the value color (`High` = red) is the only signal.
 > 💬  **525k** · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: **11** · **5A** / 2B / 8P / 41S   ← `ISC` blue when > 0, gray when 0; `5A` orange when > 0
 
 Every chip / icon / value has a hover tooltip:
 - **Next Step** — task / who / what / how / context
 - **Property** — type, beds/baths, sq ft, lot, year, etc.
-- **Source** — consolidated `origin — sales-type - status` label (e.g. `MLS — STD - Active`). Tooltip shows raw source, status, sales-type code → full label (STD = Standard, REO, NOD, …), and property type. There is no separate Sales Type chip — its data lives in this label and tooltip.
+- **Source** — consolidated `origin — status - sales-type` label (e.g. `MLS — Active - STD`). Tooltip shows raw source, status, sales-type code → full label (STD = Standard, REO, NOD, …), and property type. There is no separate Sales Type chip — its data lives in this label and tooltip.
 - **Price History** — every list-price change + total reduction
 - **ARV** — asking vs ARV percentage
 - **Seller Pain** — DOM, price drops, showings, equity, propensity
@@ -54,7 +54,7 @@ Detailed Analysis).
    *what mental question it answers* so the rep's eye scans
    top-to-bottom in priority order.
    - **Line 1 — property identity (what is it):** Address →
-     world-icon → consolidated source label (`MLS — STD - Active`,
+     world-icon → consolidated source label (`MLS — Active - STD`,
      no `Source:` prefix; sales type is folded in) → **Keywrds**
      (short label, no dot — value color is the only signal). Pure
      asset description. This row is **`flex-nowrap` + `whitespace-nowrap`**
@@ -833,8 +833,8 @@ export default function DealCard({
             {ICON.globe}
           </button>
           <span className="shrink-0 text-gray-300">·</span>
-          {/* Consolidated source — no "Source:" prefix. Format: `MLS — STD - Active`
-              (origin · sales type · status). The status segment keeps its color
+          {/* Consolidated source — no "Source:" prefix. Format: `MLS — Active - STD`
+              (origin · status · sales type). The status segment keeps its color
               via sourceTextColor(). The Sales Type chip is gone — its data lives
               in this composite label and in the Source tooltip. */}
           <span className="shrink-0 relative group cursor-help text-gray-700 font-medium hover:text-gray-900">
@@ -1319,7 +1319,7 @@ The tooltip content sources:
 | 1   | Inline flag `Critical` / `Reminder`  | none — plain word       | rendered when `notifications` includes `"critical"` (red) or `"reminder"` (blue)       |
 | 2 (property) | Address                       | `Property`              | `prop` rows                                                                            |
 | 2 (property) | `Keywrds: Mid` (at the end of Row 2, after the source) | `Listing Remarks` | **No dot** — the value color is the only signal. The literal `Keywrds:` prefix stays the row's default gray; **only the `kwLabel` value** (`High` / `Mid` / `Low`) is colored via `KW_TEXT[detail.kw]` (high = **red #E24B4A semibold**, mid = amber #BA7517, low = gray #B4B2A9). Tooltip: `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills |
-| 2 (property) | `MLS — STD - Active` (no `Source:` prefix) | `Source` | Consolidated `origin — sales-type - status` label. Origin (`MLS`) and type (`STD`/`REO`) render in `text-gray-700 font-medium`; the status segment (`Active`/`Pending`/etc.) is colored via `sourceTextColor(property.source, property.sourceStatus)`. Tooltip rows: `Source` (raw `property.source`), optional `Status`, `Sales Type` (code + full label from `SALES_TYPE_LABELS`), `Property Type`. The standalone Sales-Type chip is removed — its data is embedded here. |
+| 2 (property) | `MLS — Active - STD` (no `Source:` prefix) | `Source` | Consolidated `origin — status - sales-type` label. Origin (`MLS`) and type (`STD`/`REO`) render in `text-gray-700 font-medium`; the status segment (`Active`/`Pending`/etc.) sits in the middle and is colored via `sourceTextColor(property.source, property.sourceStatus)`. Tooltip rows: `Source` (raw `property.source`), optional `Status`, `Sales Type` (code + full label from `SALES_TYPE_LABELS`), `Property Type`. The standalone Sales-Type chip is removed — its data is embedded here. |
 | 3 (deal)     | `525k` (semibold, gray-900, no `$`) | `Price History`   | `priceHist` + `priceTotal`. Rendered via `compactPrice(property.price)` — drops `$`, collapses zeros to `k` / `m` |
 | 3 (deal)     | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
 | 3 (deal)     | `● Pain: Mid` (after ARV)     | `Seller Pain`           | dot color from `PAIN_DOT[detail.pain]`, label from `detail.painLabel`, tooltip rows from `detail.painSig`. Mirrors the Row 1 chip — Row 1 is the at-a-glance signal, this is the inline data label. |

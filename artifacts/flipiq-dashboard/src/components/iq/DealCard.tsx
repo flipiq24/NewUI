@@ -608,20 +608,22 @@ export default function DealCard({ property }: { property: DealProperty }) {
             {ICON.globe}
           </button>
           <span className="shrink-0 text-gray-300">·</span>
-          {/* Consolidated source — no "Source:" prefix. Format: `MLS — STD - Active`
-              (origin · sales type · status). The status segment keeps its color. */}
+          {/* Consolidated source — no "Source:" prefix. Format: `MLS — Active - STD`
+              (origin · status · sales type). The status segment keeps its color. */}
           <span className="shrink-0 relative group cursor-help text-gray-700 font-medium hover:text-gray-900">
             <span>
               {property.source.replace(/\s*—\s*.*$/, "")}
               {" — "}
-              {property.type}
-              {" - "}
             </span>
             <span
               className="font-medium"
               style={{ color: sourceTextColor(property.source, property.sourceStatus) }}
             >
               {property.sourceStatus || (property.source.match(/\s*—\s*(.*)$/)?.[1] ?? "")}
+            </span>
+            <span>
+              {" - "}
+              {property.type}
             </span>
             <TipPanel
               title="Source"
