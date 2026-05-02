@@ -33,14 +33,14 @@ export const PAIN_TEXT: Record<DealDetail["pain"], string> = {
  * Green = recent (≤3 days), yellow = getting stale (4–7 days),
  * red = cold or never (>7 days, "—", "N/A").
  */
-const FRESHNESS: Record<"fresh" | "stale" | "cold", string> = {
+export const FRESHNESS: Record<"fresh" | "stale" | "cold", string> = {
   fresh: "text-[#476B14]",
   stale: "text-[#8B6210]",
   cold:  "text-[#A33232]",
 };
 
 /** Grade an "MM/DD" or "MM/DD/YY" string against today. */
-function gradeFreshness(mmdd: string): keyof typeof FRESHNESS {
+export function gradeFreshness(mmdd: string): keyof typeof FRESHNESS {
   if (!mmdd || mmdd === "—" || /n\/?a/i.test(mmdd)) return "cold";
   const m = mmdd.match(/^(\d{1,2})\/(\d{1,2})/);
   if (!m) return "cold";

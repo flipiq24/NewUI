@@ -7,6 +7,8 @@ import { DEAL_REVIEW_PROPERTIES, type DealProperty } from "@/lib/iq/mockData";
 import { DEAL_DETAILS, type DealDetail } from "@/lib/iq/dealDetails";
 import {
   AGENT_DOT,
+  FRESHNESS,
+  gradeFreshness,
   PAIN_DOT,
   PAIN_TEXT,
   SALES_TYPE_LABELS,
@@ -130,22 +132,13 @@ export default function IqPropertyDetail() {
                   Reminder
                 </span>
               )}
-              <div className="ml-auto shrink-0 flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 text-[13px] text-gray-700 cursor-pointer hover:text-gray-900">
-                  <span className="font-semibold">{property.offerPct}%</span>
-                  <span>{property.offerLabel}</span>
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-3 h-3 text-gray-400">
-                    <polyline points="4,6 8,10 12,6" />
-                  </svg>
-                </span>
-                <button className="text-gray-400 hover:text-gray-700 cursor-pointer p-1" title="More">
-                  <svg viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3">
-                    <circle cx="8" cy="3" r="1.4" />
-                    <circle cx="8" cy="8" r="1.4" />
-                    <circle cx="8" cy="13" r="1.4" />
-                  </svg>
-                </button>
-              </div>
+              <span className="ml-auto inline-flex items-center gap-1.5 text-[13px] text-gray-700 cursor-pointer hover:text-gray-900 shrink-0">
+                <span className="font-semibold">{property.offerPct}%</span>
+                <span>{property.offerLabel}</span>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-3 h-3 text-gray-400">
+                  <polyline points="4,6 8,10 12,6" />
+                </svg>
+              </span>
             </div>
 
             {/* ROW 2 — Address + globe · source — status · sales-type ·
@@ -174,10 +167,20 @@ export default function IqPropertyDetail() {
               <span className="shrink-0 text-[12px] text-gray-500 cursor-help" title="Keywords pulled from listing remarks">
                 Keywords: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span>
               </span>
-              <span className="ml-auto shrink-0 text-[12px] text-gray-500" title="Last opened / Last called">
-                Opened <span className="text-emerald-600 font-medium">{property.lastOpenDate}</span>
-                <span className="mx-1.5 text-gray-300">·</span>
-                Called <span className="text-gray-700 font-medium">{property.lastCalledDate}</span>
+              <span className="ml-auto shrink-0 inline-flex items-center gap-1.5 text-[11.5px] text-gray-500">
+                <span
+                  className={`font-medium cursor-help ${FRESHNESS[gradeFreshness(property.lastOpenDate)]}`}
+                  title={`Last opened: ${property.lastOpenDate}`}
+                >
+                  Opened {property.lastOpenDate}
+                </span>
+                <span className="text-gray-300">·</span>
+                <span
+                  className={`font-medium cursor-help ${FRESHNESS[gradeFreshness(property.lastCalledDate)]}`}
+                  title={`Last called: ${property.lastCalledDate}`}
+                >
+                  Called {property.lastCalledDate}
+                </span>
               </span>
             </div>
 
@@ -220,12 +223,12 @@ export default function IqPropertyDetail() {
               <span className="text-gray-300">·</span>
               <span
                 className="font-medium text-gray-700 tabular-nums cursor-help"
-                title={`Active ${detail.trackActive ?? 0} · Pending ${detail.trackPending ?? 0} · Backup ${detail.trackBackup ?? 0} · Sold ${detail.trackSold ?? 0}`}
+                title={`Sold ${detail.trackSold ?? 0} · Pending ${detail.trackPending ?? 0} · Backup ${detail.trackBackup ?? 0} · Active ${detail.trackActive ?? 0}`}
               >
+                {detail.trackSold ?? 0}S / {detail.trackPending ?? 0}P / {detail.trackBackup ?? 0}B /{" "}
                 <span className={(detail.trackActive ?? 0) > 0 ? "text-[#D67432] font-semibold" : ""}>
                   {detail.trackActive ?? 0}A
                 </span>
-                {" / "}{detail.trackBackup ?? 0}B / {detail.trackPending ?? 0}P / {detail.trackSold ?? 0}S
               </span>
             </div>
           </div>
