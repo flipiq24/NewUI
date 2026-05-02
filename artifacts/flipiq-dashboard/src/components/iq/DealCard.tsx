@@ -778,8 +778,8 @@ export default function DealCard({ property }: { property: DealProperty }) {
               ["Completion", detail.pct],
               ["Stage", detail.status],
               ["Source", detail.source],
-              ["Agent assigned to", detail.negotiator],
               ["Property assigned to", detail.assigned],
+              ["Agent assigned to", detail.negotiator],
             ]}
           />
         </span>
@@ -794,8 +794,8 @@ export default function DealCard({ property }: { property: DealProperty }) {
                 ["First opened", detail.firstOpened],
                 ["Last opened", detail.opened],
                 ["Total opens", String(detail.totalOpens)],
-                ["Agent assigned to", detail.negotiator],
                 ["Property assigned to", detail.assigned],
+                ["Agent assigned to", detail.negotiator],
               ]}
             />
           </span>
@@ -809,8 +809,8 @@ export default function DealCard({ property }: { property: DealProperty }) {
                 ["First call", detail.firstCalled],
                 ["Last call", detail.called],
                 ["Total comms", String(detail.totalCommsCount)],
-                ["Agent assigned to", detail.negotiator],
                 ["Property assigned to", detail.assigned],
+                ["Agent assigned to", detail.negotiator],
               ]}
             >
               <div className="mt-1.5 pt-1.5 border-t border-gray-200">
