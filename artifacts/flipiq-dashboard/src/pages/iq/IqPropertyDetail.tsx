@@ -231,7 +231,6 @@ export default function IqPropertyDetail() {
             <WorkflowTabs active={activeStep} onChange={setActiveStep} />
             <div className="ml-auto flex items-center gap-1 shrink-0">
               <NavActionIcon kind="call" needsAction />
-              <NavActionIcon kind="text" />
               <NavActionIcon kind="email" />
               <span className="mx-1 h-5 w-px bg-gray-200" />
               <SecondaryIconStrip detail={detail} />
