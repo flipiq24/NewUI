@@ -330,7 +330,7 @@ export function compactPrice(raw: string): string {
   return `${Math.round(n / 1000)}k`;
 }
 
-export const AGENT_DOT: Record<DealDetail["agent"], string> = {
+const AGENT_DOT: Record<DealDetail["agent"], string> = {
   responsive:       "bg-[#639922]",
   "not-responsive": "bg-[#E24B4A]",
   none:             "bg-[#B4B2A9]",

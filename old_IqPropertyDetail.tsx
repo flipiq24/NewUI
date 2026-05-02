@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { Fragment, useMemo, useState, type ReactNode } from "react";
 import { useParams, useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
@@ -6,7 +6,6 @@ import IqAskBar from "@/components/iq/IqAskBar";
 import { DEAL_REVIEW_PROPERTIES, type DealProperty } from "@/lib/iq/mockData";
 import { DEAL_DETAILS, type DealDetail } from "@/lib/iq/dealDetails";
 import {
-  AGENT_DOT,
   PAIN_DOT,
   PAIN_TEXT,
   SALES_TYPE_LABELS,
@@ -48,10 +47,9 @@ export default function IqPropertyDetail() {
   const rec = recommendedChannel(detail);
   const [detailed, setDetailed] = useState(false);
   const [snapshotOpen, setSnapshotOpen] = useState(false);
+  const [activeStep, setActiveStep] = useState("PIQ");
 
   const propertyBasics = `${property.propertyType} / ${property.beds} Br / ${property.baths} Ba / ${property.garage} Gar / ${property.year} / ${property.sqft} / ${property.lotSqft} / Pool: ${property.pool}`;
-  const isCritical = property.notifications?.includes("critical");
-  const isReminder = property.notifications?.includes("reminder");
 
   return (
     <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
@@ -59,34 +57,33 @@ export default function IqPropertyDetail() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <IqTopBar />
 
-        {/* Breadcrumb — secondary-tab icons on the LEFT, then breadcrumb,
-            then Back on the right. */}
+        {/* Breadcrumb + secondary-tab icon strip + Back */}
         <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-2 min-w-0">
-            <SecondaryIconStrip detail={detail} />
-            <span className="w-px h-5 bg-gray-200 mx-1" />
-            <span className="text-sm text-gray-500 truncate">
-              <button
-                onClick={() => navigate("/iq/deal-review")}
-                className="hover:text-orange-500 cursor-pointer"
-              >
-                Deal Review
-              </button>
-              {" › "}
-              <span className="font-semibold text-gray-800 underline decoration-orange-500 decoration-2 underline-offset-2">
-                {property.address.split(",")[0]}
-              </span>
+          <span className="text-sm text-gray-500">
+            <button
+              onClick={() => navigate("/iq/deal-review")}
+              className="hover:text-orange-500 cursor-pointer"
+            >
+              Deal Review
+            </button>
+            {" › "}
+            <span className="font-semibold text-gray-800 underline decoration-orange-500 decoration-2 underline-offset-2">
+              {property.address.split(",")[0]}
             </span>
+          </span>
+          <div className="flex items-center gap-1">
+            <SecondaryIconStrip detail={detail} />
+            <span className="w-px h-5 bg-gray-200 mx-2" />
+            <button
+              onClick={() => navigate("/iq/deal-review")}
+              className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider hover:text-orange-500 transition-colors cursor-pointer inline-flex items-center gap-1.5"
+            >
+              <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="10,3 5,8 10,13" />
+              </svg>
+              Back
+            </button>
           </div>
-          <button
-            onClick={() => navigate("/iq/deal-review")}
-            className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider hover:text-orange-500 transition-colors cursor-pointer inline-flex items-center gap-1.5 shrink-0"
-          >
-            <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="10,3 5,8 10,13" />
-            </svg>
-            Back
-          </button>
         </div>
 
         <div className="flex-1 overflow-y-auto bg-white">
@@ -131,9 +128,8 @@ export default function IqPropertyDetail() {
               </div>
             </div>
 
-            {/* Action row — pain + To do + action circle + 3 channel quick
-                shortcuts + Critical/Reminder flags + source meta + dates */}
-            <div className="flex items-center gap-2 flex-wrap text-[12.5px] text-gray-600">
+            {/* Pain + To do + action — single tight row, no extra source line */}
+            <div className="flex items-center gap-3 flex-wrap">
               <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold uppercase tracking-wide bg-gray-50 border border-gray-200 ${PAIN_TEXT[detail.pain]}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
                 {detail.painLabel}
@@ -144,15 +140,6 @@ export default function IqPropertyDetail() {
               </label>
               <span className="text-gray-300">·</span>
               <ActionCircle channel={rec} />
-              <ChannelShortcut kind="call" />
-              <ChannelShortcut kind="text" />
-              <ChannelShortcut kind="email" />
-              {isCritical && (
-                <span className="text-[12px] font-semibold text-[#E24B4A]" title="Critical flag">Critical</span>
-              )}
-              {isReminder && (
-                <span className="text-[12px] font-semibold text-[#2F86D6]" title="Reminder set">Reminder</span>
-              )}
               <span className="text-gray-300">·</span>
               <span className="text-[12px] text-gray-500">
                 {property.source.replace(/\s*—\s*.*$/, "")}{" — "}
@@ -164,64 +151,10 @@ export default function IqPropertyDetail() {
                 {" · "}
                 Keywrds: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span>
               </span>
-              <span className="ml-auto text-[12px] text-gray-500" title="Last opened / Last called">
-                Opened <span className="text-emerald-600 font-medium">{property.lastOpenDate}</span>
-                <span className="mx-1.5 text-gray-300">·</span>
-                Called <span className="text-gray-700 font-medium">{property.lastCalledDate}</span>
-              </span>
-            </div>
-
-            {/* Data row — price · ARV% · Pain · Agent · ISC · S/P/B/A.
-                Same fields as DealCard's bottom row, with hover-only details
-                via the title attribute. */}
-            <div className="flex items-center gap-2 flex-wrap mt-2.5 text-[12.5px] text-gray-600">
-              <span
-                className="font-semibold text-gray-900 cursor-help"
-                title={`Asking ${property.price} · ARV ${detail.arv}`}
-              >
-                {compactPrice(property.price)}
-              </span>
-              <span className="text-gray-300">·</span>
-              <span className="font-medium text-gray-700 cursor-help" title={`Asking vs ARV: ${detail.arvPct}`}>
-                {detail.arvPct}
-              </span>
-              <span className="text-gray-300">·</span>
-              <span
-                className="inline-flex items-center gap-1.5 cursor-help"
-                title={detail.painSig.map(([k, v]) => `${k}: ${v}`).join(" · ")}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
-                Pain: <span className="text-gray-800 font-medium">{detail.painLabel}</span>
-              </span>
-              <span className="text-gray-300">·</span>
-              <span
-                className="inline-flex items-center gap-1.5 cursor-help"
-                title={`Response rate: ${detail.agentRate ?? "—"}`}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full ${AGENT_DOT[detail.agent]}`} />
-                Agent: <span className="text-gray-800 font-medium">{detail.agentLabel}</span>
-              </span>
-              <span className="text-gray-300">·</span>
-              <span className="cursor-help" title="Investor Sourced Count">
-                ISC:{" "}
-                <span className={(detail.isc ?? 0) > 0 ? "font-medium text-[#2F86D6]" : "font-medium text-gray-400"}>
-                  {detail.isc ?? 0}
-                </span>
-              </span>
-              <span className="text-gray-300">·</span>
-              <span
-                className="font-medium text-gray-700 tabular-nums cursor-help"
-                title={`Active ${detail.trackActive ?? 0} · Pending ${detail.trackPending ?? 0} · Backup ${detail.trackBackup ?? 0} · Sold ${detail.trackSold ?? 0}`}
-              >
-                <span className={(detail.trackActive ?? 0) > 0 ? "text-[#D67432] font-semibold" : ""}>
-                  {detail.trackActive ?? 0}A
-                </span>
-                {" / "}{detail.trackBackup ?? 0}B / {detail.trackPending ?? 0}P / {detail.trackSold ?? 0}S
-              </span>
             </div>
           </div>
 
-          {/* PROPERTY BASICS — always visible one-liner. The Details
+          {/* PROPERTY BASICS — always visible one-liner. The Snapshot
               section below is hidden by default; click the toggle to reveal
               the 5 metric cards. */}
           <div className="px-6 pt-4 pb-3 flex items-start justify-between gap-4 border-b border-gray-100">
@@ -232,9 +165,9 @@ export default function IqPropertyDetail() {
               type="button"
               onClick={() => setSnapshotOpen((v) => !v)}
               className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500 hover:text-orange-500 transition-colors cursor-pointer"
-              title={snapshotOpen ? "Hide details" : "Show details"}
+              title={snapshotOpen ? "Hide snapshot" : "Show snapshot"}
             >
-              <span>{snapshotOpen ? "Hide" : "Show"} details</span>
+              <span>{snapshotOpen ? "Hide" : "Show"} snapshot</span>
               <svg
                 viewBox="0 0 16 16"
                 fill="none"
@@ -247,12 +180,12 @@ export default function IqPropertyDetail() {
             </button>
           </div>
 
-          {/* DETAILS — collapsed by default */}
+          {/* METRIC CARDS — collapsed by default */}
           {snapshotOpen && (
           <>
           <div className="px-6 pt-4 pb-2 flex items-center justify-between">
             <div className="text-[11px] uppercase tracking-wider font-semibold text-gray-400">
-              Details
+              Snapshot
             </div>
             <SimpleDetailedToggle value={detailed} onChange={setDetailed} />
           </div>
@@ -340,7 +273,26 @@ export default function IqPropertyDetail() {
           </>
           )}
 
-          {/* Body intentionally empty — prototyping. */}
+          {/* WORKFLOW STEPPER — PIQ → Offer Terms */}
+          <WorkflowStepper active={activeStep} onChange={setActiveStep} />
+
+          {/* PIQ TAB BODY */}
+          {activeStep === "PIQ" && (
+            <div className="px-6 py-6 grid grid-cols-1 lg:grid-cols-3 gap-5">
+              <RecommendedActionPanel detail={detail} channel={rec} />
+              <CommunicationsPanel detail={detail} />
+              <PriceHistoryPanel detail={detail} />
+              <ListingRemarksPanel detail={detail} />
+              <PainSignalsPanel detail={detail} />
+              <AssignmentsPanel detail={detail} />
+            </div>
+          )}
+          {activeStep !== "PIQ" && (
+            <div className="px-6 py-16 text-center text-gray-400 text-sm">
+              <span className="font-medium text-gray-500">{activeStep}</span> step is
+              not yet wired up — keep going through the workflow above.
+            </div>
+          )}
         </div>
         <IqAskBar />
       </div>
@@ -545,27 +497,245 @@ function ActionCircle({ channel }: { channel: RecChannel }) {
   );
 }
 
-/** Inline channel quick-shortcut — call/text/email — shown as the small
- *  outlined icons after the recommended ActionCircle. Mirrors the chips on
- *  DealCard. Click is a no-op for now; tooltip identifies the channel. */
-function ChannelShortcut({ kind }: { kind: "call" | "text" | "email" }) {
-  const label = kind === "call" ? "Quick call" : kind === "text" ? "Quick text" : "Quick email";
-  const icon =
-    kind === "call" ? (
-      <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5"><path d="M3 2h3l1.5 3.5-2 1.2C6.3 9 7 9.7 8.3 10.5l1.2-2L13 10v3c0 .6-.5 1-1 1C5.4 14 2 6.6 2 3c0-.5.4-1 1-1z" /></svg>
-    ) : kind === "text" ? (
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5"><path d="M2 3.5h12v7H6.5L3.5 13v-2.5H2v-7z" /></svg>
-    ) : (
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5"><rect x="2" y="3.5" width="12" height="9" rx="1" /><polyline points="2.5,4.5 8,9 13.5,4.5" /></svg>
-    );
+/**
+ * Workflow stepper — PIQ → Comps → Investment Analysis → Agent → Offer
+ * Terms. Steps before active are "complete" (green check), active is
+ * orange, future is muted gray. Click to jump.
+ */
+function WorkflowStepper({
+  active,
+  onChange,
+}: {
+  active: string;
+  onChange: (s: string) => void;
+}) {
+  const steps = ["PIQ", "Comps", "Investment Analysis", "Agent", "Offer Terms"];
+  const activeIdx = steps.indexOf(active);
   return (
-    <button
-      type="button"
-      title={label}
-      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-gray-400 hover:text-orange-500 hover:bg-orange-50 cursor-pointer transition-colors"
-    >
-      {icon}
-    </button>
+    <div className="px-6 py-2 border-b border-gray-100 bg-white">
+      <div className="flex items-center gap-2 flex-wrap text-[12px]">
+        {steps.map((step, i) => {
+          const isActive = i === activeIdx;
+          const isComplete = i < activeIdx;
+          return (
+            <Fragment key={step}>
+              <button
+                type="button"
+                onClick={() => onChange(step)}
+                title={
+                  isComplete ? `${step} — done` : isActive ? `${step} — current step` : `${step} — pending`
+                }
+                className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 transition-colors cursor-pointer ${
+                  isActive
+                    ? "bg-orange-50 text-orange-600 font-semibold"
+                    : isComplete
+                    ? "text-emerald-700 hover:bg-emerald-50"
+                    : "text-gray-400 hover:text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                <span
+                  className={`w-3.5 h-3.5 rounded-[3px] border flex items-center justify-center shrink-0 ${
+                    isActive
+                      ? "border-orange-500 bg-white"
+                      : isComplete
+                      ? "border-emerald-500 bg-emerald-500"
+                      : "border-gray-300 bg-white"
+                  }`}
+                >
+                  {isComplete && (
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="3" className="w-2.5 h-2.5 text-white">
+                      <polyline points="3,8 7,12 13,4" />
+                    </svg>
+                  )}
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />}
+                </span>
+                <span className="whitespace-nowrap">{step}</span>
+              </button>
+              {i < steps.length - 1 && <span className="text-gray-300">›</span>}
+            </Fragment>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
+function PanelCard({ title, children, className = "" }: { title: string; children: ReactNode; className?: string }) {
+  return (
+    <div className={`border border-gray-200 rounded-lg p-4 bg-white ${className}`}>
+      <div className="text-[11px] uppercase tracking-wider font-semibold text-orange-600 mb-2.5">
+        {title}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function RecommendedActionPanel({ detail, channel }: { detail: DealDetail; channel: RecChannel }) {
+  const copy = REC_COPY[channel];
+  return (
+    <PanelCard title="Recommended Action" className="lg:col-span-2">
+      <div className="flex items-center gap-2 mb-2">
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-500 text-white text-[11px] font-bold uppercase">
+          {channel[0]}
+        </span>
+        <span className="text-[14px] font-semibold text-gray-900">{copy.label}</span>
+      </div>
+      <p className="text-[12.5px] text-gray-700 leading-relaxed mb-3">{copy.tip}</p>
+      <div className="border-t border-gray-100 pt-3 space-y-1.5 text-[12.5px]">
+        {detail.taskWho && <Row label="Who" value={detail.taskWho} />}
+        {detail.taskWhat && <Row label="What" value={detail.taskWhat} />}
+        <Row label="How" value={copy.how} />
+      </div>
+    </PanelCard>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex gap-3">
+      <span className="w-12 shrink-0 text-[10px] uppercase tracking-wider font-semibold text-gray-400 mt-0.5">{label}</span>
+      <span className="text-gray-800 leading-snug">{value}</span>
+    </div>
+  );
+}
+
+function CommunicationsPanel({ detail }: { detail: DealDetail }) {
+  const log = detail.commLog;
+  if (!log) {
+    return (
+      <PanelCard title="Communications">
+        <div className="text-[12.5px] text-gray-500 italic">No messages on file yet.</div>
+      </PanelCard>
+    );
+  }
+  const channels: { key: "call" | "text" | "email"; label: string }[] = [
+    { key: "call", label: "Call" },
+    { key: "text", label: "Text" },
+    { key: "email", label: "Email" },
+  ];
+  return (
+    <PanelCard title="Communications">
+      <div className="space-y-3">
+        {channels.map(({ key, label }) => {
+          const c = log[key];
+          if (!c?.lastSent && !c?.lastReply) return null;
+          return (
+            <div key={key}>
+              <div className="text-[10.5px] uppercase tracking-wider text-gray-400 font-semibold mb-1">{label}</div>
+              {c.lastSent && (
+                <div className="text-[12px] text-gray-700 mb-0.5">
+                  <span className="text-gray-400">Sent {c.lastSent.ts}:</span> {c.lastSent.body}
+                </div>
+              )}
+              {c.lastReply && (
+                <div className="text-[12px] text-emerald-700">
+                  <span className="text-gray-400">Reply {c.lastReply.ts}:</span> {c.lastReply.body}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </PanelCard>
+  );
+}
+
+function PriceHistoryPanel({ detail }: { detail: DealDetail }) {
+  return (
+    <PanelCard title="Price History">
+      <div className="space-y-1 text-[12.5px]">
+        <div className="flex justify-between gap-3 text-gray-500">
+          <span>DOM / CDOM</span>
+          <span className="text-gray-800 font-medium">
+            {detail.prop.find(([k]) => k === "DOM / CDOM")?.[1] ?? "—"}
+          </span>
+        </div>
+        {detail.priceHist.map(([k, v]) => (
+          <div key={k} className="flex justify-between gap-3">
+            <span className="text-gray-500">{k}</span>
+            <span className="text-gray-900 font-medium">{v}</span>
+          </div>
+        ))}
+        {detail.priceTotal && detail.priceTotal !== "—" && (
+          <div className="flex justify-between gap-3 pt-1.5 border-t border-gray-100 mt-1.5">
+            <span className="text-gray-500">Total reduction</span>
+            <span className="text-gray-900 font-semibold">{detail.priceTotal}</span>
+          </div>
+        )}
+      </div>
+    </PanelCard>
+  );
+}
+
+function ListingRemarksPanel({ detail }: { detail: DealDetail }) {
+  return (
+    <PanelCard title="Listing Remarks">
+      <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-1">Public</div>
+      <KwHtml html={detail.pubCmt} />
+      <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-3 mb-1">Agent</div>
+      <KwHtml html={detail.agtCmt} />
+    </PanelCard>
+  );
+}
+
+function PainSignalsPanel({ detail }: { detail: DealDetail }) {
+  if (!detail.painSig.length) return null;
+  return (
+    <PanelCard title="Pain Signals">
+      <div className="space-y-1 text-[12.5px]">
+        {detail.painSig.map(([k, v]) => (
+          <div key={k} className="flex justify-between gap-3">
+            <span className="text-gray-500">{k}</span>
+            <span className="text-gray-900 font-medium text-right">{v}</span>
+          </div>
+        ))}
+      </div>
+    </PanelCard>
+  );
+}
+
+function AssignmentsPanel({ detail }: { detail: DealDetail }) {
+  return (
+    <PanelCard title="Assignments">
+      <div className="space-y-1 text-[12.5px]">
+        <div className="flex justify-between gap-3">
+          <span className="text-gray-500">Source</span>
+          <span className="text-gray-900 font-medium">{detail.source}</span>
+        </div>
+        <div className="flex justify-between gap-3">
+          <span className="text-gray-500">Negotiator</span>
+          <span className="text-gray-900 font-medium">{detail.negotiator}</span>
+        </div>
+        <div className="flex justify-between gap-3">
+          <span className="text-gray-500">Property assigned to</span>
+          <span className="text-gray-900 font-medium">{detail.assigned}</span>
+        </div>
+        <div className="flex justify-between gap-3">
+          <span className="text-gray-500">Status</span>
+          <span className="text-gray-900 font-medium">{detail.pct} · {detail.status}</span>
+        </div>
+      </div>
+    </PanelCard>
+  );
+}
+
+/** Same kw-pill renderer as DealCard. Inlined to keep this page standalone. */
+function KwHtml({ html }: { html: string }) {
+  const parts = html.split(/(<span class="kw">.*?<\/span>)/g);
+  return (
+    <p className="text-[12px] text-gray-900 leading-snug m-0">
+      {parts.map((part, i) => {
+        const m = part.match(/^<span class="kw">(.*?)<\/span>$/);
+        if (m) {
+          return (
+            <span key={i} className="inline-block bg-red-500 text-white px-1.5 py-px rounded font-medium text-[10.5px] tracking-wide mx-0.5">
+              {m[1]}
+            </span>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </p>
+  );
+}
