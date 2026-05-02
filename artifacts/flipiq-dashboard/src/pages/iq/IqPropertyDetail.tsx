@@ -65,8 +65,6 @@ export default function IqPropertyDetail() {
             then Back on the right. */}
         <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2 min-w-0">
-            <SecondaryIconStrip detail={detail} />
-            <span className="w-px h-5 bg-gray-200 mx-1" />
             <span className="text-sm text-gray-500 truncate">
               <button
                 onClick={() => navigate("/iq/deal-review")}
@@ -240,23 +238,27 @@ export default function IqPropertyDetail() {
             <div className="text-[13px] text-gray-800 leading-6 min-w-0" title={propertyBasics}>
               {propertyBasics}
             </div>
-            <button
-              type="button"
-              onClick={() => setSnapshotOpen((v) => !v)}
-              className="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500 hover:text-orange-500 transition-colors cursor-pointer"
-              title={snapshotOpen ? "Hide details" : "Show details"}
-            >
-              <span>{snapshotOpen ? "Hide" : "Show"} details</span>
-              <svg
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className={`w-3 h-3 transition-transform ${snapshotOpen ? "rotate-180" : ""}`}
+            <div className="shrink-0 inline-flex items-center gap-2">
+              <SecondaryIconStrip detail={detail} />
+              <span className="w-px h-5 bg-gray-200" />
+              <button
+                type="button"
+                onClick={() => setSnapshotOpen((v) => !v)}
+                className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500 hover:text-orange-500 transition-colors cursor-pointer"
+                title={snapshotOpen ? "Hide details" : "Show details"}
               >
-                <polyline points="4,6 8,10 12,6" />
-              </svg>
-            </button>
+                <span>{snapshotOpen ? "Hide" : "Show"} details</span>
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className={`w-3 h-3 transition-transform ${snapshotOpen ? "rotate-180" : ""}`}
+                >
+                  <polyline points="4,6 8,10 12,6" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* DETAILS — collapsed by default */}
