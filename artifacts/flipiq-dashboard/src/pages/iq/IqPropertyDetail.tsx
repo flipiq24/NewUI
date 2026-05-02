@@ -1,5 +1,5 @@
 import { useMemo, type ReactNode } from "react";
-import { useParams, useLocation } from "wouter";
+import { useParams } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqAskBar from "@/components/iq/IqAskBar";
 import { DEAL_REVIEW_PROPERTIES, type DealProperty } from "@/lib/iq/mockData";
@@ -34,7 +34,6 @@ import {
  */
 export default function IqPropertyDetail() {
   const params = useParams<{ address: string }>();
-  const [, navigate] = useLocation();
   const decoded = decodeURIComponent(params.address ?? "");
 
   // Look up by exact address; fall back to the first deal so the page is
@@ -56,45 +55,160 @@ export default function IqPropertyDetail() {
     <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Breadcrumb — secondary-tab icons on the LEFT, then breadcrumb,
-            then Back on the right. */}
-        <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-2 min-w-0">
-            <button
-              onClick={() => navigate("/iq/deal-review")}
-              className="shrink-0 text-gray-500 hover:text-orange-500 cursor-pointer p-1 -ml-1"
-              title="Back to Deal Review"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="10,3 5,8 10,13" />
-              </svg>
-            </button>
-            <span className="text-sm text-gray-500 truncate">
-              <button
-                onClick={() => navigate("/iq/deal-review")}
-                className="hover:text-orange-500 cursor-pointer"
+        <div className="flex-1 overflow-y-auto bg-white">
+          {/* HEADER — address + flavor + status, then pain/todo/action */}
+          <div className="px-6 pt-5 pb-4 border-b border-gray-100">
+            {/* ROW 1 — Action row mirroring DealCard exactly:
+                ☐ checkbox · pulsing action circle · HIGH (colored text, no
+                pill) · action text (orange bold) · 3 channel shortcuts ·
+                Critical · Reminder ........ status pill · ⋮ */}
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <input
+                type="checkbox"
+                className="w-3.5 h-3.5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer shrink-0"
+                title="Mark as done"
+              />
+              <ActionCircle channel={rec} />
+              {detail.pain !== "none" && (
+                <span
+                  className={`text-[12px] font-semibold uppercase tracking-wide cursor-help ${PAIN_TEXT[detail.pain]}`}
+                  title={detail.painSig.map(([k, v]) => `${k}: ${v}`).join(" · ")}
+                >
+                  {detail.painLabel}
+                </span>
+              )}
+              <span
+                className="text-[15px] font-semibold leading-snug text-orange-600 hover:text-orange-700 cursor-help"
+                title={`${REC_COPY[rec].label} — ${REC_COPY[rec].how}`}
               >
-                Deal Review
-              </button>
-              {" › "}
-              <span className="font-semibold text-gray-800 underline decoration-orange-500 decoration-2 underline-offset-2">
-                {property.address.split(",")[0]}
+                {property.nextSteps}
               </span>
-            </span>
-          </div>
-          <button
-            onClick={() => navigate("/iq/deal-review")}
-            className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider hover:text-orange-500 transition-colors cursor-pointer inline-flex items-center gap-1.5 shrink-0"
-          >
-            <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="10,3 5,8 10,13" />
-            </svg>
-            Back
-          </button>
-        </div>
+              <ChannelShortcut kind="call" />
+              <ChannelShortcut kind="text" />
+              <ChannelShortcut kind="email" />
+              {isCritical && (
+                <span className="text-[12px] font-semibold text-[#E24B4A] cursor-help" title="Critical flag">
+                  Critical
+                </span>
+              )}
+              {isReminder && (
+                <span className="text-[12px] font-semibold text-[#2F86D6] cursor-help" title="Reminder set">
+                  Reminder
+                </span>
+              )}
+              <span className="ml-auto inline-flex items-center gap-1.5 text-[13px] text-gray-700 cursor-pointer hover:text-gray-900 shrink-0">
+                <span className="font-semibold">{property.offerPct}%</span>
+                <span>{property.offerLabel}</span>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-3 h-3 text-gray-400">
+                  <polyline points="4,6 8,10 12,6" />
+                </svg>
+              </span>
+            </div>
 
-        {/* Body intentionally empty — prototyping. */}
-        <div className="flex-1 overflow-y-auto bg-white" />
+            {/* ROW 2 — Address + globe · source — status · sales-type ·
+                keywords ........ Opened/Called dates */}
+            <div className="flex items-center flex-wrap gap-x-2 mt-2 text-[13px] text-gray-700 leading-6">
+              <span className="font-semibold text-gray-900 truncate max-w-full" title={property.address}>
+                {property.address}
+              </span>
+              <button className="shrink-0 text-gray-400 hover:text-orange-500 cursor-pointer" title="Open map">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4" className="w-3.5 h-3.5">
+                  <circle cx="6" cy="6" r="5" />
+                  <line x1="1" y1="6" x2="11" y2="6" />
+                  <path d="M6 1c1.5 1.5 1.5 8.5 0 10M6 1c-1.5 1.5-1.5 8.5 0 10" />
+                </svg>
+              </button>
+              <span className="shrink-0 text-gray-300">·</span>
+              <span className="shrink-0 cursor-help text-gray-700" title={`${property.source} · ${SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}`}>
+                <span className="font-medium">{property.source.replace(/\s*—\s*.*$/, "")}</span>
+                {" — "}
+                <span className="font-medium" style={{ color: sourceTextColor(property.source, property.sourceStatus) }}>
+                  {property.sourceStatus || (property.source.match(/\s*—\s*(.*)$/)?.[1] ?? "")}
+                </span>
+                <span> - {SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}</span>
+              </span>
+              <span className="shrink-0 text-gray-300">·</span>
+              <span className="shrink-0 text-[12px] text-gray-500 cursor-help" title="Keywords pulled from listing remarks">
+                Keywords: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span>
+              </span>
+              <span className="ml-auto shrink-0 inline-flex items-center gap-1.5 text-[11.5px] text-gray-500">
+                <span
+                  className={`font-medium cursor-help ${FRESHNESS[gradeFreshness(property.lastOpenDate)]}`}
+                  title={`Last opened: ${property.lastOpenDate}`}
+                >
+                  Opened {property.lastOpenDate}
+                </span>
+                <span className="text-gray-300">·</span>
+                <span
+                  className={`font-medium cursor-help ${FRESHNESS[gradeFreshness(property.lastCalledDate)]}`}
+                  title={`Last called: ${property.lastCalledDate}`}
+                >
+                  Called {property.lastCalledDate}
+                </span>
+              </span>
+            </div>
+
+            {/* ROW 3 — Data row. Same fields as DealCard's bottom row, with
+                hover-only details via the title attribute. */}
+            <div className="flex items-center gap-x-2 flex-wrap mt-2 text-[13px] text-gray-700 leading-6">
+              <span
+                className="font-semibold text-gray-900 cursor-help"
+                title={`Asking ${property.price} · ARV ${detail.arv}`}
+              >
+                {compactPrice(property.price)}
+              </span>
+              <span className="text-gray-300">·</span>
+              <span className="font-medium text-gray-700 cursor-help" title={`Asking vs ARV: ${detail.arvPct}`}>
+                {detail.arvPct}
+              </span>
+              <span className="text-gray-300">·</span>
+              <span
+                className="inline-flex items-center gap-1.5 text-[12px] text-gray-500 cursor-help"
+                title={detail.painSig.map(([k, v]) => `${k}: ${v}`).join(" · ")}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
+                Pain: <span className="text-gray-800 font-medium">{detail.painLabel}</span>
+              </span>
+              <span className="text-gray-300">·</span>
+              <span
+                className="inline-flex items-center gap-1.5 text-[12px] text-gray-500 cursor-help"
+                title={`Response rate: ${detail.agentRate ?? "—"}`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${AGENT_DOT[detail.agent]}`} />
+                Agent: <span className="text-gray-800 font-medium">{detail.agentLabel}</span>
+              </span>
+              <span className="text-gray-300">·</span>
+              <span className="text-[12px] text-gray-500 cursor-help" title="Investor Sourced Count">
+                ISC:{" "}
+                <span className={(detail.isc ?? 0) > 0 ? "font-medium text-[#2F86D6]" : "font-medium text-gray-400"}>
+                  {detail.isc ?? 0}
+                </span>
+              </span>
+              <span className="text-gray-300">·</span>
+              <span
+                className="font-medium text-gray-700 tabular-nums cursor-help"
+                title={`Sold ${detail.trackSold ?? 0} · Pending ${detail.trackPending ?? 0} · Backup ${detail.trackBackup ?? 0} · Active ${detail.trackActive ?? 0}`}
+              >
+                {detail.trackSold ?? 0}S / {detail.trackPending ?? 0}P / {detail.trackBackup ?? 0}B /{" "}
+                <span className={(detail.trackActive ?? 0) > 0 ? "text-[#D67432] font-semibold" : ""}>
+                  {detail.trackActive ?? 0}A
+                </span>
+              </span>
+            </div>
+          </div>
+
+          {/* PROPERTY BASICS — always visible one-liner. The Details
+              section below is hidden by default; click the toggle to reveal
+              the 5 metric cards. */}
+          <div className="px-6 pt-4 pb-3 flex items-start justify-between gap-4 border-b border-gray-100">
+            <div className="text-[13px] text-gray-800 leading-6 min-w-0" title={propertyBasics}>
+              {propertyBasics}
+            </div>
+            <SecondaryIconStrip detail={detail} />
+          </div>
+
+          {/* Body intentionally empty — prototyping. */}
+        </div>
         <IqAskBar />
       </div>
     </div>
