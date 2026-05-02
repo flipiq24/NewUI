@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { useParams, useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqAskBar from "@/components/iq/IqAskBar";
@@ -47,8 +47,6 @@ export default function IqPropertyDetail() {
   const detail: DealDetail = DEAL_DETAILS[property.id];
 
   const rec = recommendedChannel(detail);
-  const [detailed, setDetailed] = useState(false);
-  const [snapshotOpen, setSnapshotOpen] = useState(false);
 
   const propertyBasics = `${property.propertyType} / ${property.beds} Br / ${property.baths} Ba / ${property.garage} Gar / ${property.year} / ${property.sqft} / ${property.lotSqft} / Pool: ${property.pool}`;
   const isCritical = property.notifications?.includes("critical");
@@ -244,121 +242,8 @@ export default function IqPropertyDetail() {
             <div className="text-[13px] text-gray-800 leading-6 min-w-0" title={propertyBasics}>
               {propertyBasics}
             </div>
-            <div className="shrink-0 inline-flex items-center gap-2">
-              <SecondaryIconStrip detail={detail} />
-              <span className="w-px h-5 bg-gray-200" />
-              <button
-                type="button"
-                onClick={() => setSnapshotOpen((v) => !v)}
-                className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-500 hover:text-orange-500 transition-colors cursor-pointer"
-                title={snapshotOpen ? "Hide details" : "Show details"}
-              >
-                <span>{snapshotOpen ? "Hide" : "Show"} details</span>
-                <svg
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className={`w-3 h-3 transition-transform ${snapshotOpen ? "rotate-180" : ""}`}
-                >
-                  <polyline points="4,6 8,10 12,6" />
-                </svg>
-              </button>
-            </div>
+            <SecondaryIconStrip detail={detail} />
           </div>
-
-          {/* DETAILS — collapsed by default */}
-          {snapshotOpen && (
-          <>
-          <div className="px-6 pt-4 pb-2 flex items-center justify-between">
-            <div className="text-[11px] uppercase tracking-wider font-semibold text-gray-400">
-              Details
-            </div>
-            <SimpleDetailedToggle value={detailed} onChange={setDetailed} />
-          </div>
-          <div className="px-6 pb-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
-            <MetricCard
-              label="Property Details"
-              headline={propertyBasics}
-              detailed={detailed}
-            >
-              <div className="text-[13px] text-gray-800 leading-6">
-                {propertyBasics}
-              </div>
-            </MetricCard>
-
-            <MetricCard
-              label="List Price"
-              headline={compactPrice(property.price)}
-              detailed={detailed}
-            >
-              <div className="text-[18px] font-bold text-gray-900 mb-1">{compactPrice(property.price)}</div>
-              <div className="text-[12px] text-gray-600 mb-1.5">
-                Propensity: <span className="font-semibold text-orange-500">{property.propensityScore ?? "—"}</span>
-                <span className="mx-1.5 text-gray-300">|</span>
-                <span className={PAIN_TEXT[detail.pain]}>{detail.painLabel}</span>
-              </div>
-              {property.tags.length > 0 && (
-                <div className="text-[11.5px] text-emerald-700 leading-snug">
-                  {property.tags.slice(0, 3).join(" · ")}
-                  {property.tags.length > 3 && (
-                    <span className="text-gray-400"> · +{property.tags.length - 3} more</span>
-                  )}
-                </div>
-              )}
-            </MetricCard>
-
-            <MetricCard
-              label="Market Info"
-              headline={`${property.days} Days · ${property.sourceStatus || "—"}`}
-              detailed={detailed}
-            >
-              <div className="text-[13px] text-gray-900 font-semibold">
-                {property.days} Days{" "}
-                <span
-                  className="font-medium"
-                  style={{ color: sourceTextColor(property.source, property.sourceStatus) }}
-                >
-                  / {property.sourceStatus || "—"}
-                </span>
-              </div>
-              <div className="text-[12px] text-gray-600 mt-1">
-                DOM: {property.dom} · CDOM: {property.cdom}
-              </div>
-              <div className="text-[12px] text-gray-700 font-semibold mt-1.5">
-                {property.type.toUpperCase()}
-              </div>
-            </MetricCard>
-
-            <MetricCard
-              label="Evaluation Metrics"
-              headline={`${detail.arvPct} ARV`}
-              detailed={detailed}
-            >
-              <div className="text-[13px] text-gray-900">
-                Asking VS ARV: <span className="font-bold">{detail.arvPct}</span>
-              </div>
-              <div className="text-[12px] text-gray-600 mt-1">ARV: {detail.arv}</div>
-              <div className="text-[12px] text-gray-600 mt-1.5">
-                Comp Data:{" "}
-                <span className="font-medium">
-                  A{detail.trackActive ?? 0}, P{detail.trackPending ?? 0}, B{detail.trackBackup ?? 0}, C{detail.trackSold ?? 0}
-                </span>
-              </div>
-            </MetricCard>
-
-            <MetricCard
-              label="Last Open / Last Comm"
-              headline={`LOD ${property.lastOpenDate}`}
-              detailed={detailed}
-            >
-              <div className="text-[13px] text-gray-900">LOD: {property.lastOpenDate}</div>
-              <div className="text-[12px] text-emerald-600 mt-0.5">{property.lastOpenNote}</div>
-              <div className="text-[12px] text-gray-700 mt-1.5">LCD: {property.lastCalledDate}</div>
-            </MetricCard>
-          </div>
-          </>
-          )}
 
           {/* Body intentionally empty — prototyping. */}
         </div>
@@ -454,88 +339,6 @@ function SecondaryIconStrip({ detail }: { detail: DealDetail }) {
           ) : null}
         </button>
       ))}
-    </div>
-  );
-}
-
-/** Two-state pill toggle for Simple vs Detailed metric-card view. */
-function SimpleDetailedToggle({
-  value,
-  onChange,
-}: {
-  value: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  return (
-    <div className="inline-flex bg-gray-100 rounded-full p-0.5 text-[11px] font-semibold">
-      <button
-        type="button"
-        onClick={() => onChange(false)}
-        className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${
-          !value ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
-        }`}
-      >
-        Simple
-      </button>
-      <button
-        type="button"
-        onClick={() => onChange(true)}
-        className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${
-          value ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
-        }`}
-      >
-        Detailed
-      </button>
-    </div>
-  );
-}
-
-/**
- * Collapsible metric card. Simple mode = headline only; Detailed = full
- * children. Each card is also independently togglable via the chevron.
- */
-function MetricCard({
-  label,
-  headline,
-  detailed,
-  children,
-}: {
-  label: string;
-  headline: string;
-  detailed: boolean;
-  children: ReactNode;
-}) {
-  const [override, setOverride] = useState<boolean | null>(null);
-  const expanded = override ?? detailed;
-  return (
-    <div className="border border-gray-200 rounded-lg p-4 bg-white">
-      <button
-        type="button"
-        onClick={() => setOverride(!expanded)}
-        className="w-full flex items-center justify-between mb-2 cursor-pointer group"
-      >
-        <span className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
-          {label}
-        </span>
-        <svg
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          className={`w-3 h-3 text-gray-300 group-hover:text-gray-500 transition-transform ${
-            expanded ? "rotate-180" : ""
-          }`}
-        >
-          <polyline points="4,6 8,10 12,6" />
-        </svg>
-      </button>
-      {expanded ? (
-        children
-      ) : (
-        <div className="text-[14px] font-semibold text-gray-900 leading-tight">
-          {headline}
-        </div>
-      )}
     </div>
   );
 }
