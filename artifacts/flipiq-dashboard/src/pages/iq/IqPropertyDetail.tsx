@@ -62,7 +62,7 @@ export default function IqPropertyDetail() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto bg-white">
           {/* HEADER — address + flavor + status, then pain/todo/action */}
-          <div className="px-6 pt-5 pb-3">
+          <div className="px-6 pt-4 pb-2">
             {/* ROW 1 — Action row mirroring DealCard:
                 pulsing action circle · HIGH (colored text, no pill) ·
                 action text (orange bold) · Critical · Reminder ........
@@ -106,7 +106,7 @@ export default function IqPropertyDetail() {
 
             {/* ROW 2 — Address + globe · source — status · sales-type ·
                 keywords ........ Opened/Called dates */}
-            <div className="flex items-center flex-wrap gap-x-2 mt-2.5 text-[13px] text-gray-700 leading-6">
+            <div className="flex items-center flex-wrap gap-x-2 mt-1 text-[13px] text-gray-700 leading-5">
               <button
                 type="button"
                 title="More actions"
@@ -160,7 +160,7 @@ export default function IqPropertyDetail() {
 
             {/* ROW 3 — Data row. Same fields as DealCard's bottom row, with
                 hover-only details via the title attribute. */}
-            <div className="flex items-center gap-x-2 flex-wrap mt-2.5 text-[13px] text-gray-700 leading-6">
+            <div className="flex items-center gap-x-2 flex-wrap mt-1 text-[13px] text-gray-700 leading-5">
               <button
                 type="button"
                 title="Comments"
@@ -218,8 +218,8 @@ export default function IqPropertyDetail() {
 
           {/* PROPERTY BASICS — blends with the header above (no divider on
               top); a soft line below separates it from the workflow row. */}
-          <div className="px-6 pt-1 pb-4 border-b border-gray-100">
-            <div className="text-[13px] text-gray-800 leading-6 min-w-0" title={propertyBasics}>
+          <div className="px-6 pt-0.5 pb-3 border-b border-gray-100">
+            <div className="text-[13px] text-gray-800 leading-5 min-w-0" title={propertyBasics}>
               {propertyBasics}
             </div>
           </div>
