@@ -63,11 +63,6 @@ export default function IqPropertyDetail() {
                 pill) · action text (orange bold) · 3 channel shortcuts ·
                 Critical · Reminder ........ status pill · ⋮ */}
             <div className="flex items-center gap-2.5 flex-wrap">
-              <input
-                type="checkbox"
-                className="w-3.5 h-3.5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer shrink-0"
-                title="Mark as done"
-              />
               <ActionCircle channel={rec} />
               {detail.pain !== "none" && (
                 <span
@@ -108,6 +103,17 @@ export default function IqPropertyDetail() {
             {/* ROW 2 — Address + globe · source — status · sales-type ·
                 keywords ........ Opened/Called dates */}
             <div className="flex items-center flex-wrap gap-x-2 mt-2 text-[13px] text-gray-700 leading-6">
+              <button
+                type="button"
+                title="More actions"
+                className="shrink-0 inline-flex items-center justify-center w-4 text-gray-400 hover:text-gray-700 cursor-pointer -ml-0.5"
+              >
+                <svg viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3">
+                  <circle cx="8" cy="3" r="1.4" />
+                  <circle cx="8" cy="8" r="1.4" />
+                  <circle cx="8" cy="13" r="1.4" />
+                </svg>
+              </button>
               <span className="font-semibold text-gray-900 truncate max-w-full" title={property.address}>
                 {property.address}
               </span>
@@ -151,6 +157,15 @@ export default function IqPropertyDetail() {
             {/* ROW 3 — Data row. Same fields as DealCard's bottom row, with
                 hover-only details via the title attribute. */}
             <div className="flex items-center gap-x-2 flex-wrap mt-2 text-[13px] text-gray-700 leading-6">
+              <button
+                type="button"
+                title="Comments"
+                className="shrink-0 inline-flex items-center justify-center text-gray-400 hover:text-orange-500 cursor-pointer -ml-0.5"
+              >
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5">
+                  <path d="M2 3.5h12v7H6.5L3.5 13v-2.5H2v-7z" />
+                </svg>
+              </button>
               <span
                 className="font-semibold text-gray-900 cursor-help"
                 title={`Asking ${property.price} · ARV ${detail.arv}`}
