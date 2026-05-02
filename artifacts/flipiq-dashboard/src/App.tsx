@@ -7,6 +7,7 @@ import MyStats from "@/pages/MyStats";
 import AdaptationReports from "@/pages/AdaptationReports";
 import IqTasks from "@/pages/iq/IqTasks";
 import IqDealReview from "@/pages/iq/IqDealReview";
+import IqPropertyDetail from "@/pages/iq/IqPropertyDetail";
 import IqDailyOutreach from "@/pages/iq/IqDailyOutreach";
 import IqCampaignResponses from "@/pages/iq/IqCampaignResponses";
 import IqPriorityAgents from "@/pages/iq/IqPriorityAgents";
@@ -24,14 +25,7 @@ function Router() {
       <Route path="/iq" component={IqTasks} />
       <Route path="/iq/tasks" component={IqTasks} />
       <Route path="/iq/deal-review" component={IqDealReview} />
-      <Route path="/iq/deal-review/:address" component={() => (
-        <div className="flex h-screen items-center justify-center bg-[#f5f6f8]">
-          <div className="text-center">
-            <h2 className="text-lg font-bold text-gray-700 mb-2">Property detail</h2>
-            <p className="text-gray-400 text-sm">Not yet built</p>
-          </div>
-        </div>
-      )} />
+      <Route path="/iq/deal-review/:address" component={IqPropertyDetail} />
       <Route path="/iq/daily-outreach" component={IqDailyOutreach} />
       <Route path="/iq/campaign-responses" component={IqCampaignResponses} />
       <Route path="/iq/priority-agents" component={IqPriorityAgents} />

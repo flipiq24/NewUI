@@ -134,6 +134,7 @@ Create `src/DealCard.tsx` and paste the entire block below.
 
 ```tsx
 import { useState, useEffect, useRef, type ReactNode } from "react";
+import { useLocation } from "wouter";
 
 /* ────────────────────────────────────────────────────────────────
    TYPES
@@ -271,13 +272,13 @@ const RESPONSE_LABEL: Record<ResponseStatus, string> = {
   negative: "Negative",
 };
 
-const PAIN_DOT: Record<DealDetail["pain"], string> = {
+export const PAIN_DOT: Record<DealDetail["pain"], string> = {
   high: "bg-[#E24B4A]",
   mid:  "bg-[#BA7517]",
   low:  "bg-[#B4B2A9]",
   none: "bg-[#B4B2A9]",
 };
-const PAIN_TEXT: Record<DealDetail["pain"], string> = {
+export const PAIN_TEXT: Record<DealDetail["pain"], string> = {
   high: "text-[#E24B4A]",
   mid:  "text-[#BA7517]",
   low:  "text-[#B4B2A9]",
@@ -319,7 +320,7 @@ function gradeFreshness(mmdd: string): keyof typeof FRESHNESS {
  * "$525,000" → "525k", "$1,250,000" → "1.25m", "$335,800" → "336k".
  * The meta row drops the "$" prefix and collapses zeros for scannability.
  */
-function compactPrice(raw: string): string {
+export function compactPrice(raw: string): string {
   const n = Number(String(raw).replace(/[^0-9.]/g, ""));
   if (!Number.isFinite(n) || n <= 0) return raw;
   if (n >= 1_000_000) {
@@ -338,13 +339,13 @@ const AGENT_DOT: Record<DealDetail["agent"], string> = {
  * Label color for "Keywrds: High / Mid / Low" so the WORD itself reflects
  * the heat — high deserves the same urgency as Pain. Mirrors PAIN_TEXT.
  */
-const KW_TEXT: Record<DealDetail["kw"], string> = {
+export const KW_TEXT: Record<DealDetail["kw"], string> = {
   high: "text-[#E24B4A] font-semibold",
   mid:  "text-[#BA7517]",
   low:  "text-[#B4B2A9]",
 };
 
-const SALES_TYPE_LABELS: Record<string, string> = {
+export const SALES_TYPE_LABELS: Record<string, string> = {
   STD:  "Standard",
   SPAY: "Short Sale",
   NOD:  "Notice Of Default",
@@ -359,7 +360,7 @@ const SALES_TYPE_LABELS: Record<string, string> = {
   CONS: "Conservatorship",
 };
 
-const SOURCE_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
+export const SOURCE_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
   active:                { bg: "#EAF3DE", text: "#27500A", dot: "#5C9A2A" },
   pending:               { bg: "#FAEEDA", text: "#854F0B", dot: "#C58323" },
   "back up offer":       { bg: "#E6F1FB", text: "#185FA5", dot: "#2F86D6" },
@@ -374,7 +375,7 @@ function sourceKey(source: string, status: string) {
   const s = (status || source.replace(/^MLS\s*—\s*/i, "")).trim().toLowerCase();
   return s in SOURCE_COLORS ? s : source.trim().toLowerCase();
 }
-function sourceTextColor(source: string, status: string): string {
+export function sourceTextColor(source: string, status: string): string {
   const c = SOURCE_COLORS[sourceKey(source, status)] ?? SOURCE_COLORS["off market"];
   return c.text;
 }
@@ -393,13 +394,13 @@ const STATUS_PILL: Record<DealDetail["statusType"], string> = {
  * tooltip; the Next-Step tooltip rewrites its "How" row to match. The rep
  * always sees the recommended channel + the exact playbook for that channel.
  */
-type RecChannel = "call" | "text" | "email";
-function recommendedChannel(detail: DealDetail): RecChannel {
+export type RecChannel = "call" | "text" | "email";
+export function recommendedChannel(detail: DealDetail): RecChannel {
   if (detail.pain === "high" || detail.agent === "not-responsive") return "call";
   if (detail.pain === "mid") return "text";
   return "email";
 }
-const REC_COPY: Record<RecChannel, { label: string; tip: string; how: string }> = {
+export const REC_COPY: Record<RecChannel, { label: string; tip: string; how: string }> = {
   call: {
     label: "Call first",
     tip:  "This property has critical signals and the agent hasn't replied to text or email. Pick up the phone — if no answer, leave a voicemail and immediately follow with both a text and an email so all three channels are stamped within 5 minutes.",
@@ -746,6 +747,7 @@ export default function DealCard({
   property: DealProperty;
   detail: DealDetail;
 }) {
+  const [, navigate] = useLocation();
   const [done, setDone] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [nudgeOpen, setNudgeOpen] = useState(false);
@@ -890,8 +892,15 @@ export default function DealCard({
             ARV / Pain live on Line 2; the at-a-glance pain chip also
             appears on Row 1 next to the action icon. */}
         <div className="flex items-center flex-nowrap min-w-0 gap-x-2 text-[13px] text-gray-700 leading-6 whitespace-nowrap">
-          <span className="relative group cursor-help min-w-0 truncate">
-            <span className="group-hover:text-gray-900">{property.address}</span>
+          <span className="relative group min-w-0 truncate">
+            <button
+              type="button"
+              onClick={() => navigate(`/iq/deal-review/${encodeURIComponent(property.address)}`)}
+              className="group-hover:text-gray-900 hover:text-orange-600 hover:underline cursor-pointer text-left truncate max-w-full"
+              title="Open property detail"
+            >
+              {property.address}
+            </button>
             <TipPanel title="Property" rows={detail.prop} />
           </span>
           <button type="button" className="shrink-0 text-gray-400 hover:text-orange-500 cursor-pointer">
