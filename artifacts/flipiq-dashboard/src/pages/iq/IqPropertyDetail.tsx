@@ -225,17 +225,18 @@ export default function IqPropertyDetail() {
             </div>
           </div>
 
-          {/* WORKFLOW STEPPER — thin inline progress on the left, contact +
-              utility icons on the right. */}
+          {/* WORKFLOW STEPPER — thin inline progress. Contact icons (with an
+              orange "action needed" dot) only appear at the final step
+              (Offer Terms), pinned all the way to the right. */}
           <div className="px-6 py-2 border-b border-gray-100 flex items-center gap-4">
             <WorkflowTabs active={activeStep} onChange={setActiveStep} />
-            <div className="ml-auto flex items-center gap-1 shrink-0">
-              <NavActionIcon kind="call" />
-              <NavActionIcon kind="text" />
-              <NavActionIcon kind="email" />
-              <span className="mx-1 h-5 w-px bg-gray-200" />
-              <SecondaryIconStrip detail={detail} />
-            </div>
+            {activeStep === WORKFLOW_STEPS.length - 1 && (
+              <div className="ml-auto flex items-center gap-1 shrink-0">
+                <NavActionIcon kind="call" needsAction />
+                <NavActionIcon kind="text" />
+                <NavActionIcon kind="email" />
+              </div>
+            )}
           </div>
 
           {/* Body intentionally empty — prototyping. */}
@@ -394,7 +395,7 @@ function SecondaryIconStrip({ detail }: { detail: DealDetail }) {
  * Matches the visual treatment of the SecondaryIconStrip buttons so the two
  * groups read as one cohesive cluster.
  */
-function NavActionIcon({ kind }: { kind: "call" | "text" | "email" }) {
+function NavActionIcon({ kind, needsAction }: { kind: "call" | "text" | "email"; needsAction?: boolean }) {
   const label = kind === "call" ? "Call" : kind === "text" ? "Text" : "Email";
   const icon =
     kind === "call" ? (
@@ -414,10 +415,13 @@ function NavActionIcon({ kind }: { kind: "call" | "text" | "email" }) {
   return (
     <button
       type="button"
-      title={label}
+      title={needsAction ? `${label} — action needed` : label}
       className="relative inline-flex items-center justify-center w-9 h-9 rounded-md text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-colors cursor-pointer"
     >
       {icon}
+      {needsAction && (
+        <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-orange-500 ring-2 ring-white" />
+      )}
     </button>
   );
 }
