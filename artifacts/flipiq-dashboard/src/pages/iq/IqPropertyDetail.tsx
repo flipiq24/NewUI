@@ -62,7 +62,7 @@ export default function IqPropertyDetail() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto bg-white">
           {/* HEADER — address + flavor + status, then pain/todo/action */}
-          <div className="px-6 pt-5 pb-4 border-b border-gray-100">
+          <div className="px-6 pt-5 pb-4">
             {/* ROW 1 — Action row mirroring DealCard exactly:
                 ☐ checkbox · pulsing action circle · HIGH (colored text, no
                 pill) · action text (orange bold) · 3 channel shortcuts ·
@@ -142,7 +142,7 @@ export default function IqPropertyDetail() {
               <span className="shrink-0 text-[12px] text-gray-500 cursor-help" title="Keywords pulled from listing remarks">
                 Keywords: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span>
               </span>
-              <span className="ml-auto shrink-0 inline-flex flex-col items-end gap-1">
+              <span className="ml-auto shrink-0 inline-flex flex-col items-end gap-2">
                 <span className="inline-flex items-center gap-1.5 text-[11.5px] text-gray-500">
                   <span
                     className={`font-medium cursor-help ${FRESHNESS[gradeFreshness(property.lastOpenDate)]}`}
@@ -220,9 +220,9 @@ export default function IqPropertyDetail() {
             </div>
           </div>
 
-          {/* PROPERTY BASICS — always visible one-liner, blended with header
-              above (no divider). */}
-          <div className="px-6 pb-3">
+          {/* PROPERTY BASICS — blends with the header above (no divider on
+              top); a soft line below separates it from the workflow row. */}
+          <div className="px-6 pb-3 border-b border-gray-100">
             <div className="text-[13px] text-gray-800 leading-6 min-w-0" title={propertyBasics}>
               {propertyBasics}
             </div>
@@ -366,12 +366,12 @@ function SecondaryIconStrip({ detail }: { detail: DealDetail }) {
     },
   ];
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-2">
       {items.map((it) => (
         <button
           key={it.key}
           title={it.badge ? `${it.title} (${it.badge})` : it.title}
-          className="relative inline-flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-colors cursor-pointer"
+          className="relative inline-flex items-center justify-center w-9 h-9 rounded-md text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-colors cursor-pointer"
         >
           {it.icon}
           {it.badge ? (
