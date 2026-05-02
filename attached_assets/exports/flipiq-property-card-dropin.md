@@ -5,13 +5,13 @@ property row in the screenshot:
 
 > ☐  📞 **MID** **No response — send offer**  📞● 💬● ✉●  **Critical**            15% Outreach Sent ▾
 >                                                                                       Opened 04/22 · Called —   ← red text (cold)
-> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · MLS — **Active** - STD · Keywrds: **High**   ← Source label is consolidated `origin — status - type` (no `Source:` prefix); only the status keeps its color. `Keywrds:` is the new short label, no dot indicator — the value color (`High` = red) is the only signal.
+> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · MLS — **Active** - Standard · Keywrds: **High**   ← Source label is consolidated `origin — status - sales-type` (no `Source:` prefix); only the status keeps its color, and the sales type is **spelled out** (STD → Standard, REO → Real Estate Owned, …). `Keywrds:` is the new short label, no dot indicator — the value color (`High` = red) is the only signal.
 > 💬  **525k** · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: **11** · **5A** / 2B / 8P / 41S   ← `ISC` blue when > 0, gray when 0; `5A` orange when > 0
 
 Every chip / icon / value has a hover tooltip:
 - **Next Step** — task / who / what / how / context
 - **Property** — type, beds/baths, sq ft, lot, year, etc.
-- **Source** — consolidated `origin — status - sales-type` label (e.g. `MLS — Active - STD`). Tooltip shows raw source, status, sales-type code → full label (STD = Standard, REO, NOD, …), and property type. There is no separate Sales Type chip — its data lives in this label and tooltip.
+- **Source** — consolidated `origin — status - sales-type` label (e.g. `MLS — Active - Standard`). The trailing sales type is **fully spelled out** (STD → "Standard", REO → "Real Estate Owned", NOD → "Notice Of Default", …) via `SALES_TYPE_LABELS`; the raw code only appears in the tooltip. Tooltip shows raw source, status, sales-type code → full label, property type, **List Date**, and **DOM / CDOM**. There is no separate Sales Type chip — its data lives in this label and tooltip.
 - **Price History** — every list-price change + total reduction
 - **ARV** — asking vs ARV percentage
 - **Seller Pain** — DOM, price drops, showings, equity, propensity
@@ -22,7 +22,7 @@ Every chip / icon / value has a hover tooltip:
 - **Listing Remarks** — public + agent comments with red `<span class="kw">` pills
 - **Open History** — first / last / total opens + property assigned to + agent assigned to
 - **Communication History** — first / last + per-channel call/text/email totals + property assigned to + agent assigned to
-- **Offer Status** — completion %, stage, source, property assigned to, agent assigned to
+- **Offer Status** — completion %, stage, source, **price change**, property assigned to, agent assigned to
 
 The kebab opens a 3-column drill menu (Communication, Quick Links,
 Detailed Analysis).
@@ -54,7 +54,7 @@ Detailed Analysis).
    *what mental question it answers* so the rep's eye scans
    top-to-bottom in priority order.
    - **Line 1 — property identity (what is it):** Address →
-     world-icon → consolidated source label (`MLS — Active - STD`,
+     world-icon → consolidated source label (`MLS — Active - Standard`,
      no `Source:` prefix; sales type is folded in) → **Keywrds**
      (short label, no dot — value color is the only signal). Pure
      asset description. This row is **`flex-nowrap` + `whitespace-nowrap`**
@@ -140,11 +140,14 @@ export type NotificationKind = "critical" | "reminder" | "unseen" | "text";
 export type DealProperty = {
   id: number | string;
   address: string;
-  type: string;          // sales type code, e.g. "STD", "REO"
+  type: string;          // sales type code, e.g. "STD", "REO" — spelled out via SALES_TYPE_LABELS
   propertyType: string;  // e.g. "SFR", "Condo"
   price: string;         // formatted, e.g. "$525,000"
   source: string;        // e.g. "MLS — Active"
   sourceStatus: string;  // e.g. "Active"
+  dom: number;           // days on market (current cycle)
+  cdom: number;          // cumulative days on market (across cycles)
+  listDate: string;      // e.g. "03/01/26"
   offerPct: number;      // 0–100
   offerLabel: string;    // e.g. "Outreach Sent"
   nextSteps: string;     // e.g. "No response — send offer"
@@ -340,7 +343,7 @@ const SALES_TYPE_LABELS: Record<string, string> = {
   STD:  "Standard",
   SPAY: "Short Sale",
   NOD:  "Notice Of Default",
-  REO:  "REO",
+  REO:  "Real Estate Owned",
   PRO:  "Probate Listing",
   AUC:  "Auction",
   TRUS: "Trust",
@@ -833,19 +836,24 @@ export default function DealCard({
             {ICON.globe}
           </button>
           <span className="shrink-0 text-gray-300">·</span>
-          {/* Consolidated source — no "Source:" prefix. Format: `MLS — Active - STD`
-              (origin · status · sales type). The status segment keeps its color
-              via sourceTextColor(). The Sales Type chip is gone — its data lives
-              in this composite label and in the Source tooltip. */}
+          {/* Consolidated source — no "Source:" prefix. Format: `MLS — Active - Standard`
+              (origin · status · sales-type-spelled-out). The status segment keeps
+              its color via sourceTextColor(); the trailing sales type is rendered
+              via SALES_TYPE_LABELS so the user sees "Standard" / "Real Estate
+              Owned" / "Notice Of Default" instead of bare codes. The Sales Type
+              chip is gone — its data lives in this composite label and in the
+              Source tooltip (which also shows List Date and DOM / CDOM). */}
           <span className="shrink-0 relative group cursor-help text-gray-700 font-medium hover:text-gray-900">
             <span>
               {property.source.replace(/\s*—\s*.*$/, "")}
               {" — "}
-              {property.type}
-              {" - "}
             </span>
             <span className="font-medium" style={{ color: sourceTextColor(property.source, property.sourceStatus) }}>
               {property.sourceStatus || (property.source.match(/\s*—\s*(.*)$/)?.[1] ?? "")}
+            </span>
+            <span>
+              {" - "}
+              {SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}
             </span>
             <TipPanel
               title="Source"
@@ -854,6 +862,8 @@ export default function DealCard({
                 ...(property.sourceStatus ? ([["Status", property.sourceStatus]] as [string, string][]) : []),
                 ["Sales Type",   `${property.type} — ${SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}`],
                 ["Property Type", property.propertyType],
+                ["List Date",    property.listDate],
+                ["DOM / CDOM",   `${property.dom} / ${property.cdom}`],
               ]}
             />
           </span>
@@ -978,6 +988,7 @@ export default function DealCard({
               ["Completion", detail.pct],
               ["Stage",      detail.status],
               ["Source",     detail.source],
+              ["Price change", detail.priceTotal],
               ["Property assigned to", detail.assigned],
               ["Agent assigned to", detail.negotiator],
             ]}
@@ -1061,6 +1072,7 @@ const property1: DealProperty = {
   price: "$399,000",
   source: "MLS — Active",
   sourceStatus: "Active",
+  dom: 108, cdom: 108, listDate: "01/16/26",
   offerPct: 60,
   offerLabel: "In Negotiations",
   nextSteps: "Adjust terms",
@@ -1137,6 +1149,7 @@ const property2: DealProperty = {
   price: "$335,800",
   source: "MLS — Pending",
   sourceStatus: "Pending",
+  dom: 54, cdom: 108, listDate: "03/09/26",
   offerPct: 50,
   offerLabel: "Contract Submitted",
   nextSteps: "Prepare backup offer",
@@ -1209,6 +1222,7 @@ const property10: DealProperty = {
   price: "$525,000",
   source: "MLS — Active",
   sourceStatus: "Active",
+  dom: 62, cdom: 62, listDate: "03/01/26",
   offerPct: 15,
   offerLabel: "Outreach Sent",
   nextSteps: "No response — send offer",
@@ -1319,14 +1333,14 @@ The tooltip content sources:
 | 1   | Inline flag `Critical` / `Reminder`  | none — plain word       | rendered when `notifications` includes `"critical"` (red) or `"reminder"` (blue)       |
 | 2 (property) | Address                       | `Property`              | `prop` rows                                                                            |
 | 2 (property) | `Keywrds: Mid` (at the end of Row 2, after the source) | `Listing Remarks` | **No dot** — the value color is the only signal. The literal `Keywrds:` prefix stays the row's default gray; **only the `kwLabel` value** (`High` / `Mid` / `Low`) is colored via `KW_TEXT[detail.kw]` (high = **red #E24B4A semibold**, mid = amber #BA7517, low = gray #B4B2A9). Tooltip: `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills |
-| 2 (property) | `MLS — Active - STD` (no `Source:` prefix) | `Source` | Consolidated `origin — status - sales-type` label. Origin (`MLS`) and type (`STD`/`REO`) render in `text-gray-700 font-medium`; the status segment (`Active`/`Pending`/etc.) sits in the middle and is colored via `sourceTextColor(property.source, property.sourceStatus)`. Tooltip rows: `Source` (raw `property.source`), optional `Status`, `Sales Type` (code + full label from `SALES_TYPE_LABELS`), `Property Type`. The standalone Sales-Type chip is removed — its data is embedded here. |
+| 2 (property) | `MLS — Active - Standard` (no `Source:` prefix) | `Source` | Consolidated `origin — status - sales-type` label. Origin (`MLS`) and the trailing sales-type (rendered fully spelled out via `SALES_TYPE_LABELS` — "Standard", "Real Estate Owned", "Notice Of Default", …) render in `text-gray-700 font-medium`; the status segment (`Active`/`Pending`/etc.) sits in the middle and is colored via `sourceTextColor(property.source, property.sourceStatus)`. Tooltip rows: `Source` (raw `property.source`), optional `Status`, `Sales Type` (code + full label from `SALES_TYPE_LABELS`), `Property Type`, `List Date`, `DOM / CDOM`. The standalone Sales-Type chip is removed — its data is embedded here. |
 | 3 (deal)     | `525k` (semibold, gray-900, no `$`) | `Price History`   | `priceHist` + `priceTotal`. Rendered via `compactPrice(property.price)` — drops `$`, collapses zeros to `k` / `m` |
 | 3 (deal)     | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
 | 3 (deal)     | `● Pain: Mid` (after ARV)     | `Seller Pain`           | dot color from `PAIN_DOT[detail.pain]`, label from `detail.painLabel`, tooltip rows from `detail.painSig`. Mirrors the Row 1 chip — Row 1 is the at-a-glance signal, this is the inline data label. |
 | 3 (deal)     | `● Agent: Not Responsive`     | `Last Attempts`         | `agentComms` (last 5) + `agentRate`                                                    |
 | 3 (deal)     | `ISC: 19`                     | `Investor Sourced Count` | Three-row breakdown: `Listings Sold for Investors` (`iscSoldFor`), `Listings Sold to Investors` (`iscSoldTo`), `Unique Investor Relationships` (`iscUniqueInvestors`). **Color:** `isc === 0` renders the inline number gray (`text-gray-400`) — agent has never sourced a deal, nothing to drill into. Any positive count renders the inline number in hyperlink blue (`text-[#2F86D6]`) to signal it's drillable history. |
 | 3 (deal)     | `7A/0B/3P/54S` (`7A` orange when > 0) | `Deal Track Record` | Render order is **A / B / P / S** (Active, Backup, Pending, Sold) — Backup sits next to Active because it's the next-most-actionable signal. Backed by `trackActive`, `trackBackup`, `trackPending`, `trackSold`, `trackTotal` (Active Nyr intentionally omitted — tenure isn't actionable). The Active count is wrapped in `<span class="text-[#D67432] font-semibold">` whenever `trackActive > 0` — open deals are the only piece needing immediate attention. When `trackActive === 0`, the `0A` renders in the same plain gray as the rest of the row. |
-| Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / **property assigned to** / **agent assigned to** |
+| Right | `15% Outreach Sent ▾`              | `Offer Status` (right-aligned) | completion / stage / source / **price change** (`detail.priceTotal`) / **property assigned to** / **agent assigned to** |
 | Right | `Opened 04/22` (plain colored text — green / yellow / red) | `Open History` (right-aligned) | first / last / total opens, then **property assigned to** + **agent assigned to**. Color via `gradeFreshness(detail.opened)` — green ≤3d, yellow 4–7d, red >7d / `—`. **No pill, no box.** |
 | Right | `Called —` (plain colored text — green / yellow / red)     | `Communication History` (right-aligned) | first / last + per-channel calls/texts/emails, then **property assigned to** + **agent assigned to**. Same `gradeFreshness()` rule on `detail.called`. **No pill, no box.** |
 | Kebab (⋮) | (click to open)                | drill menu              | 3 cols: Communication / Quick Links / Detailed Analysis + footer "Auto Tracker"        |

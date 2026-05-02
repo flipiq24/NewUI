@@ -89,7 +89,7 @@ const SALES_TYPE_LABELS: Record<string, string> = {
   STD: "Standard",
   SPAY: "Short Sale",
   NOD: "Notice Of Default",
-  REO: "REO",
+  REO: "Real Estate Owned",
   PRO: "Probate Listing",
   AUC: "Auction",
   TRUS: "Trust",
@@ -623,7 +623,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
             </span>
             <span>
               {" - "}
-              {property.type}
+              {SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}
             </span>
             <TipPanel
               title="Source"
@@ -632,6 +632,8 @@ export default function DealCard({ property }: { property: DealProperty }) {
                 ...(property.sourceStatus ? ([["Status", property.sourceStatus]] as [string, string][]) : []),
                 ["Sales Type", `${property.type} — ${SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}`],
                 ["Property Type", property.propertyType],
+                ["List Date", property.listDate],
+                ["DOM / CDOM", `${property.dom} / ${property.cdom}`],
               ]}
             />
           </span>
@@ -767,6 +769,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
               ["Completion", detail.pct],
               ["Stage", detail.status],
               ["Source", detail.source],
+              ["Price change", detail.priceTotal],
               ["Property assigned to", detail.assigned],
               ["Agent assigned to", detail.negotiator],
             ]}
