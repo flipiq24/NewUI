@@ -231,6 +231,7 @@ export default function IqPropertyDetail() {
             <WorkflowTabs active={activeStep} onChange={setActiveStep} />
             <div className="ml-auto flex items-center gap-1 shrink-0">
               <NavActionIcon kind="call" needsAction />
+              <CommsActionIcon detail={detail} />
               <NavActionIcon kind="email" />
               <span className="mx-1 h-5 w-px bg-gray-200" />
               <SecondaryIconStrip detail={detail} />
@@ -305,13 +306,7 @@ function WorkflowTabs({
  * Activity / Tax Data). Hover reveals a label tooltip — keeps the header
  * dense without sacrificing access.
  */
-function SecondaryIconStrip({ detail }: { detail: DealDetail }) {
-  const commCount = detail.commLog
-    ? (["call", "text", "email"] as const).reduce((n, k) => {
-        const c = detail.commLog?.[k];
-        return n + (c?.lastSent ? 1 : 0) + (c?.lastReply ? 1 : 0);
-      }, 0)
-    : 0;
+function SecondaryIconStrip({ detail: _detail }: { detail: DealDetail }) {
   const items: { key: string; title: string; badge?: number; icon: ReactNode }[] = [
     {
       key: "notes",
@@ -322,16 +317,6 @@ function SecondaryIconStrip({ detail }: { detail: DealDetail }) {
           <polyline points="10,2 10,5 13,5" />
           <line x1="5" y1="8" x2="11" y2="8" />
           <line x1="5" y1="11" x2="11" y2="11" />
-        </svg>
-      ),
-    },
-    {
-      key: "comms",
-      title: "Communications",
-      badge: commCount,
-      icon: (
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4">
-          <path d="M2 3.5h12v7H6.5L3.5 13v-2.5H2v-7z" />
         </svg>
       ),
     },
@@ -420,6 +405,36 @@ function NavActionIcon({ kind, needsAction }: { kind: "call" | "text" | "email";
       {needsAction && (
         <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-orange-500 ring-2 ring-white" />
       )}
+    </button>
+  );
+}
+
+/**
+ * Comms button — chat-bubble icon with the unread badge. Lives between Call
+ * and Email in the workflow nav cluster, replacing the standalone "text"
+ * NavActionIcon since they were duplicates.
+ */
+function CommsActionIcon({ detail }: { detail: DealDetail }) {
+  const count = detail.commLog
+    ? (["call", "text", "email"] as const).reduce((n, k) => {
+        const c = detail.commLog?.[k];
+        return n + (c?.lastSent ? 1 : 0) + (c?.lastReply ? 1 : 0);
+      }, 0)
+    : 0;
+  return (
+    <button
+      type="button"
+      title={count ? `Communications (${count})` : "Communications"}
+      className="relative inline-flex items-center justify-center w-9 h-9 rounded-md text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-colors cursor-pointer"
+    >
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4">
+        <path d="M2 3.5h12v7H6.5L3.5 13v-2.5H2v-7z" />
+      </svg>
+      {count ? (
+        <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center min-w-[14px] h-[14px] px-1 rounded-full bg-orange-500 text-white text-[9px] font-bold leading-none">
+          {count}
+        </span>
+      ) : null}
     </button>
   );
 }
