@@ -62,7 +62,7 @@ export default function IqPropertyDetail() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto bg-white">
           {/* HEADER — address + flavor + status, then pain/todo/action */}
-          <div className="px-6 pt-5 pb-4">
+          <div className="px-6 pt-5 pb-3">
             {/* ROW 1 — Action row mirroring DealCard exactly:
                 ☐ checkbox · pulsing action circle · HIGH (colored text, no
                 pill) · action text (orange bold) · 3 channel shortcuts ·
@@ -107,7 +107,7 @@ export default function IqPropertyDetail() {
 
             {/* ROW 2 — Address + globe · source — status · sales-type ·
                 keywords ........ Opened/Called dates */}
-            <div className="flex items-center flex-wrap gap-x-2 mt-2 text-[13px] text-gray-700 leading-6">
+            <div className="flex items-center flex-wrap gap-x-2 mt-2.5 text-[13px] text-gray-700 leading-6">
               <button
                 type="button"
                 title="More actions"
@@ -142,29 +142,26 @@ export default function IqPropertyDetail() {
               <span className="shrink-0 text-[12px] text-gray-500 cursor-help" title="Keywords pulled from listing remarks">
                 Keywords: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span>
               </span>
-              <span className="ml-auto shrink-0 inline-flex flex-col items-end gap-2">
-                <span className="inline-flex items-center gap-1.5 text-[11.5px] text-gray-500">
-                  <span
-                    className={`font-medium cursor-help ${FRESHNESS[gradeFreshness(property.lastOpenDate)]}`}
-                    title={`Last opened: ${property.lastOpenDate}`}
-                  >
-                    Opened {property.lastOpenDate}
-                  </span>
-                  <span className="text-gray-300">·</span>
-                  <span
-                    className={`font-medium cursor-help ${FRESHNESS[gradeFreshness(property.lastCalledDate)]}`}
-                    title={`Last called: ${property.lastCalledDate}`}
-                  >
-                    Called {property.lastCalledDate}
-                  </span>
+              <span className="ml-auto shrink-0 inline-flex items-center gap-1.5 text-[11.5px] text-gray-500">
+                <span
+                  className={`font-medium cursor-help ${FRESHNESS[gradeFreshness(property.lastOpenDate)]}`}
+                  title={`Last opened: ${property.lastOpenDate}`}
+                >
+                  Opened {property.lastOpenDate}
                 </span>
-                <SecondaryIconStrip detail={detail} />
+                <span className="text-gray-300">·</span>
+                <span
+                  className={`font-medium cursor-help ${FRESHNESS[gradeFreshness(property.lastCalledDate)]}`}
+                  title={`Last called: ${property.lastCalledDate}`}
+                >
+                  Called {property.lastCalledDate}
+                </span>
               </span>
             </div>
 
             {/* ROW 3 — Data row. Same fields as DealCard's bottom row, with
                 hover-only details via the title attribute. */}
-            <div className="flex items-center gap-x-2 flex-wrap mt-2 text-[13px] text-gray-700 leading-6">
+            <div className="flex items-center gap-x-2 flex-wrap mt-2.5 text-[13px] text-gray-700 leading-6">
               <button
                 type="button"
                 title="Comments"
@@ -217,12 +214,15 @@ export default function IqPropertyDetail() {
                   {detail.trackActive ?? 0}A
                 </span>
               </span>
+              <span className="ml-auto shrink-0">
+                <SecondaryIconStrip detail={detail} />
+              </span>
             </div>
           </div>
 
           {/* PROPERTY BASICS — blends with the header above (no divider on
               top); a soft line below separates it from the workflow row. */}
-          <div className="px-6 pb-3 border-b border-gray-100">
+          <div className="px-6 pt-1 pb-4 border-b border-gray-100">
             <div className="text-[13px] text-gray-800 leading-6 min-w-0" title={propertyBasics}>
               {propertyBasics}
             </div>
