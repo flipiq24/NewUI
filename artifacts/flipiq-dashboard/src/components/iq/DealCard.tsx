@@ -687,7 +687,7 @@ export default function DealCard({ property }: { property: DealProperty }) {
             </span>
             <span>
               {" - "}
-              {SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}
+              {property.type.toUpperCase()}
             </span>
             <TipPanel
               title="Source"

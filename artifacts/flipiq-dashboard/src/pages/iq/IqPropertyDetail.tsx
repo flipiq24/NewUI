@@ -135,7 +135,7 @@ export default function IqPropertyDetail() {
                 <span className="font-medium" style={{ color: sourceTextColor(property.source, property.sourceStatus) }}>
                   {property.sourceStatus || (property.source.match(/\s*—\s*(.*)$/)?.[1] ?? "")}
                 </span>
-                <span> - {SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}</span>
+                <span> - {property.type.toUpperCase()}</span>
               </span>
               <span className="shrink-0 text-gray-300">·</span>
               <span className="shrink-0 text-[12px] text-gray-500 cursor-help" title="Keywords pulled from listing remarks">
