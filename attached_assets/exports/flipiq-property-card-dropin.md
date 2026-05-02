@@ -5,14 +5,13 @@ property row in the screenshot:
 
 > ☐  📞 **MID** **No response — send offer**  📞● 💬● ✉●  **Critical**            15% Outreach Sent ▾
 >                                                                                       Opened 04/22 · Called —   ← red text (cold)
-> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · STD · ● Keywords: **High** · Source: MLS — Active   ← only the `High` value is red; `Keywords:` stays gray
+> ⋮   1842 Camino Del Sol, Riverside, CA 92506 · ● Keywords: **High** · MLS — STD - **Active**   ← only the `High` value is red; `Keywords:` stays gray. Source label is consolidated `origin — type - status` (no `Source:` prefix); only the status keeps its color.
 > 💬  **525k** · 77% ARV · ● Pain: Mid · ● Agent: Not Responsive · ISC: **11** · **5A** / 8P / 2B / 41S   ← `ISC` blue when > 0, gray when 0; `5A` orange when > 0
 
 Every chip / icon / value has a hover tooltip:
 - **Next Step** — task / who / what / how / context
 - **Property** — type, beds/baths, sq ft, lot, year, etc.
-- **Sales Type** — code → full label (STD = Standard, REO, NOD, …)
-- **Source** — source / status / negotiator / assigned
+- **Source** — consolidated `origin — sales-type - status` label (e.g. `MLS — STD - Active`). Tooltip shows raw source, status, sales-type code → full label (STD = Standard, REO, NOD, …), and property type. There is no separate Sales Type chip — its data lives in this label and tooltip.
 - **Price History** — every list-price change + total reduction
 - **ARV** — asking vs ARV percentage
 - **Seller Pain** — DOM, price drops, showings, equity, propensity
@@ -838,20 +837,8 @@ export default function DealCard({
             {ICON.globe}
           </button>
           <span className="shrink-0 text-gray-300">·</span>
-          <span className="shrink-0 relative group cursor-help text-gray-700 font-medium hover:text-gray-900">
-            {property.type}
-            <TipPanel
-              title="Sales Type"
-              rows={[
-                ["Sales Type",   `${property.type} — ${SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}`],
-                ["Property Type", property.propertyType],
-              ]}
-            />
-          </span>
-          <span className="shrink-0 text-gray-300">·</span>
-          {/* Keywords — right after sales type (it's property data).
-              Label color mirrors the dot via KW_TEXT — high = red,
-              mid = amber, low = gray. */}
+          {/* Keywords — right after address. Label color mirrors the dot via
+              KW_TEXT — high = red, mid = amber, low = gray. */}
           <span className="shrink-0 relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
             <span>Keywords: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span></span>
@@ -863,11 +850,16 @@ export default function DealCard({
             </TipPanel>
           </span>
           <span className="shrink-0 text-gray-300">·</span>
-          <span className="shrink-0 relative group cursor-help text-gray-500 hover:text-gray-900">
-            Source:{" "}
-            <span className="text-gray-700 font-medium">
+          {/* Consolidated source — no "Source:" prefix. Format: `MLS — STD - Active`
+              (origin · sales type · status). The status segment keeps its color
+              via sourceTextColor(). The Sales Type chip is gone — its data lives
+              in this composite label and in the Source tooltip. */}
+          <span className="shrink-0 relative group cursor-help text-gray-700 font-medium hover:text-gray-900">
+            <span>
               {property.source.replace(/\s*—\s*.*$/, "")}
-              {property.sourceStatus || /\s*—\s*/.test(property.source) ? " — " : ""}
+              {" — "}
+              {property.type}
+              {" - "}
             </span>
             <span className="font-medium" style={{ color: sourceTextColor(property.source, property.sourceStatus) }}>
               {property.sourceStatus || (property.source.match(/\s*—\s*(.*)$/)?.[1] ?? "")}
@@ -877,6 +869,8 @@ export default function DealCard({
               rows={[
                 ["Source", property.source],
                 ...(property.sourceStatus ? ([["Status", property.sourceStatus]] as [string, string][]) : []),
+                ["Sales Type",   `${property.type} — ${SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}`],
+                ["Property Type", property.propertyType],
               ]}
             />
           </span>
@@ -1329,9 +1323,8 @@ The tooltip content sources:
 | 1   | Channel chips after the response (call/text/mail) | `Call — Positive` etc. via `TipPanel` | Hover renders `ChannelPreview` (last sent + last reply for that channel from `detail.commLog[key]`). Click opens `<CommunicationDialog>` — full thread bubbles (sent right/orange, reply left/gray) + composer. Modal closes on overlay, `Escape`, or `×`. |
 | 1   | Inline flag `Critical` / `Reminder`  | none — plain word       | rendered when `notifications` includes `"critical"` (red) or `"reminder"` (blue)       |
 | 2 (property) | Address                       | `Property`              | `prop` rows                                                                            |
-| 2 (property) | Sales-type code (e.g. `STD`)  | `Sales Type`            | code + full label, property type                                                       |
 | 2 (property) | `● Keywords: Mid` (next to STD) | `Listing Remarks`     | dot color from `KW_DOT[detail.kw]`. The literal `Keywords:` prefix stays the row's default gray — **only the `kwLabel` value** (`High` / `Mid` / `Low`) is colored via `KW_TEXT[detail.kw]` (high = **red #E24B4A semibold**, mid = amber #BA7517, low = gray #B4B2A9). Tooltip: `pubCmt` + `agtCmt` with red `<span class="kw">…</span>` pills |
-| 2 (property) | `Source: MLS — Active`        | `Source`                | source / status / negotiator / assigned                                                |
+| 2 (property) | `MLS — STD - Active` (no `Source:` prefix) | `Source` | Consolidated `origin — sales-type - status` label. Origin (`MLS`) and type (`STD`/`REO`) render in `text-gray-700 font-medium`; the status segment (`Active`/`Pending`/etc.) is colored via `sourceTextColor(property.source, property.sourceStatus)`. Tooltip rows: `Source` (raw `property.source`), optional `Status`, `Sales Type` (code + full label from `SALES_TYPE_LABELS`), `Property Type`. The standalone Sales-Type chip is removed — its data is embedded here. |
 | 3 (deal)     | `525k` (semibold, gray-900, no `$`) | `Price History`   | `priceHist` + `priceTotal`. Rendered via `compactPrice(property.price)` — drops `$`, collapses zeros to `k` / `m` |
 | 3 (deal)     | `77% ARV`                     | `ARV`                   | asking vs ARV                                                                          |
 | 3 (deal)     | `● Pain: Mid` (after ARV)     | `Seller Pain`           | dot color from `PAIN_DOT[detail.pain]`, label from `detail.painLabel`, tooltip rows from `detail.painSig`. Mirrors the Row 1 chip — Row 1 is the at-a-glance signal, this is the inline data label. |

@@ -613,20 +613,8 @@ export default function DealCard({ property }: { property: DealProperty }) {
             {ICON.globe}
           </button>
           <span className="shrink-0 text-gray-300">·</span>
-          <span className="shrink-0 relative group cursor-help text-gray-700 font-medium hover:text-gray-900">
-            {property.type}
-            <TipPanel
-              title="Sales Type"
-              rows={[
-                ["Sales Type", `${property.type} — ${SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}`],
-                ["Property Type", property.propertyType],
-              ]}
-            />
-          </span>
-          <span className="shrink-0 text-gray-300">·</span>
-          {/* Keywords — right after sales type (it's property data).
-              Label color mirrors the dot via KW_TEXT — high = red,
-              mid = amber, low = gray. */}
+          {/* Keywords — right after address. Label color mirrors the dot via
+              KW_TEXT — high = red, mid = amber, low = gray. */}
           <span className="shrink-0 relative group cursor-help inline-flex items-center gap-1.5 text-[12px] text-gray-500 hover:text-gray-900">
             <span className={`w-1.5 h-1.5 rounded-full ${KW_DOT[detail.kw]}`} />
             <span>Keywords: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span></span>
@@ -638,11 +626,14 @@ export default function DealCard({ property }: { property: DealProperty }) {
             </TipPanel>
           </span>
           <span className="shrink-0 text-gray-300">·</span>
-          <span className="shrink-0 relative group cursor-help text-gray-500 hover:text-gray-900">
-            Source:{" "}
-            <span className="text-gray-700 font-medium">
+          {/* Consolidated source — no "Source:" prefix. Format: `MLS — STD - Active`
+              (origin · sales type · status). The status segment keeps its color. */}
+          <span className="shrink-0 relative group cursor-help text-gray-700 font-medium hover:text-gray-900">
+            <span>
               {property.source.replace(/\s*—\s*.*$/, "")}
-              {property.sourceStatus || /\s*—\s*/.test(property.source) ? " — " : ""}
+              {" — "}
+              {property.type}
+              {" - "}
             </span>
             <span
               className="font-medium"
@@ -655,6 +646,8 @@ export default function DealCard({ property }: { property: DealProperty }) {
               rows={[
                 ["Source", property.source],
                 ...(property.sourceStatus ? ([["Status", property.sourceStatus]] as [string, string][]) : []),
+                ["Sales Type", `${property.type} — ${SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}`],
+                ["Property Type", property.propertyType],
               ]}
             />
           </span>
