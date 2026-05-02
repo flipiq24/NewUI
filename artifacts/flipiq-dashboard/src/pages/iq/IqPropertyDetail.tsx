@@ -62,6 +62,15 @@ export default function IqPropertyDetail() {
             then Back on the right. */}
         <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2 min-w-0">
+            <button
+              onClick={() => navigate("/iq/deal-review")}
+              className="shrink-0 text-gray-500 hover:text-orange-500 cursor-pointer p-1 -ml-1"
+              title="Back to Deal Review"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="10,3 5,8 10,13" />
+              </svg>
+            </button>
             <span className="text-sm text-gray-500 truncate">
               <button
                 onClick={() => navigate("/iq/deal-review")}
