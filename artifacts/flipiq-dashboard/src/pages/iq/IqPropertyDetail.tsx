@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState, type ReactNode } from "react";
 import { useParams, useLocation } from "wouter";
 import Sidebar from "@/components/Sidebar";
 import IqTopBar from "@/components/iq/IqTopBar";
@@ -18,26 +18,26 @@ import {
 } from "@/components/iq/DealCard";
 
 /**
- * Property detail page — wide horizontal layout (header + 5 metric cards
- * + tabs + body). Mounted on /iq/deal-review/:address. The DealCard row
- * navigates here when its address is clicked.
+ * Property detail page — simplified, workflow-driven layout.
  *
- * The page is intentionally a flat, scannable read view — no nested
- * hover-only tooltips. Everything that lives behind a tooltip in DealCard
- * gets surfaced as plain rows here so the rep can act in one glance.
- *
- * Color logic and channel-aware playbook are imported from DealCard so
- * both surfaces stay in lockstep (PAIN_*, SOURCE_COLORS, REC_COPY,
- * recommendedChannel).
+ * - Header: address + globe + edit + "agent has N other listings" + status pill.
+ *   Secondary tabs (Notes / Comms / Reminders / Activity / Tax) hidden behind
+ *   icons on the right of the breadcrumb row (hover-revealed labels).
+ * - Workflow tabs: PIQ → Comps → Investment Analysis → Agent → Offer Terms,
+ *   shown as a numbered stepper with completion state.
+ * - Metric cards: Simple / Detailed toggle. Simple mode shows just the
+ *   headline number per card; Detailed shows everything.
+ * - Body panels reuse the same channel-aware playbook + color tokens from
+ *   DealCard so both surfaces stay in lockstep.
  */
 export default function IqPropertyDetail() {
   const params = useParams<{ address: string }>();
   const [, navigate] = useLocation();
   const decoded = decodeURIComponent(params.address ?? "");
 
-  // Look up by exact address match first; if the URL is the literal `:address`
-  // placeholder or any other unmatched value, fall back to the first deal so
-  // the page is always navigable as a demo entry point.
+  // Look up by exact address; fall back to the first deal so the page is
+  // always navigable as a demo entry point (e.g. when visiting the literal
+  // `:address` placeholder URL).
   const property = useMemo<DealProperty>(() => {
     const match = DEAL_REVIEW_PROPERTIES.find((p) => p.address === decoded);
     return match ?? DEAL_REVIEW_PROPERTIES[0];
@@ -45,6 +45,8 @@ export default function IqPropertyDetail() {
   const detail: DealDetail = DEAL_DETAILS[property.id];
 
   const rec = recommendedChannel(detail);
+  const [detailed, setDetailed] = useState(false);
+  const [activeStep, setActiveStep] = useState("PIQ");
 
   return (
     <div className="flex h-screen bg-[#f5f6f8] overflow-hidden">
@@ -52,7 +54,7 @@ export default function IqPropertyDetail() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <IqTopBar />
 
-        {/* Breadcrumb */}
+        {/* Breadcrumb + secondary-tab icon strip + Back */}
         <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
           <span className="text-sm text-gray-500">
             <button
@@ -66,23 +68,26 @@ export default function IqPropertyDetail() {
               {property.address.split(",")[0]}
             </span>
           </span>
-          <button
-            onClick={() => navigate("/iq/deal-review")}
-            className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider hover:text-orange-500 transition-colors cursor-pointer inline-flex items-center gap-1.5"
-          >
-            <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="10,3 5,8 10,13" />
-            </svg>
-            Back
-          </button>
+          <div className="flex items-center gap-1">
+            <SecondaryIconStrip detail={detail} />
+            <span className="w-px h-5 bg-gray-200 mx-2" />
+            <button
+              onClick={() => navigate("/iq/deal-review")}
+              className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider hover:text-orange-500 transition-colors cursor-pointer inline-flex items-center gap-1.5"
+            >
+              <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="10,3 5,8 10,13" />
+              </svg>
+              Back
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto bg-white">
-          {/* HEADER BAR — address, source, status pill, pain, To do, action */}
-          <div className="px-6 pt-6 pb-4 border-b border-gray-100">
-            {/* Row 1 — address + status pill */}
+          {/* HEADER — address + flavor + status, then pain/todo/action */}
+          <div className="px-6 pt-5 pb-4 border-b border-gray-100">
             <div className="flex items-start justify-between gap-4 mb-3">
-              <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex items-center gap-2.5 min-w-0 flex-wrap">
                 <h1 className="text-[20px] font-bold text-gray-900 truncate">
                   {property.address}
                 </h1>
@@ -98,14 +103,20 @@ export default function IqPropertyDetail() {
                     <path d="M3 13l2-.5 7-7-1.5-1.5-7 7L3 13z" />
                   </svg>
                 </button>
+                <span className="text-[12.5px] text-orange-600 font-medium ml-1">
+                  Agent has 3 other listings
+                </span>
               </div>
               <div className="shrink-0 flex items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 text-[13px] text-gray-700 border border-gray-300 rounded-full px-3 py-1">
                   <span className="font-semibold">{property.offerPct}%</span>
                   <span>{property.offerLabel}</span>
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-3 h-3 text-gray-400 ml-0.5">
+                    <polyline points="4,6 8,10 12,6" />
+                  </svg>
                 </span>
-                <button className="text-gray-400 hover:text-gray-700 cursor-pointer p-1" title="More">
-                  <svg viewBox="0 0 16 16" fill="currentColor" className="w-3.5 h-3.5">
+                <button className="text-gray-400 hover:text-gray-700 cursor-pointer p-1 border border-gray-200 rounded-full" title="More">
+                  <svg viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3">
                     <circle cx="8" cy="3" r="1.4" />
                     <circle cx="8" cy="8" r="1.4" />
                     <circle cx="8" cy="13" r="1.4" />
@@ -114,49 +125,56 @@ export default function IqPropertyDetail() {
               </div>
             </div>
 
-            {/* Row 2 — source · sales type · keywords */}
-            <div className="flex items-center gap-2 text-[13px] text-gray-700 mb-3">
-              <span className="font-medium">
-                {property.source.replace(/\s*—\s*.*$/, "")}
-                {" — "}
-                <span style={{ color: sourceTextColor(property.source, property.sourceStatus) }}>
-                  {property.sourceStatus || (property.source.match(/\s*—\s*(.*)$/)?.[1] ?? "")}
-                </span>
-                {" - "}
-                {SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}
-              </span>
-              <span className="text-gray-300">·</span>
-              <span className="text-[12px] text-gray-500">
-                Keywrds: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span>
-              </span>
-            </div>
-
-            {/* Row 3 — pain pill · To do · channel-aware action */}
-            <div className="flex items-center gap-3">
+            {/* Pain + To do + action — single tight row, no extra source line */}
+            <div className="flex items-center gap-3 flex-wrap">
               <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold uppercase tracking-wide bg-gray-50 border border-gray-200 ${PAIN_TEXT[detail.pain]}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${PAIN_DOT[detail.pain]}`} />
-                Pain: {detail.painLabel}
+                {detail.painLabel}
               </span>
-              <span className="text-gray-300">·</span>
               <label className="inline-flex items-center gap-2 cursor-pointer text-[13px] text-gray-700">
                 <input type="checkbox" className="w-3.5 h-3.5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer" />
                 <span>To do: <span className="font-medium text-gray-900">{property.nextSteps}</span></span>
               </label>
               <span className="text-gray-300">·</span>
               <ActionCircle channel={rec} />
+              <span className="text-gray-300">·</span>
+              <span className="text-[12px] text-gray-500">
+                {property.source.replace(/\s*—\s*.*$/, "")}{" — "}
+                <span style={{ color: sourceTextColor(property.source, property.sourceStatus) }}>
+                  {property.sourceStatus || (property.source.match(/\s*—\s*(.*)$/)?.[1] ?? "")}
+                </span>
+                {" · "}
+                {SALES_TYPE_LABELS[property.type.toUpperCase()] ?? property.type}
+                {" · "}
+                Keywrds: <span className={KW_TEXT[detail.kw]}>{detail.kwLabel}</span>
+              </span>
             </div>
           </div>
 
-          {/* 5 METRIC CARDS — wide horizontal layout */}
-          <div className="px-6 py-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
-            <MetricCard label="Property Details">
+          {/* METRIC CARDS with Simple / Detailed toggle */}
+          <div className="px-6 pt-4 pb-2 flex items-center justify-between">
+            <div className="text-[11px] uppercase tracking-wider font-semibold text-gray-400">
+              Snapshot
+            </div>
+            <SimpleDetailedToggle value={detailed} onChange={setDetailed} />
+          </div>
+          <div className="px-6 pb-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+            <MetricCard
+              label="Property Details"
+              headline={`${property.propertyType} · ${property.beds} Br`}
+              detailed={detailed}
+            >
               <div className="text-[13px] text-gray-800 leading-6">
                 {property.propertyType} / {property.beds} Br / {property.baths} Ba / {property.garage} Gar /{" "}
                 {property.year} / {property.sqft} / {property.lotSqft} / Pool: {property.pool}
               </div>
             </MetricCard>
 
-            <MetricCard label="List Price">
+            <MetricCard
+              label="List Price"
+              headline={compactPrice(property.price)}
+              detailed={detailed}
+            >
               <div className="text-[18px] font-bold text-gray-900 mb-1">{compactPrice(property.price)}</div>
               <div className="text-[12px] text-gray-600 mb-1.5">
                 Propensity: <span className="font-semibold text-orange-500">{property.propensityScore ?? "—"}</span>
@@ -173,7 +191,11 @@ export default function IqPropertyDetail() {
               )}
             </MetricCard>
 
-            <MetricCard label="Market Info">
+            <MetricCard
+              label="Market Info"
+              headline={`${property.days} Days · ${property.sourceStatus || "—"}`}
+              detailed={detailed}
+            >
               <div className="text-[13px] text-gray-900 font-semibold">
                 {property.days} Days{" "}
                 <span
@@ -191,7 +213,11 @@ export default function IqPropertyDetail() {
               </div>
             </MetricCard>
 
-            <MetricCard label="Evaluation Metrics">
+            <MetricCard
+              label="Evaluation Metrics"
+              headline={`${detail.arvPct} ARV`}
+              detailed={detailed}
+            >
               <div className="text-[13px] text-gray-900">
                 Asking VS ARV: <span className="font-bold">{detail.arvPct}</span>
               </div>
@@ -204,25 +230,37 @@ export default function IqPropertyDetail() {
               </div>
             </MetricCard>
 
-            <MetricCard label="Last Open / Last Communication">
+            <MetricCard
+              label="Last Open / Last Comm"
+              headline={`LOD ${property.lastOpenDate}`}
+              detailed={detailed}
+            >
               <div className="text-[13px] text-gray-900">LOD: {property.lastOpenDate}</div>
               <div className="text-[12px] text-emerald-600 mt-0.5">{property.lastOpenNote}</div>
               <div className="text-[12px] text-gray-700 mt-1.5">LCD: {property.lastCalledDate}</div>
             </MetricCard>
           </div>
 
-          {/* TABS ROW */}
-          <PropertyTabs />
+          {/* WORKFLOW STEPPER — PIQ → Offer Terms */}
+          <WorkflowStepper active={activeStep} onChange={setActiveStep} />
 
-          {/* PIQ TAB BODY — recommended action + comms + price history + remarks */}
-          <div className="px-6 py-6 grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <RecommendedActionPanel detail={detail} channel={rec} />
-            <CommunicationsPanel detail={detail} />
-            <PriceHistoryPanel detail={detail} />
-            <ListingRemarksPanel detail={detail} />
-            <PainSignalsPanel detail={detail} />
-            <AssignmentsPanel detail={detail} />
-          </div>
+          {/* PIQ TAB BODY */}
+          {activeStep === "PIQ" && (
+            <div className="px-6 py-6 grid grid-cols-1 lg:grid-cols-3 gap-5">
+              <RecommendedActionPanel detail={detail} channel={rec} />
+              <CommunicationsPanel detail={detail} />
+              <PriceHistoryPanel detail={detail} />
+              <ListingRemarksPanel detail={detail} />
+              <PainSignalsPanel detail={detail} />
+              <AssignmentsPanel detail={detail} />
+            </div>
+          )}
+          {activeStep !== "PIQ" && (
+            <div className="px-6 py-16 text-center text-gray-400 text-sm">
+              <span className="font-medium text-gray-500">{activeStep}</span> step is
+              not yet wired up — keep going through the workflow above.
+            </div>
+          )}
         </div>
         <IqAskBar />
       </div>
@@ -232,21 +270,179 @@ export default function IqPropertyDetail() {
 
 /* ───────────── presentational helpers ───────────── */
 
-function MetricCard({ label, children }: { label: string; children: React.ReactNode }) {
+/**
+ * Five small icons for the secondary nav (Notes / Comms / Reminders /
+ * Activity / Tax Data). Hover reveals a label tooltip — keeps the header
+ * dense without sacrificing access.
+ */
+function SecondaryIconStrip({ detail }: { detail: DealDetail }) {
+  const commCount = detail.commLog
+    ? (["call", "text", "email"] as const).reduce((n, k) => {
+        const c = detail.commLog?.[k];
+        return n + (c?.lastSent ? 1 : 0) + (c?.lastReply ? 1 : 0);
+      }, 0)
+    : 0;
+  const items: { key: string; title: string; badge?: number; icon: ReactNode }[] = [
+    {
+      key: "notes",
+      title: "Property Notes",
+      icon: (
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5">
+          <path d="M3 2h7l3 3v9H3V2z" />
+          <polyline points="10,2 10,5 13,5" />
+          <line x1="5" y1="8" x2="11" y2="8" />
+          <line x1="5" y1="11" x2="11" y2="11" />
+        </svg>
+      ),
+    },
+    {
+      key: "comms",
+      title: "Communications",
+      badge: commCount,
+      icon: (
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5">
+          <path d="M2 3.5h12v7H6.5L3.5 13v-2.5H2v-7z" />
+        </svg>
+      ),
+    },
+    {
+      key: "reminders",
+      title: "Reminders",
+      icon: (
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5">
+          <circle cx="8" cy="9" r="5.5" />
+          <polyline points="8,6 8,9 10,10.5" />
+          <line x1="6" y1="2" x2="3.5" y2="4" />
+          <line x1="10" y1="2" x2="12.5" y2="4" />
+        </svg>
+      ),
+    },
+    {
+      key: "activity",
+      title: "Activity",
+      icon: (
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5">
+          <polyline points="2,9 5,9 7,4 9,12 11,7 14,7" />
+        </svg>
+      ),
+    },
+    {
+      key: "tax",
+      title: "Tax Data",
+      icon: (
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-3.5 h-3.5">
+          <rect x="2.5" y="2.5" width="11" height="11" rx="1" />
+          <line x1="2.5" y1="6" x2="13.5" y2="6" />
+          <line x1="6" y1="6" x2="6" y2="13.5" />
+        </svg>
+      ),
+    },
+  ];
+  return (
+    <div className="flex items-center gap-0.5">
+      {items.map((it) => (
+        <button
+          key={it.key}
+          title={it.badge ? `${it.title} (${it.badge})` : it.title}
+          className="relative inline-flex items-center justify-center w-7 h-7 rounded-md text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-colors cursor-pointer"
+        >
+          {it.icon}
+          {it.badge ? (
+            <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center min-w-[14px] h-[14px] px-1 rounded-full bg-orange-500 text-white text-[9px] font-bold leading-none">
+              {it.badge}
+            </span>
+          ) : null}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Two-state pill toggle for Simple vs Detailed metric-card view. */
+function SimpleDetailedToggle({
+  value,
+  onChange,
+}: {
+  value: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <div className="inline-flex bg-gray-100 rounded-full p-0.5 text-[11px] font-semibold">
+      <button
+        type="button"
+        onClick={() => onChange(false)}
+        className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${
+          !value ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+        }`}
+      >
+        Simple
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange(true)}
+        className={`px-3 py-1 rounded-full transition-colors cursor-pointer ${
+          value ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+        }`}
+      >
+        Detailed
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Collapsible metric card. Simple mode = headline only; Detailed = full
+ * children. Each card is also independently togglable via the chevron.
+ */
+function MetricCard({
+  label,
+  headline,
+  detailed,
+  children,
+}: {
+  label: string;
+  headline: string;
+  detailed: boolean;
+  children: ReactNode;
+}) {
+  const [override, setOverride] = useState<boolean | null>(null);
+  const expanded = override ?? detailed;
   return (
     <div className="border border-gray-200 rounded-lg p-4 bg-white">
-      <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mb-2">
-        {label}
-      </div>
-      {children}
+      <button
+        type="button"
+        onClick={() => setOverride(!expanded)}
+        className="w-full flex items-center justify-between mb-2 cursor-pointer group"
+      >
+        <span className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
+          {label}
+        </span>
+        <svg
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          className={`w-3 h-3 text-gray-300 group-hover:text-gray-500 transition-transform ${
+            expanded ? "rotate-180" : ""
+          }`}
+        >
+          <polyline points="4,6 8,10 12,6" />
+        </svg>
+      </button>
+      {expanded ? (
+        children
+      ) : (
+        <div className="text-[14px] font-semibold text-gray-900 leading-tight">
+          {headline}
+        </div>
+      )}
     </div>
   );
 }
 
 /**
  * Channel-aware action circle — same logic & colors as the orange action
- * circle on Row 1 of DealCard. The icon and label both reflect the
- * recommended channel for THIS deal.
+ * circle on Row 1 of DealCard.
  */
 function ActionCircle({ channel }: { channel: RecChannel }) {
   const copy = REC_COPY[channel];
@@ -269,34 +465,78 @@ function ActionCircle({ channel }: { channel: RecChannel }) {
   );
 }
 
-function PropertyTabs() {
-  const [active, setActive] = useState("PIQ");
-  const left = ["PIQ", "Comps", "Investment Analysis", "Agent", "Offer Terms"];
-  const right = ["Property Notes", "Communications", "Reminders", "Activity", "Tax Data"];
-  function Tab({ label }: { label: string }) {
-    const isActive = active === label;
-    return (
-      <button
-        onClick={() => setActive(label)}
-        className={`px-3 py-1.5 text-[12.5px] font-medium rounded-md transition-colors cursor-pointer ${
-          isActive
-            ? "bg-orange-500 text-white"
-            : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-        }`}
-      >
-        {label}
-      </button>
-    );
-  }
+/**
+ * Workflow stepper — PIQ → Comps → Investment Analysis → Agent → Offer
+ * Terms. Steps before active are "complete" (green check), active is
+ * orange, future is muted gray. Click to jump.
+ */
+function WorkflowStepper({
+  active,
+  onChange,
+}: {
+  active: string;
+  onChange: (s: string) => void;
+}) {
+  const steps = ["PIQ", "Comps", "Investment Analysis", "Agent", "Offer Terms"];
+  const activeIdx = steps.indexOf(active);
   return (
-    <div className="px-6 py-3 border-y border-gray-100 bg-gray-50/50 flex items-center justify-between flex-wrap gap-2">
-      <div className="flex items-center gap-1">{left.map((l) => <Tab key={l} label={l} />)}</div>
-      <div className="flex items-center gap-1">{right.map((l) => <Tab key={l} label={l} />)}</div>
+    <div className="px-6 py-4 border-y border-gray-100 bg-gray-50/40">
+      <div className="flex items-center justify-between gap-1 max-w-3xl mx-auto">
+        {steps.map((step, i) => {
+          const isActive = i === activeIdx;
+          const isComplete = i < activeIdx;
+          return (
+            <Fragment key={step}>
+              <button
+                type="button"
+                onClick={() => onChange(step)}
+                className="flex flex-col items-center gap-1.5 cursor-pointer group min-w-0"
+              >
+                <span
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold transition-colors ${
+                    isActive
+                      ? "bg-orange-500 text-white ring-4 ring-orange-100"
+                      : isComplete
+                      ? "bg-emerald-500 text-white"
+                      : "bg-gray-200 text-gray-500 group-hover:bg-gray-300"
+                  }`}
+                >
+                  {isComplete ? (
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3 h-3">
+                      <polyline points="3,8 7,12 13,4" />
+                    </svg>
+                  ) : (
+                    i + 1
+                  )}
+                </span>
+                <span
+                  className={`text-[11px] font-medium whitespace-nowrap ${
+                    isActive
+                      ? "text-orange-600"
+                      : isComplete
+                      ? "text-emerald-700"
+                      : "text-gray-500 group-hover:text-gray-700"
+                  }`}
+                >
+                  {step}
+                </span>
+              </button>
+              {i < steps.length - 1 && (
+                <div
+                  className={`flex-1 h-px mx-1 mb-5 transition-colors ${
+                    i < activeIdx ? "bg-emerald-300" : "bg-gray-200"
+                  }`}
+                />
+              )}
+            </Fragment>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
-function PanelCard({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
+function PanelCard({ title, children, className = "" }: { title: string; children: ReactNode; className?: string }) {
   return (
     <div className={`border border-gray-200 rounded-lg p-4 bg-white ${className}`}>
       <div className="text-[11px] uppercase tracking-wider font-semibold text-orange-600 mb-2.5">
@@ -319,12 +559,8 @@ function RecommendedActionPanel({ detail, channel }: { detail: DealDetail; chann
       </div>
       <p className="text-[12.5px] text-gray-700 leading-relaxed mb-3">{copy.tip}</p>
       <div className="border-t border-gray-100 pt-3 space-y-1.5 text-[12.5px]">
-        {detail.taskWho && (
-          <Row label="Who" value={detail.taskWho} />
-        )}
-        {detail.taskWhat && (
-          <Row label="What" value={detail.taskWhat} />
-        )}
+        {detail.taskWho && <Row label="Who" value={detail.taskWho} />}
+        {detail.taskWhat && <Row label="What" value={detail.taskWhat} />}
         <Row label="How" value={copy.how} />
       </div>
     </PanelCard>
@@ -479,4 +715,3 @@ function KwHtml({ html }: { html: string }) {
     </p>
   );
 }
-
